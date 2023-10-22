@@ -111,7 +111,7 @@ int main()
     cout << "=== Dataset Loading ===\n";
     cout << " Enter the Path of the CSV : \n";
     //cin >>;
-    Dataset D{"Documents/methode_ensemblistes_modelisation/datasets/d1.csv"};
+    Dataset D{"methode_ensemblistes_modelisation/datasets/d1.csv"};
     D.print();
     return 0;
 }
