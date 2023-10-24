@@ -6,6 +6,7 @@
 #include <sstream> // std::stringstream
 
 #include "data_loading.h"
+#include "decision_tree.h"
 
 using namespace std;
 
