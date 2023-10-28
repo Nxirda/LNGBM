@@ -31,8 +31,8 @@ class Dataset
         void print() const;
         // Dans votre classe Dataset
 
-        bool size() const {
-        return Values.size();
+        bool empty() const {
+        return Values.empty();
         }
 
 };
