@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <iterator>
 
 #include "decision_tree.h"
 
@@ -115,27 +116,56 @@ std::vector<Dataset> Data_Splitting_in_two(const Dataset& data)
     std::vector<std::string> subLabels2;
     std::vector<std::vector<float>> subSet2;
 
-    for(int i = 0; i<data.Label_length(); ++i)
+    for(int i = 0; i < data.Label_length(); ++i)
     {
-        if (i < data.Entries_size() / 2)
+
+        /* Splitting the labels */
+        if(i < data.Label_length()/2)
         {
             subLabels1.push_back(data.get_Labels()[i]);
-            subSet1.push_back(data.get_Values()[i]);
         }
-
         else
         {
             subLabels2.push_back(data.get_Labels()[i]);
-            subSet2.push_back(data.get_Values()[i]);
         }
+        
+        /* Splitting the datas accordingly */
+        //We get the current line (easier to manipulate)
+        vector<float> curr_line = data.get_Values()[i];
+
+        vector<float> left;
+        vector<float> right;
+
+        //We define an iterator that splits de columns in two parts (half)
+        vector<float>::iterator middleItr(curr_line.begin() + curr_line.size() / 2);
+
+        //Loop to put the datas in the half it belongs to 
+        for (auto it = curr_line.begin(); it != curr_line.end(); ++it)
+        {
+            if (std::distance(it, middleItr) > 0) 
+            {
+                left.push_back(*it);
+            }
+            else 
+            {
+                right.push_back(*it);
+            }
+        }
+        
+        //
+        subSet1.push_back(left);
+        subSet2.push_back(right);
+
     }
 
-    Dataset subset_1 {subLabels1, subSet1};
-    Dataset subset_2 {subLabels2, subSet2};
+    //Create two "new" Datasets
+    Dataset First_Half  {subLabels1, subSet1};
+    Dataset Second_Half {subLabels2, subSet2};
 
+    //Cast the two half in a vector (could be an array at some point)
     std::vector<Dataset> res;
-    res.push_back(subset_1);
-    res.push_back(subset_2);
+    res.push_back(First_Half);
+    res.push_back(Second_Half);
 
     return (res);
 }

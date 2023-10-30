@@ -4,7 +4,7 @@ project(PPN)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(data_loading data_loading.cpp decision_tree.cpp)
+add_executable(Projet_run data_loading.cpp decision_tree.cpp)
 
 
 
