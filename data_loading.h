@@ -29,6 +29,12 @@ class Dataset
 
         //Methods
         void print() const;
+        // Dans votre classe Dataset
+
+        bool empty() const {
+        return Values.empty();
+        }
+
 };
 
 #endif
