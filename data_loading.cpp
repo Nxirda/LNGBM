@@ -6,7 +6,6 @@
 #include <sstream> // std::stringstream
 
 #include "data_loading.h"
-#include "decision_tree.h"
 
 using namespace std;
 
@@ -74,11 +73,23 @@ Dataset::Dataset(string FilePath)
     file.close();
 }
 
+/* Explicit Constructor */
+/* Use : First Argument : Labels | second : Values*/
+Dataset::Dataset(vector<string> L, vector<vector<float>> V)
+{
+    this->Labels = L;
+    this->Values = V;
+}
+
+/* Default Constructor */
+Dataset::Dataset(){}
+
+
 /* Naive print function of the Dataset */
 void Dataset::print() const
 {
     // Logical but Prints the Labels
-    for(int i = 0; i < int(this->Labels.size()); ++i)
+    for(int i = 0; i < this->Labels.size(); ++i)
     {
         cout << Labels[i] << "\t";
     }
@@ -86,7 +97,7 @@ void Dataset::print() const
     // Logical but Prints the Values
     for(int i = 0; i < int(this->Values.size()); ++i)
     {
-        for(int j = 0; j < int(this->Values[0].size()); ++j)
+        for(int j = 0; j < this->Values[0].size(); ++j)
         {
             cout << Values[i][j] << "|\t";
         }
@@ -107,12 +118,21 @@ vector<vector<float>> Dataset::get_Values() const
     return this->Values;
 }
 
-int main()
+/* Return True if there are no values in the Dataset */
+bool Dataset::empty() const 
 {
-    cout << "=== Dataset Loading ===\n";
-    cout << " Enter the Path of the CSV : \n";
-    //cin >>;
-    Dataset D{"methode_ensemblistes_modelisation/datasets/d1.csv"};
-    D.print();
-    return 0;
+    return this->Values.empty();
 }
+
+/* Return the length (= number of Labels) of the Dataset */
+int Dataset::Label_length() const
+{
+    return this->get_Labels().size();
+}
+
+/* Return the height (= number of entries)  of the Dataset*/
+int Dataset::Entries_size() const
+{
+    return this->get_Values()[0].size();
+}
+

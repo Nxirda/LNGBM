@@ -2,21 +2,47 @@
 #include <string>
 #include <vector>
 
+#include "data_loading.h"
+
 #ifndef DecisionTree_H_
 #define DecisionTree_H_
 
-#include "data_loading.h"
+// Node Class
+class TreeNode{ 
+	protected:
+		//Parameters
+		Dataset data;
+		//Division Function to be added
+		
+	public:
+		//Constructor
+		TreeNode();
+		TreeNode(const Dataset& d);
 
-struct DecisionTree { // Classe arbre de désion 
+		//Getters
+		Dataset get_Dataset();
 
-	struct TreeNode{ // Classe d'un noeud
+		//Methods
+				
+};
 
- 		std::string label;
- 		std::string attribute;
- 		TreeNode* Right; //pointeur du sous arbre droit
- 		TreeNode* Left; //pointeur du sous arbre gauche
+// Binary Search Tree Class
+class DecisionTree { 
+	protected:
+		//Parameters
+		DecisionTree* Parent;
+		TreeNode   Curr_Node; // Actual Node with properties
+		DecisionTree*  Right; // Right Node pointer
+		DecisionTree*   Left; // Left  Node pointer
+	
+	public :
+		//Constructor
+		DecisionTree(const Dataset& data);
 
-	};
+		//Methods
+		TreeNode get_Current_Node();
+		DecisionTree   *buildTree();
+
 };
 
 #endif
