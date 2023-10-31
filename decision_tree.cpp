@@ -24,7 +24,7 @@ TreeNode::TreeNode(const Dataset& d)
     this->data = d;
 }
 
-/* Override = operator so it points to a TreeNode */
+/* Override "=" operator */
 TreeNode &TreeNode::operator= (TreeNode const& TN)
 {
     data = get_Dataset(); 
@@ -55,7 +55,7 @@ DecisionTree::DecisionTree(const Dataset& data)
 }
 
 /* Override "=" operator */
-DecisionTree &DecisionTree::operator= (DecisionTree const& DT)
+DecisionTree &DecisionTree::operator= (const DecisionTree & DT)
 {
     Parent = &get_ParentTree();
     Curr_Node = &get_Current_Node();
@@ -109,6 +109,19 @@ void DecisionTree::add_right(Dataset data)
     this->Right->add_Parent(this);
 }
 
+/* Print function for Decision Trees */
+void DecisionTree::print_Tree()
+{
+    this->get_Current_Node().get_Dataset().print();
+    if(&this->get_LeftTree() != nullptr )
+    {
+        this->get_LeftTree().print_Tree();
+    }
+    if(&this->get_RightTree() != nullptr )
+    {
+        this->get_RightTree().print_Tree();
+    }
+}
 
 /**********************/
 /*                    */
@@ -163,7 +176,7 @@ std::vector<std::vector<std::string>> Labels_Splitting(const std::vector<std::st
 }*/
 
 /* Divides the dataset in two subsets depending on the label size */
-std::vector<Dataset> Data_Splitting_in_two(const Dataset& data)
+std::vector<Dataset> Data_Splitting_in_two(DecisionTree *DT)
 {
     //Naive version for testing
     std::vector<std::string> subLabels1;
@@ -172,6 +185,7 @@ std::vector<Dataset> Data_Splitting_in_two(const Dataset& data)
     std::vector<std::string> subLabels2;
     std::vector<std::vector<float>> subSet2;
 
+    Dataset data = DT->get_Current_Node().get_Dataset();
     for(int i = 0; i < data.Label_length(); ++i)
     {
 
@@ -184,10 +198,16 @@ std::vector<Dataset> Data_Splitting_in_two(const Dataset& data)
         {
             subLabels2.push_back(data.get_Labels()[i]);
         }
-        
+    }  
         /* Splitting the datas accordingly */
         //We get the current line (easier to manipulate)
-        vector<float> curr_line = data.get_Values()[i];
+    for(int i = 0; i < data.Entries_size(); ++i)
+    {
+        vector<float> curr_line;
+        for(int j = 0; j < data.Label_length(); ++j) 
+        {
+            curr_line.push_back(data.get_Values()[i][j]);
+        }
 
         vector<float> left;
         vector<float> right;
@@ -226,6 +246,27 @@ std::vector<Dataset> Data_Splitting_in_two(const Dataset& data)
     return (res);
 }
 
+/* Calls the splitting function recursively on the tree */
+void rec_Naive_Splitting(DecisionTree *DT)
+{
+    if(DT->get_Current_Node().get_Dataset().Label_length() > 1)
+    {
+        vector<Dataset> Data_Splitted = Data_Splitting_in_two(DT);
+        DT->add_left (Data_Splitted[0]);
+        DT->add_right(Data_Splitted[1]);
+
+        /*
+        cout << "Left Sub Tree :\n";
+        DT->get_LeftTree().get_Current_Node().get_Dataset().print();
+        cout << "Right Sub Tree :\n";
+        DT->get_RightTree().get_Current_Node().get_Dataset().print(); 
+        */       
+
+        rec_Naive_Splitting (&DT->get_LeftTree());
+        rec_Naive_Splitting(&DT->get_RightTree());
+    }
+}
+
 /**********************/
 /*                    */
 /*    TESTING         */
@@ -240,7 +281,7 @@ int main()
     //cin >>;
     Dataset D{"../methode_ensemblistes_modelisation/datasets/d1.csv"};
     //D.print();
-
+    
     //Initialize labels
     vector<string> label;
     label.push_back("Test1");
@@ -264,6 +305,10 @@ int main()
 
     cout << "=== Dataset Loading & Tests ===\n";
 
+    cout << "Dataset copy test \n";
+    Dataset truc = testing_DS;
+    truc.print();
+
     cout << "Node copy test \n";
     TreeNode tn{testing_DS};
     TreeNode ts = tn;
@@ -279,6 +324,9 @@ int main()
     //DT.get_Current_Node()->get_Dataset().print();
     DT.get_Current_Node().get_Dataset().print();
 
+    rec_Naive_Splitting(&DT);
+    DT.print_Tree();
+    /* 
     vector<Dataset> split_Test = Data_Splitting_in_two(DT.get_Current_Node().get_Dataset());
 
     DT.add_left (split_Test[0]);
@@ -295,6 +343,7 @@ int main()
     right.get_Current_Node().get_Dataset().print();    
     cout << "Sub Tree right Parent is :\n";
     right.get_ParentTree().get_Current_Node().get_Dataset().print();
+    */
 
     return 0;
 }
