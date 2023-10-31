@@ -39,9 +39,19 @@ class DecisionTree {
 		//Constructor
 		DecisionTree(const Dataset& data);
 
+		//Getters 
+		TreeNode get_Current_Node   ();
+		DecisionTree *get_ParentTree();
+		DecisionTree *get_RightTree ();
+		DecisionTree *get_LeftTree  ();
+
+		//Setters
+		void add_right(Dataset data);
+		void add_left (Dataset data);
+
 		//Methods
-		TreeNode get_Current_Node();
-		DecisionTree   *buildTree();
+		DecisionTree *buildTree();
+		
 
 };
 

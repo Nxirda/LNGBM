@@ -53,6 +53,37 @@ TreeNode DecisionTree::get_Current_Node()
     return this->Curr_Node;
 }
 
+/* Returns the Parent Tree */
+DecisionTree *DecisionTree::get_ParentTree()
+{
+    return this->Parent;
+}
+
+/* Returns the Left Sub Tree*/
+DecisionTree *DecisionTree::get_LeftTree()
+{
+    return this->Left;
+}
+
+/* Returns the Right Sub Tree */
+DecisionTree *DecisionTree::get_RightTree()
+{
+    return this->Right;
+}
+
+/* Sets a new left Subtree */
+void DecisionTree::add_left(Dataset data)
+{
+    DecisionTree left{data};
+    this->Left = &left;
+}
+
+/* Sets a new right Subtree */
+void DecisionTree::add_right(Dataset data)
+{
+    DecisionTree right{data};
+    this->Right = &right;
+}
 
 /**********************/
 /*                    */
