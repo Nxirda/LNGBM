@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#ifndef MyClass_H_
-#define MyClass_H_
+#ifndef DATASET_H_
+#define DATASET_H_
 
 using namespace std;
 
@@ -12,15 +12,17 @@ class Dataset
 {
     protected:
         //Parameters
-        vector<string> Labels;
+        vector<string>        Labels;
         vector<vector<float>> Values;
 
     public:
         //Constructor
+        Dataset();
         Dataset(string FilePath);
+        Dataset(vector<string> L, vector<vector<float>> V);
 
         //Getters
-        vector<string> get_Labels() const;
+        vector<string>        get_Labels() const;
         vector<vector<float>> get_Values() const;
 
         //Override operands
@@ -29,12 +31,10 @@ class Dataset
 
         //Methods
         void print() const;
-        // Dans votre classe Dataset
+        bool empty() const;
 
-        bool empty() const {
-        return Values.empty();
-        }
-
+        int Label_length() const;
+        int Entries_size() const;
 };
 
 #endif
