@@ -39,11 +39,11 @@ class DecisionTree {
 	public :
 		//Constructor
 		DecisionTree(const Dataset& data);
-		DecisionTree& operator= (DecisionTree const& DT); // copy assignment
+		DecisionTree& operator= (const DecisionTree & DT); 
 
 
 		//Getters 
-		TreeNode &get_Current_Node  ();
+		TreeNode   &get_Current_Node();
 		DecisionTree &get_ParentTree();
 		DecisionTree &get_RightTree ();
 		DecisionTree &get_LeftTree  ();
@@ -55,7 +55,7 @@ class DecisionTree {
 
 		//Methods
 		DecisionTree *buildTree();
-		
+		void print_Tree();
 
 };
 

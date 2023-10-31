@@ -25,10 +25,6 @@ class Dataset
         vector<string>        get_Labels() const;
         vector<vector<float>> get_Values() const;
 
-        //Override operands
-        //Dataset(Dataset const& a); // copy operator
-        //Dataset& operator= (Dataset const& a); // copy assignment
-
         //Methods
         void print() const;
         bool empty() const;

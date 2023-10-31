@@ -133,6 +133,6 @@ int Dataset::Label_length() const
 /* Return the height (= number of entries)  of the Dataset*/
 int Dataset::Entries_size() const
 {
-    return this->get_Values()[0].size();
+    return this->get_Values().size();
 }
 
