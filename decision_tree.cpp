@@ -24,6 +24,13 @@ TreeNode::TreeNode(const Dataset& d)
     this->data = d;
 }
 
+/* Override = operator so it points to a TreeNode */
+TreeNode &TreeNode::operator= (TreeNode const& TN)
+{
+    data = get_Dataset(); 
+    return *this;
+}
+
 /* Returns the Node's Dataset */
 Dataset TreeNode::get_Dataset()
 {
@@ -42,48 +49,66 @@ Dataset TreeNode::get_Dataset()
 DecisionTree::DecisionTree(const Dataset& data)
 {
     this->Parent = nullptr;
-    this->Curr_Node = TreeNode{data};
+    this->Curr_Node = new TreeNode{data};
     this->Left = nullptr;
     this->Right = nullptr;
 }
 
-/* Returns the Current Node of the Tree */
-TreeNode DecisionTree::get_Current_Node()
+/* Override "=" operator */
+DecisionTree &DecisionTree::operator= (DecisionTree const& DT)
 {
-    return this->Curr_Node;
+    Parent = &get_ParentTree();
+    Curr_Node = &get_Current_Node();
+    Left = &get_LeftTree();
+    Right = &get_RightTree(); 
+
+    return *this;
+}
+
+/* Returns the Current Node of the Tree */
+TreeNode &DecisionTree::get_Current_Node()
+{
+    return *this->Curr_Node;
 }
 
 /* Returns the Parent Tree */
-DecisionTree *DecisionTree::get_ParentTree()
+DecisionTree &DecisionTree::get_ParentTree()
 {
-    return this->Parent;
+    return *this->Parent;
 }
 
 /* Returns the Left Sub Tree*/
-DecisionTree *DecisionTree::get_LeftTree()
+DecisionTree &DecisionTree::get_LeftTree()
 {
-    return this->Left;
+    return *this->Left;
 }
 
 /* Returns the Right Sub Tree */
-DecisionTree *DecisionTree::get_RightTree()
+DecisionTree &DecisionTree::get_RightTree()
 {
-    return this->Right;
+    return *this->Right;
+}
+
+/* Sets a new Parent for the given tree*/
+void DecisionTree::add_Parent(DecisionTree *d)
+{
+    this->Parent = d;
 }
 
 /* Sets a new left Subtree */
 void DecisionTree::add_left(Dataset data)
 {
-    DecisionTree left{data};
-    this->Left = &left;
+    this->Left = new DecisionTree{data};
+    this->Left->add_Parent(this);
 }
 
 /* Sets a new right Subtree */
 void DecisionTree::add_right(Dataset data)
 {
-    DecisionTree right{data};
-    this->Right = &right;
+    this->Right = new DecisionTree{data};
+    this->Right->add_Parent(this);
 }
+
 
 /**********************/
 /*                    */
@@ -236,16 +261,40 @@ int main()
     Datas.push_back(vect3);
 
     Dataset testing_DS{label, Datas};
+
+    cout << "=== Dataset Loading & Tests ===\n";
+
+    cout << "Node copy test \n";
+    TreeNode tn{testing_DS};
+    TreeNode ts = tn;
+    ts.get_Dataset().print();
+
+    cout << "Data set is :\n";
     testing_DS.print();
 
     // Building a one node Tree
     DecisionTree DT{testing_DS};
+
+    cout << "Decision Tree is :\n";
+    //DT.get_Current_Node()->get_Dataset().print();
     DT.get_Current_Node().get_Dataset().print();
 
     vector<Dataset> split_Test = Data_Splitting_in_two(DT.get_Current_Node().get_Dataset());
 
-    split_Test[0].print();
-    split_Test[1].print();
+    DT.add_left (split_Test[0]);
+    DT.add_right(split_Test[1]);
+
+    cout << "Sub Tree left is :\n";
+    DecisionTree left = DT.get_LeftTree();
+    left.get_Current_Node().get_Dataset().print();   
+    cout << "Sub Tree left Parent is :\n";
+    left.get_ParentTree().get_Current_Node().get_Dataset().print();
+
+    cout << "Sub Tree right is :\n";
+    DecisionTree right = DT.get_RightTree();
+    right.get_Current_Node().get_Dataset().print();    
+    cout << "Sub Tree right Parent is :\n";
+    right.get_ParentTree().get_Current_Node().get_Dataset().print();
 
     return 0;
 }
