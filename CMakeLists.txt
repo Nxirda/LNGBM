@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
+#Set the project name
 project(PPN)
 
+#Enable modern C++
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Projet_run data_loading.cpp decision_tree.cpp)
+#Add the executable
+add_executable(Projet_run main.cpp src/data_loading.cpp src/decision_tree.cpp)
 
 
 
