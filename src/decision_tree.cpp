@@ -15,6 +15,9 @@
 /* Default Constructor */
 TreeNode::TreeNode() {}
 
+/* Default Destructor */
+TreeNode::~TreeNode() {}
+
 /* Constructor with Dataset :            */
 /* Build a Node with Dataset infos in it */
 TreeNode::TreeNode(const Dataset &d) { this->data = d; }
@@ -38,7 +41,7 @@ Dataset TreeNode::get_Dataset() { return this->data; }
 /* Builds a Tree with One node containing all the Datas */
 DecisionTree::DecisionTree(const Dataset &data) {
   this->Parent = nullptr;
-  this->Curr_Node = new TreeNode{data};
+  this->Curr_Node = std::move(new TreeNode{data});
   this->Left = nullptr;
   this->Right = nullptr;
 }
@@ -51,6 +54,13 @@ DecisionTree &DecisionTree::operator=(const DecisionTree &DT) {
   Right = &get_RightTree();
 
   return *this;
+}
+
+/* Default Destructor */
+DecisionTree::~DecisionTree() {
+  delete this->Curr_Node;
+  delete this->Left;
+  delete this->Right;
 }
 
 /* Returns the Current Node of the Tree */
@@ -66,17 +76,17 @@ DecisionTree &DecisionTree::get_LeftTree() { return *this->Left; }
 DecisionTree &DecisionTree::get_RightTree() { return *this->Right; }
 
 /* Sets a new Parent for the given tree*/
-void DecisionTree::add_Parent(DecisionTree *d) { this->Parent = d; }
+void DecisionTree::add_Parent(DecisionTree *d) { this->Parent = std::move(d); }
 
 /* Sets a new left Subtree */
 void DecisionTree::add_left(Dataset data) {
-  this->Left = new DecisionTree{data};
+  this->Left = std::move(new DecisionTree{data});
   this->Left->add_Parent(this);
 }
 
 /* Sets a new right Subtree */
 void DecisionTree::add_right(Dataset data) {
-  this->Right = new DecisionTree{data};
+  this->Right = std::move(new DecisionTree{data});
   this->Right->add_Parent(this);
 }
 

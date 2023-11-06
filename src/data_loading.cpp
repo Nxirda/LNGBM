@@ -75,6 +75,9 @@ Dataset::Dataset(vector<string> L, vector<vector<float>> V) {
 /* Default Constructor */
 Dataset::Dataset() {}
 
+/* Default Destructor */
+Dataset::~Dataset() {}
+
 /* Naive print function of the Dataset */
 void Dataset::print() const {
   // Logical but Prints the Labels

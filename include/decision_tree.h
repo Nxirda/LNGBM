@@ -20,6 +20,8 @@ public:
   TreeNode(const Dataset &d);
   TreeNode &operator=(TreeNode const &TN); // copy assignment
 
+  // Destructor
+  ~TreeNode();
   // Getters
   Dataset get_Dataset();
 
@@ -39,6 +41,9 @@ public:
   // Constructor
   DecisionTree(const Dataset &data);
   DecisionTree &operator=(const DecisionTree &DT);
+
+  //Destructor 
+  ~DecisionTree();
 
   // Getters
   TreeNode &get_Current_Node();
