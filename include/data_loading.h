@@ -20,6 +20,9 @@ public:
   Dataset(string FilePath);
   Dataset(vector<string> L, vector<vector<float>> V);
 
+  // Destructor
+  ~Dataset();
+
   // Getters
   vector<string> get_Labels() const;
   vector<vector<float>> get_Values() const;
