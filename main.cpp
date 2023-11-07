@@ -80,6 +80,7 @@ void rec_Naive_Splitting(DecisionTree *DT) {
   }
 }
 
+
 int main() {
 
   cout << "=== Dataset Loading ===\n";
@@ -127,6 +128,11 @@ int main() {
 
   cout << "Decision Tree is :\n";
   DT.get_Current_Node().get_Dataset().print();
+
+  cout << "Copy column test \n";
+  //vector<float> column = DT.get_Current_Node().get_Dataset().get_Column(0);
+
+  ReductionInVariance2(&DT, "Test1", 0);
 
   rec_Naive_Splitting(&DT);
   DT.print_Tree();

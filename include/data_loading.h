@@ -33,6 +33,9 @@ public:
 
   int Label_length() const;
   int Entries_size() const;
+
+  vector<float> get_Column(int position);
+  
 };
 
 #endif

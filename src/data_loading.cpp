@@ -101,6 +101,15 @@ vector<string> Dataset::get_Labels() const { return this->Labels; }
 /* Returns the Values of the Dataset */
 vector<vector<float>> Dataset::get_Values() const { return this->Values; }
 
+/* Returns the specified column of the dataset */
+vector<float> Dataset::get_Column(int position) {
+  vector<float> Col;
+  for (int j = 0; j < this->get_Values()[0].size(); ++j){
+    Col.push_back(this->get_Values()[j][position]);
+  }
+  return Col;
+}
+
 /* Return True if there are no values in the Dataset */
 bool Dataset::empty() const { return this->Values.empty(); }
 
