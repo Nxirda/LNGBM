@@ -26,6 +26,7 @@ public:
   // Getters
   vector<string> get_Labels() const;
   vector<vector<float>> get_Values() const;
+  vector<float> get_Column (int position) const;
 
   // Methods
   void print() const;
@@ -33,9 +34,6 @@ public:
 
   int Label_length() const;
   int Entries_size() const;
-
-  vector<float> get_Column(int position);
-  
 };
 
 #endif

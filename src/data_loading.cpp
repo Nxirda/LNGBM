@@ -11,8 +11,10 @@ using namespace std;
 
 // https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
 
-/* Take the path of the file to read
-Instanciates an object of type Dataset from the given CSV */
+/* Take the path of the file to read                         */
+/* Instanciates an object of type Dataset from the given CSV */
+/* Inputs : String                                           */
+/* Ouputs : Object of Dataset Cass                           */
 Dataset::Dataset(string FilePath) {
   // input filestream
   ifstream file;
@@ -65,20 +67,27 @@ Dataset::Dataset(string FilePath) {
   file.close();
 }
 
-/* Explicit Constructor */
-/* Use : First Argument : Labels | second : Values*/
+/* Explicit Constructor, takes two vectors and builds a Dataset Object */
+/* Inputs : vector<string>, vector<vector<float>>                      */
+/* Ouputs : Object of Dataset Class                                    */
 Dataset::Dataset(vector<string> L, vector<vector<float>> V) {
   this->Labels = L;
   this->Values = V;
 }
 
-/* Default Constructor */
+/* Default Constructor              */
+/* Inputs :                         */
+/* Ouputs : Object of Dataset Class */
 Dataset::Dataset() {}
 
 /* Default Destructor */
+/* Inputs :           */
+/* Ouputs :           */
 Dataset::~Dataset() {}
 
 /* Naive print function of the Dataset */
+/* Inputs :                            */
+/* Ouputs :                            */
 void Dataset::print() const {
   // Logical but Prints the Labels
   for (int i = 0; i < this->Labels.size(); ++i) {
@@ -96,25 +105,37 @@ void Dataset::print() const {
 }
 
 /* Returns the Labels of the Dataset */
+/* Inputs :                          */
+/* Ouputs : vector<string>           */
 vector<string> Dataset::get_Labels() const { return this->Labels; }
 
 /* Returns the Values of the Dataset */
+/* Inputs :                          */
+/* Ouputs : vector<vector<float>>    */
 vector<vector<float>> Dataset::get_Values() const { return this->Values; }
 
 /* Returns the specified column of the dataset */
-vector<float> Dataset::get_Column(int position) {
+/* Inputs : int                                */
+/* Ouputs : vector<vector<float>>              */
+vector<float> Dataset::get_Column(int position) const {
   vector<float> Col;
-  for (int j = 0; j < this->get_Values()[0].size(); ++j){
+  for (int j = 0; j < this->get_Values()[0].size(); ++j) {
     Col.push_back(this->get_Values()[j][position]);
   }
   return Col;
 }
 
 /* Return True if there are no values in the Dataset */
+/* Inputs :                                          */
+/* Ouputs : boolean                                  */
 bool Dataset::empty() const { return this->Values.empty(); }
 
 /* Return the length (= number of Labels) of the Dataset */
+/* Inputs :                                              */
+/* Ouputs : int                                          */
 int Dataset::Label_length() const { return this->get_Labels().size(); }
 
 /* Return the height (= number of entries)  of the Dataset*/
+/* Inputs :                                              */
+/* Ouputs : int                                          */
 int Dataset::Entries_size() const { return this->get_Values().size(); }

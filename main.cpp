@@ -83,10 +83,10 @@ void rec_Naive_Splitting(DecisionTree *DT) {
 
 int main() {
 
-  cout << "=== Dataset Loading ===\n";
+  /*cout << "=== Dataset Loading ===\n";
   // cout << " Enter the Path of the CSV : \n";
   // cin >>;
-  Dataset D{"../methode_ensemblistes_modelisation/datasets/d1.csv"};
+  Dataset D{"../methode_ensemblistes_modelisation/datasets/d1.csv"};*/
 
   // Initialize labels
   vector<string> label;
@@ -131,9 +131,7 @@ int main() {
 
   cout << "Copy column test \n";
   //vector<float> column = DT.get_Current_Node().get_Dataset().get_Column(0);
-
-  ReductionInVariance2(&DT, "Test1", 0);
-
+  DT.FindBestAttribute();
   rec_Naive_Splitting(&DT);
   DT.print_Tree();
 

@@ -131,53 +131,82 @@ void DecisionTree::print_Tree() {
   }
 }
 
-float Variance(vector<float> Current_Column) {
+/* Computes the Variance of a given Column from the Tree Dataset */
+/* Inputs  : vector<float>                                       */
+/* Outputs : float                                               */
+float DecisionTree::Variance(vector<float> Current_Column) {
   int len = Current_Column.size();
-  // check if there are values in the current node
+  // cout << "Len of Column is : " << len << endl;
+  //  check if there are values in the current node
   if (len <= 0) {
     return 0.0;
   }
   float mean = 0;
   float variance = 0.0;
   for (float elem : Current_Column) {
+    // cout << "Elem of Column is : " << elem << endl;
     mean += elem;
-
-    float difference = elem - len;
-    variance += difference * difference;
   }
   mean /= len;
+  // cout << "Mean of Column is : " << mean << endl;
+  for (float elem : Current_Column) {
+    float difference = elem - mean;
+    variance += difference * difference;
+  }
   variance /= len;
-
+  // cout << "Variance of Column is : " << variance << endl;
   return variance;
 }
 
-float ReductionInVariance(DecisionTree *DT, std::string label, int position) {
-  float CurrNode_Var = Variance(DT);
+/* Computes the Variance for every Column of the given Tree Dataset */
+/* Inputs  : pointer of Decision Tree Object                        */
+/* Outputs : float                                                  */
+float DecisionTree::NodeHomogeneity(DecisionTree *DT) {
+  int len = DT->get_Current_Node().get_Dataset().Label_length();
+  float Homogeneous = 0;
+  for (int i = 0; i < len; ++i) {
+    Homogeneous += Variance(DT->get_Current_Node().get_Dataset().get_Column(i));
+  }
+  Homogeneous /= len;
+  return Homogeneous;
+}
+
+/* Computes the Reduction in Variance of a given Column of the Tree Dataset */
+/* Inputs  : pointer of Decision Tree Object, string, int                   */
+/* Outputs : float                                                          */
+float DecisionTree::ReductionInVariance(DecisionTree *DT, std::string label,
+                                        int position) {
+  float CurrNode_Var = NodeHomogeneity(DT);
+  std::cout << "Homogeneity is :" << CurrNode_Var << endl;
+
   float Var = 0;
   vector<float> values =
       DT->get_Current_Node().get_Dataset().get_Column(position);
   float Dataset_Length = DT->get_Current_Node().get_Dataset().Label_length();
 
-  for (float value : values) {
-    Var += (values.size() / Dataset_Length) * Variance(values);
-  }
+  Var = (values.size() / Dataset_Length) * Variance(values);
+  std::cout << "Var is :" << Var << endl;
 
+  std::cout << "ReductionInVariance result is :" << CurrNode_Var - Var << endl;
   return CurrNode_Var - Var;
 }
 
-void Build_Splitted_Tree(DecisionTree *DT) {}
+/* Builds a Decision Tree recursively following a splitting criteria */
+/* Inputs  :                                                         */
+/* Outputs :                                                         */
+void DecisionTree::Build_Splitted_Tree(DecisionTree *DT) {}
 
 /* Search for the best attribute to split the dataset on at a given Node */
 /* Inputs : Object of DecisionTree class                                 */
 /* Ouputs : String                                                       */
-std::string FindBestAttribute(DecisionTree *DT) {
+std::string DecisionTree::FindBestAttribute() {
   std::string BestAttribute = "";
   float reductionInVar = -1;
 
-  vector<string> labels = DT->get_Current_Node().get_Dataset().get_Labels();
+  vector<string> labels = this->get_Current_Node().get_Dataset().get_Labels();
 
   for (int i = 0; i < labels.size(); ++i) {
-    float tmp_var = ReductionInVariance(DT, labels[i], i);
+    float tmp_var = ReductionInVariance(this, labels[i], i);
     if (tmp_var > reductionInVar) {
       reductionInVar = tmp_var;
       BestAttribute = labels[i];
@@ -185,4 +214,3 @@ std::string FindBestAttribute(DecisionTree *DT) {
   }
   return BestAttribute;
 }
-

@@ -42,7 +42,7 @@ public:
   DecisionTree(const Dataset &data);
   DecisionTree &operator=(const DecisionTree &DT);
 
-  //Destructor 
+  // Destructor
   ~DecisionTree();
 
   // Getters
@@ -58,7 +58,16 @@ public:
 
   // Methods
   DecisionTree *buildTree();
+  void Build_Splitted_Tree(DecisionTree *DT);
   void print_Tree();
+  std::string FindBestAttribute();
+
+private:
+  // Methods only used inside the class
+  float Variance(vector<float> Current_Column);
+  float NodeHomogeneity(DecisionTree *DT);
+  float ReductionInVariance(DecisionTree *DT, std::string label, int position);
+  
 };
 
 #endif
