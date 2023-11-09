@@ -116,10 +116,13 @@ vector<vector<float>> Dataset::get_Values() const { return this->Values; }
 
 /* Returns the specified column of the dataset */
 /* Inputs : int                                */
-/* Ouputs : vector<vector<float>>              */
+/* Ouputs : vector<float>                      */
 vector<float> Dataset::get_Column(int position) const {
   vector<float> Col;
-  for (int j = 0; j < this->get_Values()[0].size(); ++j) {
+  if (position > this->Label_length()) {
+    return Col;
+  }
+  for (int j = 0; j < this->Entries_size(); ++j) {
     Col.push_back(this->get_Values()[j][position]);
   }
   return Col;
@@ -139,3 +142,75 @@ int Dataset::Label_length() const { return this->get_Labels().size(); }
 /* Inputs :                                              */
 /* Ouputs : int                                          */
 int Dataset::Entries_size() const { return this->get_Values().size(); }
+
+/* Return 2 Datasets representing the splitting of the given Dataset on the */
+/* given column label via a given limit (criteria)                          */
+/* Inputs : int, float                                                      */
+/* Ouputs : vector<Dataset>                                                 */
+vector<Dataset> Dataset::split(int position,
+                               float criteria) const {
+
+  vector<vector<float>> subValuesRight;
+  vector<vector<float>> subValuesLeft;
+  for (int row = 0; row < this->Entries_size(); ++row) {
+    if (this->get_Values()[row][position] < criteria) {
+      subValuesLeft.push_back(this->get_Values()[row]);
+    } else {
+      subValuesRight.push_back(this->get_Values()[row]);
+    }
+  }
+  Dataset D_Right{this->get_Labels(), subValuesRight};
+  Dataset D_Left{this->get_Labels(), subValuesLeft};
+  vector<Dataset> Res{D_Left, D_Right};
+  return Res;
+}
+
+/* Computes the Mean of a given Column of the Dataset */
+/* Inputs  : int                                      */
+/* Outputs : float                                    */
+float Dataset::Column_Mean(int position) {
+  vector<float> Current_Column = this->get_Column(position);
+  int len = Current_Column.size();
+  //  check if there are values in the current node
+  if (len <= 0) {
+    return 0.0;
+  }
+  float mean = 0.0;
+  for (float elem : Current_Column) {
+    mean += elem;
+  }
+  mean /= len;
+  return mean;
+}
+
+/* Computes the Variance of a given Column of the  Dataset */
+/* Inputs  : int                                           */
+/* Outputs : float                                         */
+float Dataset::Column_Variance(int position) {
+  vector<float> Current_Column = this->get_Column(position);
+  int len = Current_Column.size();
+  //  check if there are values in the current Column
+  if (len <= 0) {
+    return 0.0;
+  }
+  float mean = Column_Mean(position);
+  float variance = 0.0;
+  for (float elem : Current_Column) {
+    float difference = elem - mean;
+    variance += difference * difference;
+  }
+  variance /= len;
+  return variance;
+}
+
+/* Computes the Global Variance of the  Dataset */
+/* Inputs  :                                    */
+/* Outputs : float                              */
+float Dataset::Global_Variance(){
+  int len = this->Label_length();
+  float var_res = 0;
+  for (int i = 0; i < len; ++i) {
+    var_res += this->Column_Variance(i);
+  }
+  return var_res;
+}

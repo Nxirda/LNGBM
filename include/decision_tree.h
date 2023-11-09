@@ -26,6 +26,8 @@ public:
   Dataset get_Dataset();
 
   // Methods
+  float NodeVariance();
+  bool NodeHomogeneity();
 };
 
 // Binary Search Tree Class
@@ -57,17 +59,15 @@ public:
   void add_Parent(DecisionTree *d);
 
   // Methods
-  DecisionTree *buildTree();
-  void Build_Splitted_Tree(DecisionTree *DT);
-  void print_Tree();
-  std::string FindBestAttribute();
+  //DecisionTree *buildTree();
 
+  void Build_Splitted_Tree(DecisionTree *DT);
+  std::string FindBestAttribute();
+  void print_Tree();
+ 
 private:
   // Methods only used inside the class
-  float Variance(vector<float> Current_Column);
-  float NodeHomogeneity(DecisionTree *DT);
-  float ReductionInVariance(DecisionTree *DT, std::string label, int position);
-  
+  float splitting_variance(int position);
 };
 
 #endif

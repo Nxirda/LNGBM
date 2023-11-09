@@ -101,11 +101,13 @@ int main() {
   vector<float> vect(3, 10);
   vector<float> vect2(3, 4);
   vector<float> vect3(3, 2);
+  vector<float> vect4(3, 7);
 
   // Fill the Datas Vector
   Datas.push_back(vect);
   Datas.push_back(vect2);
   Datas.push_back(vect3);
+  Datas.push_back(vect4);
 
   Dataset testing_DS{label, Datas};
 
@@ -123,17 +125,23 @@ int main() {
   cout << "Data set is :\n";
   testing_DS.print();
 
+  cout << "Splitting Test : \n";
+  vector<Dataset> div = testing_DS.split(0, 5);
+  div[0].print();
+  div[1].print();
+
   // Building a one node Tree
   DecisionTree DT{testing_DS};
+  cout << DT.FindBestAttribute() << endl;
 
-  cout << "Decision Tree is :\n";
+  /*cout << "Decision Tree is :\n";
   DT.get_Current_Node().get_Dataset().print();
 
   cout << "Copy column test \n";
   //vector<float> column = DT.get_Current_Node().get_Dataset().get_Column(0);
   DT.FindBestAttribute();
   rec_Naive_Splitting(&DT);
-  DT.print_Tree();
+  DT.print_Tree();*/
 
   return 0;
 }

@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <limits.h> //For Max_Int value
 #include <string>
 #include <vector>
 
@@ -40,15 +41,37 @@ TreeNode &TreeNode::operator=(TreeNode const &TN) {
 /* Outputs : Object of Dataset Class */
 Dataset TreeNode::get_Dataset() { return this->data; }
 
+/* Returns the Variance of the Node's Dataset */
+/* Inputs  :                                  */
+/* Outputs : float                            */
+float TreeNode::NodeVariance() { return this->get_Dataset().Global_Variance(); }
+
+/* return the Homogeneity as a boolean by comparing the variance */
+/* for every Column of the given Tree Node Dataset               */
+/* Inputs  :                                                     */
+/* Outputs : bool                                                */
+bool TreeNode::NodeHomogeneity() {
+  int len = this->get_Dataset().Label_length();
+  float var = this->get_Dataset().Column_Variance(0);
+  for (int i = 1; i < len; ++i) {
+    float tmp = this->get_Dataset().Column_Variance(i);
+    //  If column variance is not uniform then return false
+    if (tmp != var) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /********************/
 /*                  */
 /*    TREE PART     */
 /*                  */
 /********************/
 
-/* Base Constructor with a Dataset parameter : */
-/* Inputs  : Object of Dataset Class           */
-/* Outputs : Object of Decision Tree Class     */
+/* Base Constructor with a Dataset parameter */
+/* Inputs  : Object of Dataset Class         */
+/* Outputs : Object of Decision Tree Class   */
 DecisionTree::DecisionTree(const Dataset &data) {
   this->Parent = nullptr;
   this->Curr_Node = std::move(new TreeNode{data});
@@ -131,86 +154,50 @@ void DecisionTree::print_Tree() {
   }
 }
 
-/* Computes the Variance of a given Column from the Tree Dataset */
-/* Inputs  : vector<float>                                       */
-/* Outputs : float                                               */
-float DecisionTree::Variance(vector<float> Current_Column) {
-  int len = Current_Column.size();
-  // cout << "Len of Column is : " << len << endl;
-  //  check if there are values in the current node
-  if (len <= 0) {
-    return 0.0;
-  }
-  float mean = 0;
-  float variance = 0.0;
-  for (float elem : Current_Column) {
-    // cout << "Elem of Column is : " << elem << endl;
-    mean += elem;
-  }
-  mean /= len;
-  // cout << "Mean of Column is : " << mean << endl;
-  for (float elem : Current_Column) {
-    float difference = elem - mean;
-    variance += difference * difference;
-  }
-  variance /= len;
-  // cout << "Variance of Column is : " << variance << endl;
-  return variance;
+/* Returns the variance of a split as the weighted average */
+/* variance of child nodes                                 */
+/* Inputs  : int                                           */
+/* Outputs : float                                         */
+float DecisionTree::splitting_variance(int position) {
+  float split_criteria =
+      this->get_Current_Node().get_Dataset().Column_Mean(position);
+  vector<Dataset> Child_Nodes =
+      this->get_Current_Node().get_Dataset().split(position, split_criteria);
+
+  float base_Population = this->get_Current_Node().get_Dataset().Entries_size();
+
+  float Left_Variance = Child_Nodes[0].Global_Variance();
+  float Left_weighted_average = Child_Nodes[0].Entries_size() / base_Population;
+  float Right_Variance = Child_Nodes[1].Global_Variance();
+  float Right_weighted_average =
+      Child_Nodes[1].Entries_size() / base_Population;
+
+  float weighted_average_var = Left_weighted_average * Left_Variance +
+                               Right_weighted_average * Right_Variance;
+
+  return weighted_average_var;
 }
 
-/* Computes the Variance for every Column of the given Tree Dataset */
-/* Inputs  : pointer of Decision Tree Object                        */
-/* Outputs : float                                                  */
-float DecisionTree::NodeHomogeneity(DecisionTree *DT) {
-  int len = DT->get_Current_Node().get_Dataset().Label_length();
-  float Homogeneous = 0;
-  for (int i = 0; i < len; ++i) {
-    Homogeneous += Variance(DT->get_Current_Node().get_Dataset().get_Column(i));
+/* Search for the best attribute to split the dataset on at a given Node */
+/* Inputs :                                                              */
+/* Ouputs : String                                                       */
+std::string DecisionTree::FindBestAttribute() {
+  std::string BestAttribute = "";
+  float maxReductionInVar = INT_MAX;
+
+  vector<string> labels = this->get_Current_Node().get_Dataset().get_Labels();
+
+  for (int i = 0; i < labels.size(); ++i) {
+    float tmp_var = splitting_variance(i);
+    if (tmp_var < maxReductionInVar) {
+      maxReductionInVar = tmp_var;
+      BestAttribute = labels[i];
+    }
   }
-  Homogeneous /= len;
-  return Homogeneous;
-}
-
-/* Computes the Reduction in Variance of a given Column of the Tree Dataset */
-/* Inputs  : pointer of Decision Tree Object, string, int                   */
-/* Outputs : float                                                          */
-float DecisionTree::ReductionInVariance(DecisionTree *DT, std::string label,
-                                        int position) {
-  float CurrNode_Var = NodeHomogeneity(DT);
-  std::cout << "Homogeneity is :" << CurrNode_Var << endl;
-
-  float Var = 0;
-  vector<float> values =
-      DT->get_Current_Node().get_Dataset().get_Column(position);
-  float Dataset_Length = DT->get_Current_Node().get_Dataset().Label_length();
-
-  Var = (values.size() / Dataset_Length) * Variance(values);
-  std::cout << "Var is :" << Var << endl;
-
-  std::cout << "ReductionInVariance result is :" << CurrNode_Var - Var << endl;
-  return CurrNode_Var - Var;
+  return BestAttribute;
 }
 
 /* Builds a Decision Tree recursively following a splitting criteria */
 /* Inputs  :                                                         */
 /* Outputs :                                                         */
 void DecisionTree::Build_Splitted_Tree(DecisionTree *DT) {}
-
-/* Search for the best attribute to split the dataset on at a given Node */
-/* Inputs : Object of DecisionTree class                                 */
-/* Ouputs : String                                                       */
-std::string DecisionTree::FindBestAttribute() {
-  std::string BestAttribute = "";
-  float reductionInVar = -1;
-
-  vector<string> labels = this->get_Current_Node().get_Dataset().get_Labels();
-
-  for (int i = 0; i < labels.size(); ++i) {
-    float tmp_var = ReductionInVariance(this, labels[i], i);
-    if (tmp_var > reductionInVar) {
-      reductionInVar = tmp_var;
-      BestAttribute = labels[i];
-    }
-  }
-  return BestAttribute;
-}
