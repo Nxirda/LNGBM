@@ -10,7 +10,7 @@ using namespace std;
 /*********************/
 
 /* Divides the dataset in two subsets depending on the label size */
-std::vector<Dataset> Data_Splitting_in_two(DecisionTree *DT) {
+std::vector<DataSet> Data_Splitting_in_two(DecisionTree *DT) {
   // Naive version for testing
   std::vector<std::string> subLabels1;
   std::vector<std::vector<float>> subSet1;
@@ -18,22 +18,22 @@ std::vector<Dataset> Data_Splitting_in_two(DecisionTree *DT) {
   std::vector<std::string> subLabels2;
   std::vector<std::vector<float>> subSet2;
 
-  Dataset data = DT->get_Current_Node().get_Dataset();
-  for (int i = 0; i < data.Label_length(); ++i) {
+  DataSet data = DT->get_Current_Node().get_DataSet();
+  for (int i = 0; i < data.features_Length(); ++i) {
 
     /* Splitting the labels */
-    if (i < data.Label_length() / 2) {
-      subLabels1.push_back(data.get_Labels()[i]);
+    if (i < data.features_Length() / 2) {
+      subLabels1.push_back(data.get_Features()[i]);
     } else {
-      subLabels2.push_back(data.get_Labels()[i]);
+      subLabels2.push_back(data.get_Features()[i]);
     }
   }
   /* Splitting the datas accordingly */
   // We get the current line (easier to manipulate)
-  for (int i = 0; i < data.Entries_size(); ++i) {
+  for (int i = 0; i < data.samples_Number(); ++i) {
     vector<float> curr_line;
-    for (int j = 0; j < data.Label_length(); ++j) {
-      curr_line.push_back(data.get_Values()[i][j]);
+    for (int j = 0; j < data.features_Length(); ++j) {
+      curr_line.push_back(data.get_Samples()[i][j]);
     }
 
     vector<float> left;
@@ -56,12 +56,12 @@ std::vector<Dataset> Data_Splitting_in_two(DecisionTree *DT) {
     subSet2.push_back(right);
   }
 
-  // Create two "new" Datasets
-  Dataset First_Half{subLabels1, subSet1};
-  Dataset Second_Half{subLabels2, subSet2};
+  // Create two "new" DataSets
+  DataSet First_Half{subLabels1, subSet1};
+  DataSet Second_Half{subLabels2, subSet2};
 
   // Cast the two half in a vector (could be an array at some point)
-  std::vector<Dataset> res;
+  std::vector<DataSet> res;
   res.push_back(First_Half);
   res.push_back(Second_Half);
 
@@ -70,23 +70,23 @@ std::vector<Dataset> Data_Splitting_in_two(DecisionTree *DT) {
 
 /* Calls the splitting function recursively on the tree */
 void rec_Naive_Splitting(DecisionTree *DT) {
-  //While Dataset as more than 1 column
-  if (DT->get_Current_Node().get_Dataset().Label_length() > 1) {
-    vector<Dataset> Data_Splitted = Data_Splitting_in_two(DT);
-    DT->add_left(Data_Splitted[0]);
-    DT->add_right(Data_Splitted[1]);
-    rec_Naive_Splitting(&DT->get_LeftTree());
-    rec_Naive_Splitting(&DT->get_RightTree());
+  //While DataSet as more than 1 column
+  if (DT->get_Current_Node().get_DataSet().features_Length() > 1) {
+    vector<DataSet> Data_Splitted = Data_Splitting_in_two(DT);
+    DT->add_Left(Data_Splitted[0]);
+    DT->add_Right(Data_Splitted[1]);
+    rec_Naive_Splitting(&DT->get_Left_Tree());
+    rec_Naive_Splitting(&DT->get_Right_Tree());
   }
 }
 
 
 int main() {
 
-  /*cout << "=== Dataset Loading ===\n";
+  /*cout << "=== DataSet Loading ===\n";
   // cout << " Enter the Path of the CSV : \n";
   // cin >>;
-  Dataset D{"../methode_ensemblistes_modelisation/datasets/d1.csv"};*/
+  DataSet D{"../methode_ensemblistes_modelisation/datasets/d1.csv"};*/
 
   // Initialize labels
   vector<string> label;
@@ -109,36 +109,36 @@ int main() {
   Datas.push_back(vect3);
   Datas.push_back(vect4);
 
-  Dataset testing_DS{label, Datas};
+  DataSet testing_DS{label, Datas};
 
-  cout << "=== Dataset Loading & Tests ===\n";
+  cout << "=== DataSet Loading & Tests ===\n";
 
-  cout << "Dataset copy test \n";
-  Dataset truc = testing_DS;
+  cout << "DataSet copy test \n";
+  DataSet truc = testing_DS;
   truc.print();
 
   cout << "Node copy test \n";
   TreeNode tn{testing_DS};
   TreeNode ts = tn;
-  ts.get_Dataset().print();
+  ts.get_DataSet().print();
 
   cout << "Data set is :\n";
   testing_DS.print();
 
   cout << "Splitting Test : \n";
-  vector<Dataset> div = testing_DS.split(0, 5);
+  vector<DataSet> div = testing_DS.split(0, 5);
   div[0].print();
   div[1].print();
 
   // Building a one node Tree
   DecisionTree DT{testing_DS};
-  cout << DT.FindBestAttribute() << endl;
+  cout << DT.find_Best_Attribute() << endl;
 
   /*cout << "Decision Tree is :\n";
-  DT.get_Current_Node().get_Dataset().print();
+  DT.get_Current_Node().get_DataSet().print();
 
   cout << "Copy column test \n";
-  //vector<float> column = DT.get_Current_Node().get_Dataset().get_Column(0);
+  //vector<float> column = DT.get_Current_Node().get_DataSet().get_Column(0);
   DT.FindBestAttribute();
   rec_Naive_Splitting(&DT);
   DT.print_Tree();*/
