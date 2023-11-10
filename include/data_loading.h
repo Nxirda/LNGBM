@@ -16,27 +16,31 @@ protected:
 
 public:
   // Constructor
+
   Dataset();
   Dataset(string FilePath);
   Dataset(vector<string> L, vector<vector<float>> V);
 
   // Destructor
+
   ~Dataset();
 
   // Getters
+
   vector<string> get_Labels() const;
   vector<vector<float>> get_Values() const;
   vector<float> get_Column(int position) const;
 
   // Methods
+  
   void print() const;
   bool empty() const;
 
   int Label_length() const;
   int Entries_size() const;
-  float Column_Mean(int i);
-  float Column_Variance(int i);
-  float Global_Variance();
+  float Column_Mean(int position) const;
+  float Column_Variance(int position) const;
+  float Global_Variance() const;
   vector<Dataset> split(int position, float criteria) const;
 };
 

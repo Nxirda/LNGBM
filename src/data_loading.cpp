@@ -147,8 +147,7 @@ int Dataset::Entries_size() const { return this->get_Values().size(); }
 /* given column label via a given limit (criteria)                          */
 /* Inputs : int, float                                                      */
 /* Ouputs : vector<Dataset>                                                 */
-vector<Dataset> Dataset::split(int position,
-                               float criteria) const {
+vector<Dataset> Dataset::split(int position, float criteria) const {
 
   vector<vector<float>> subValuesRight;
   vector<vector<float>> subValuesLeft;
@@ -168,10 +167,10 @@ vector<Dataset> Dataset::split(int position,
 /* Computes the Mean of a given Column of the Dataset */
 /* Inputs  : int                                      */
 /* Outputs : float                                    */
-float Dataset::Column_Mean(int position) {
+float Dataset::Column_Mean(int position) const {
   vector<float> Current_Column = this->get_Column(position);
   int len = Current_Column.size();
-  //  check if there are values in the current node
+  //  check if there are values in the current Column
   if (len <= 0) {
     return 0.0;
   }
@@ -186,7 +185,7 @@ float Dataset::Column_Mean(int position) {
 /* Computes the Variance of a given Column of the  Dataset */
 /* Inputs  : int                                           */
 /* Outputs : float                                         */
-float Dataset::Column_Variance(int position) {
+float Dataset::Column_Variance(int position) const {
   vector<float> Current_Column = this->get_Column(position);
   int len = Current_Column.size();
   //  check if there are values in the current Column
@@ -206,7 +205,7 @@ float Dataset::Column_Variance(int position) {
 /* Computes the Global Variance of the  Dataset */
 /* Inputs  :                                    */
 /* Outputs : float                              */
-float Dataset::Global_Variance(){
+float Dataset::Global_Variance() const {
   int len = this->Label_length();
   float var_res = 0;
   for (int i = 0; i < len; ++i) {
