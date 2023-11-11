@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../include/data_loading.h"
+#include "data_loading.h"
 
 using namespace std;
 
@@ -90,13 +90,13 @@ DataSet::~DataSet() {}
 /* Ouputs :                            */
 void DataSet::print() const {
   // Logical but prints the features
-  for (int i = 0; i < this->features.size(); ++i) {
+  for (long unsigned int i = 0; i < this->features.size(); ++i) {
     cout << features[i] << "\t";
   }
   cout << "\n";
   // Logical but Prints the samples
   for (int i = 0; i < int(this->samples.size()); ++i) {
-    for (int j = 0; j < this->samples[0].size(); ++j) {
+    for (long unsigned int j = 0; j < this->samples[0].size(); ++j) {
       cout << samples[i][j] << "|\t";
     }
     cout << "\n";

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "data_loading.h"
 
@@ -19,7 +20,7 @@ public:
 
   TreeNode();
   TreeNode(const DataSet &d);
-  TreeNode &operator=(TreeNode const &tn); // copy assignment
+  TreeNode &operator=(TreeNode const& tn); // copy assignment
 
   // Destructor
 
@@ -40,16 +41,18 @@ class DecisionTree {
 protected:
   // Parameters
 
-  DecisionTree *parent;
+  std::shared_ptr<DecisionTree> parent; //Shared with at least two son Trees (for the top Node) might wanna recast it to be naked ptr
   TreeNode *curr_Node; 
-  DecisionTree *right; 
-  DecisionTree *left;  
+  std::unique_ptr<DecisionTree> right; 
+  std::unique_ptr<DecisionTree> left;  
 
 public:
   // Constructor
 
+  DecisionTree();
   DecisionTree(const DataSet &data);
-  DecisionTree &operator=(const DecisionTree &dt);
+  DecisionTree(const DecisionTree &dt);      //Copy oerator
+  DecisionTree &operator=(DecisionTree &dt); //Copy assignment
 
   // Destructor
 
@@ -58,20 +61,20 @@ public:
   // Getters
 
   TreeNode &get_Current_Node();
-  DecisionTree &get_Parent_Tree();
+  std::shared_ptr<DecisionTree> get_Parent_Tree();
   DecisionTree &get_Right_Tree();
   DecisionTree &get_Left_Tree();
 
   // Setters
 
-  void add_Right(DataSet data);
-  void add_Left(DataSet data);
-  void add_Parent(DecisionTree *d);
+  void add_Right(std::unique_ptr<DecisionTree> dt);
+  void add_Left(std::unique_ptr<DecisionTree> dt);
+  void add_Parent(std::shared_ptr<DecisionTree> d);
 
   // Methods
 
   void build_Splitted_Tree(DecisionTree *dt);
-  std::string find_Best_Attribute();
+  std::string find_Best_Feature();
   void print_Tree();
 
 private:

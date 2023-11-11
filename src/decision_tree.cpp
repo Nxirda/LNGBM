@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../include/decision_tree.h"
+#include "decision_tree.h"
 
 /********************/
 /*                  */
@@ -31,8 +31,8 @@ TreeNode::TreeNode(const DataSet &d) { this->data = d; }
 /* Override "=" operator                 */
 /* Inputs  : Object of TreeNode Class    */
 /* Outputs : Object of TreeNode Class    */
-TreeNode &TreeNode::operator=(TreeNode const &tn) {
-  data = get_DataSet();
+TreeNode &TreeNode::operator=(TreeNode const& tn) {
+  data = tn.data;
   return *this;
 }
 
@@ -71,12 +71,27 @@ bool TreeNode::node_Homogeneity() {
 /*                  */
 /********************/
 
+/* Default Constructor                     */
+/* Inputs  :                               */
+/* Outputs : Object of Decision Tree Class */
+DecisionTree::DecisionTree() {}
+
+/* Base Constructor with a DecisionTree parameter */
+/* Inputs  : Object of DecisionTree Class         */
+/* Outputs : Object of Decision Tree Class        */
+DecisionTree::DecisionTree(const DecisionTree &dt) {
+  parent = dt.parent;
+  curr_Node = dt.curr_Node;
+  left = std::make_unique<DecisionTree>(get_Left_Tree());
+  right = std::make_unique<DecisionTree>(get_Right_Tree());
+}
+
 /* Base Constructor with a DataSet parameter */
 /* Inputs  : Object of DataSet Class         */
 /* Outputs : Object of Decision Tree Class   */
 DecisionTree::DecisionTree(const DataSet &data) {
   this->parent = nullptr;
-  this->curr_Node = std::move(new TreeNode{data});
+  this->curr_Node = std::move(new TreeNode{data}); // To be corrected
   this->left = nullptr;
   this->right = nullptr;
 }
@@ -84,11 +99,11 @@ DecisionTree::DecisionTree(const DataSet &data) {
 /* Override "=" operator                   */
 /* Inputs  : Object of Decision Tree Class */
 /* Outputs : Object of Decision Tree Class */
-DecisionTree &DecisionTree::operator=(const DecisionTree &dt) {
-  parent = &get_Parent_Tree();
-  curr_Node = &get_Current_Node();
-  left = &get_Left_Tree();
-  right = &get_Right_Tree();
+DecisionTree &DecisionTree::operator=(DecisionTree &dt) {
+  parent = nullptr; // std::move(dt.get_Parent_Tree()); // To be corrected
+  curr_Node = dt.curr_Node;
+  left = nullptr;  // std::make_unique<DecisionTree>(dt.get_Left_Tree());
+  right = nullptr; // std::make_unique<DecisionTree>(dt.get_Right_Tree());
 
   return *this;
 }
@@ -96,11 +111,7 @@ DecisionTree &DecisionTree::operator=(const DecisionTree &dt) {
 /* Default Destructor */
 /* Inputs  :          */
 /* Outputs :          */
-DecisionTree::~DecisionTree() {
-  delete this->curr_Node;
-  delete this->left;
-  delete this->right;
-}
+DecisionTree::~DecisionTree() {};   //delete this->curr_Node; }
 
 /* Returns the Current Node of the Tree      */
 /* Inputs  :                                 */
@@ -110,7 +121,9 @@ TreeNode &DecisionTree::get_Current_Node() { return *this->curr_Node; }
 /* Returns the Parent Tree                   */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-DecisionTree &DecisionTree::get_Parent_Tree() { return *this->parent; }
+std::shared_ptr<DecisionTree> DecisionTree::get_Parent_Tree() {
+  return this->parent;
+}
 
 /* Returns the Left Sub Tree                 */
 /* Inputs  :                                 */
@@ -125,22 +138,26 @@ DecisionTree &DecisionTree::get_Right_Tree() { return *this->right; }
 /* Sets a new Parent for the given tree      */
 /* Inputs  : pointer of Decision Tree Object */
 /* Outputs :                                 */
-void DecisionTree::add_Parent(DecisionTree *d) { this->parent = std::move(d); }
+void DecisionTree::add_Parent(std::shared_ptr<DecisionTree> d) {
+  this->parent = std::move(d);
+}
 
 /* Sets a new left Subtree          */
 /* Inputs : Object of DataSet class */
 /* Output :                         */
-void DecisionTree::add_Left(DataSet data) {
-  this->left = std::move(new DecisionTree{data});
-  this->left->add_Parent(this);
+void DecisionTree::add_Left(std::unique_ptr<DecisionTree> dt) {
+  // this->left = std::move(new DecisionTree{data});
+  this->left = std::move(dt);
+  //this->left->add_Parent(std::make_shared<DecisionTree>(*this));
 }
 
 /* Sets a new right Subtree         */
 /* Inputs : Object of DataSet class */
 /* Output :                         */
-void DecisionTree::add_Right(DataSet data) {
-  this->right = std::move(new DecisionTree{data});
-  this->right->add_Parent(this);
+void DecisionTree::add_Right(std::unique_ptr<DecisionTree> dt) {
+  // this->right = std::move(new DecisionTree{data});
+  this->right = std::move(dt);
+  //this->right->add_Parent(std::make_shared<DecisionTree>(*this));
 }
 
 /* Print function for Decision Trees */
@@ -148,10 +165,10 @@ void DecisionTree::add_Right(DataSet data) {
 /* Outputs :                         */
 void DecisionTree::print_Tree() {
   this->get_Current_Node().get_DataSet().print();
-  if (&this->get_Left_Tree() != nullptr) {
+  if (this->left) {
     this->get_Left_Tree().print_Tree();
   }
-  if (&this->get_Right_Tree() != nullptr) {
+  if (this->right) {
     this->get_Right_Tree().print_Tree();
   }
 }
@@ -187,24 +204,24 @@ float DecisionTree::splitting_Variance(int position) {
 /* Search for the best attribute to split the dataset on at a given Node */
 /* Inputs :                                                              */
 /* Ouputs : String                                                       */
-std::string DecisionTree::find_Best_Attribute() {
-  std::string best_Attribute = "";
+std::string DecisionTree::find_Best_Feature() {
+  std::string best_Feature = "";
   float max_Reduction_In_Var = INT_MAX;
 
-  std::vector<std::string> labels =
+  std::vector<std::string> features =
       this->get_Current_Node().get_DataSet().get_Features();
 
-  for (int i = 0; i < labels.size(); ++i) {
+  for (unsigned long int i = 0; i < features.size(); ++i) {
     float tmp_var = splitting_Variance(i);
     if (tmp_var < max_Reduction_In_Var) {
       max_Reduction_In_Var = tmp_var;
-      best_Attribute = labels[i];
+      best_Feature = features[i];
     }
   }
-  return best_Attribute;
+  return best_Feature;
 }
 
 /* Builds a Decision Tree recursively following a splitting criteria */
 /* Inputs  :                                                         */
 /* Outputs :                                                         */
-void DecisionTree::build_Splitted_Tree(DecisionTree *dt) {}
+// void DecisionTree::build_Splitted_Tree(DecisionTree *dt) {}
