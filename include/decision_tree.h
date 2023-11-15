@@ -69,6 +69,7 @@ public:
   void add_Parent(DecisionTree *d);
 
   // Methods
+<<<<<<< HEAD
 
   void Build_Splitted_Tree(DecisionTree *DT);
   std::string FindBestAttribute();
@@ -78,6 +79,18 @@ private:
   // Methods only used inside the class
 
   float splitting_variance(int position);
+=======
+  DecisionTree *buildTree();
+
+  //Methods Algo Splitting
+  void print_Tree();
+  void Algo_Splitting(DecisionTree* tree);
+  bool Stop_Condition(const Dataset& data);
+  double computeGiniIndex(const Dataset& data, const std::string& attribute);
+  std::string chooseSplitAttribute(const Dataset& data);
+  std::vector<Dataset> splitByAttribute(const Dataset& data, const std::string& attribute);
+  
+>>>>>>> Valentin
 };
 
 #endif
