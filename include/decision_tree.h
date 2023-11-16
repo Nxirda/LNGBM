@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -12,14 +13,14 @@ class TreeNode {
 protected:
   // Parameters
 
-  Dataset data;
+  DataSet data;
 
 public:
   // Constructor
 
   TreeNode();
-  TreeNode(const Dataset &d);
-  TreeNode &operator=(TreeNode const &TN); // copy assignment
+  TreeNode(const DataSet &d);
+  TreeNode &operator=(TreeNode const &tn); // copy assignment
 
   // Destructor
 
@@ -27,12 +28,12 @@ public:
 
   // Getters
 
-  Dataset get_Dataset();
+  DataSet get_DataSet();
 
   // Methods
 
-  float NodeVariance();
-  bool NodeHomogeneity();
+  float node_Variance();
+  bool node_Homogeneity();
 };
 
 // Binary Search Tree Class
@@ -40,16 +41,18 @@ class DecisionTree {
 protected:
   // Parameters
 
-  DecisionTree *Parent;
-  TreeNode *Curr_Node; 
-  DecisionTree *Right; 
-  DecisionTree *Left;  
+  DecisionTree *parent;
+  TreeNode *curr_Node;
+  std::unique_ptr<DecisionTree> right;
+  std::unique_ptr<DecisionTree> left;
 
 public:
   // Constructor
 
-  DecisionTree(const Dataset &data);
-  DecisionTree &operator=(const DecisionTree &DT);
+  DecisionTree();
+  DecisionTree(const DataSet &data);
+  DecisionTree(const DecisionTree &dt);      // Copy oerator
+  DecisionTree &operator=(DecisionTree &dt); // Copy assignment
 
   // Destructor
 
@@ -58,26 +61,26 @@ public:
   // Getters
 
   TreeNode &get_Current_Node();
-  DecisionTree &get_ParentTree();
-  DecisionTree &get_RightTree();
-  DecisionTree &get_LeftTree();
+  DecisionTree &get_Parent_Tree();
+  DecisionTree &get_Right_Tree();
+  DecisionTree &get_Left_Tree();
 
   // Setters
 
-  void add_right(Dataset data);
-  void add_left(Dataset data);
+  void add_Right(std::unique_ptr<DecisionTree> dt);
+  void add_Left(std::unique_ptr<DecisionTree> dt);
   void add_Parent(DecisionTree *d);
 
   // Methods
 
-  void Build_Splitted_Tree(DecisionTree *DT);
-  std::string FindBestAttribute();
+  void build_Splitted_Tree(DecisionTree *dt);
+  std::string find_Best_Feature();
   void print_Tree();
 
 private:
   // Methods only used inside the class
 
-  float splitting_variance(int position);
+  float splitting_Variance(int position);
 };
 
 #endif

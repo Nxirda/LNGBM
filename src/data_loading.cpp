@@ -5,20 +5,20 @@
 #include <string>
 #include <vector>
 
-#include "../include/data_loading.h"
+#include "data_loading.h"
 
 using namespace std;
 
 // https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
 
 /* Take the path of the file to read                         */
-/* Instanciates an object of type Dataset from the given CSV */
+/* Instanciates an object of type DataSet from the given CSV */
 /* Inputs : String                                           */
-/* Ouputs : Object of Dataset Cass                           */
-Dataset::Dataset(string FilePath) {
+/* Ouputs : Object of DataSet Cass                           */
+DataSet::DataSet(string file_Path) {
   // input filestream
   ifstream file;
-  file.open(FilePath);
+  file.open(file_Path);
 
   // Make sure the file is open
   if (!file.is_open()) {
@@ -38,8 +38,8 @@ Dataset::Dataset(string FilePath) {
 
     // Extract each column name
     while (getline(ss, colname, ',')) {
-      // Initialize Dataset Labels
-      this->Labels.push_back(colname);
+      // Initialize DataSet Labels
+      this->features.push_back(colname);
     }
   }
 
@@ -60,141 +60,141 @@ Dataset::Dataset(string FilePath) {
       }
     }
     // Place the row in the 2D Matrix
-    this->Values.push_back(tmp);
+    this->samples.push_back(tmp);
   }
 
   // Close file
   file.close();
 }
 
-/* Explicit Constructor, takes two vectors and builds a Dataset Object */
+/* Explicit Constructor, takes two vectors and builds a DataSet Object */
 /* Inputs : vector<string>, vector<vector<float>>                      */
-/* Ouputs : Object of Dataset Class                                    */
-Dataset::Dataset(vector<string> L, vector<vector<float>> V) {
-  this->Labels = L;
-  this->Values = V;
+/* Ouputs : Object of DataSet Class                                    */
+DataSet::DataSet(vector<string> features, vector<vector<float>> samples) {
+  this->features = features;
+  this->samples = samples;
 }
 
 /* Default Constructor              */
 /* Inputs :                         */
-/* Ouputs : Object of Dataset Class */
-Dataset::Dataset() {}
+/* Ouputs : Object of DataSet Class */
+DataSet::DataSet() {}
 
 /* Default Destructor */
 /* Inputs :           */
 /* Ouputs :           */
-Dataset::~Dataset() {}
+DataSet::~DataSet() {}
 
-/* Naive print function of the Dataset */
+/* Naive print function of the DataSet */
 /* Inputs :                            */
 /* Ouputs :                            */
-void Dataset::print() const {
-  // Logical but Prints the Labels
-  for (int i = 0; i < this->Labels.size(); ++i) {
-    cout << Labels[i] << "\t";
+void DataSet::print() const {
+  // Logical but prints the features
+  for (long unsigned int i = 0; i < this->features.size(); ++i) {
+    cout << features[i] << "\t";
   }
   cout << "\n";
-  // Logical but Prints the Values
-  for (int i = 0; i < int(this->Values.size()); ++i) {
-    for (int j = 0; j < this->Values[0].size(); ++j) {
-      cout << Values[i][j] << "|\t";
+  // Logical but Prints the samples
+  for (int i = 0; i < int(this->samples.size()); ++i) {
+    for (long unsigned int j = 0; j < this->samples[0].size(); ++j) {
+      cout << samples[i][j] << "|\t";
     }
     cout << "\n";
   }
   cout << "\n";
 }
 
-/* Returns the Labels of the Dataset */
-/* Inputs :                          */
-/* Ouputs : vector<string>           */
-vector<string> Dataset::get_Labels() const { return this->Labels; }
+/* Returns the features of the DataSet */
+/* Inputs :                            */
+/* Ouputs : vector<string>             */
+vector<string> DataSet::get_Features() const { return this->features; }
 
-/* Returns the Values of the Dataset */
+/* Returns the Values of the DataSet */
 /* Inputs :                          */
 /* Ouputs : vector<vector<float>>    */
-vector<vector<float>> Dataset::get_Values() const { return this->Values; }
+vector<vector<float>> DataSet::get_Samples() const { return this->samples; }
+
+/* Return True if there are no values in the DataSet */
+/* Inputs :                                          */
+/* Ouputs : boolean                                  */
+bool DataSet::empty() const { return this->get_Samples().empty(); }
+
+/* Return the length (= number of features) of the DataSet */
+/* Inputs :                                                */
+/* Ouputs : int                                            */
+int DataSet::features_Length() const { return this->get_Features().size(); }
+
+/* Return the height (= number of samples) of the DataSet*/
+/* Inputs :                                              */
+/* Ouputs : int                                          */
+int DataSet::samples_Number() const { return this->get_Samples().size(); }
 
 /* Returns the specified column of the dataset */
 /* Inputs : int                                */
 /* Ouputs : vector<float>                      */
-vector<float> Dataset::get_Column(int position) const {
+vector<float> DataSet::get_Column(int position) const {
   vector<float> Col;
-  if (position > this->Label_length()) {
+  if (position > this->features_Length()) {
     return Col;
   }
-  for (int j = 0; j < this->Entries_size(); ++j) {
-    Col.push_back(this->get_Values()[j][position]);
+  for (int j = 0; j < this->samples_Number(); ++j) {
+    Col.push_back(this->get_Samples()[j][position]);
   }
   return Col;
 }
 
-/* Return True if there are no values in the Dataset */
-/* Inputs :                                          */
-/* Ouputs : boolean                                  */
-bool Dataset::empty() const { return this->Values.empty(); }
-
-/* Return the length (= number of Labels) of the Dataset */
-/* Inputs :                                              */
-/* Ouputs : int                                          */
-int Dataset::Label_length() const { return this->get_Labels().size(); }
-
-/* Return the height (= number of entries)  of the Dataset*/
-/* Inputs :                                              */
-/* Ouputs : int                                          */
-int Dataset::Entries_size() const { return this->get_Values().size(); }
-
-/* Return 2 Datasets representing the splitting of the given Dataset on the */
-/* given column label via a given limit (criteria)                          */
+/* Return 2 DataSets representing the splitting of the given DataSet on the */
+/* given column feature position via a given limit (criteria)               */
 /* Inputs : int, float                                                      */
-/* Ouputs : vector<Dataset>                                                 */
-vector<Dataset> Dataset::split(int position, float criteria) const {
+/* Ouputs : vector<DataSet>                                                 */
+vector<DataSet> DataSet::split(int position, float criteria) const {
 
-  vector<vector<float>> subValuesRight;
-  vector<vector<float>> subValuesLeft;
-  for (int row = 0; row < this->Entries_size(); ++row) {
-    if (this->get_Values()[row][position] < criteria) {
-      subValuesLeft.push_back(this->get_Values()[row]);
+  vector<vector<float>> sub_Values_Right;
+  vector<vector<float>> sub_Values_Left;
+  for (int row = 0; row < this->samples_Number(); ++row) {
+    if (this->get_Samples()[row][position] < criteria) {
+      sub_Values_Left.push_back(this->get_Samples()[row]);
     } else {
-      subValuesRight.push_back(this->get_Values()[row]);
+      sub_Values_Right.push_back(this->get_Samples()[row]);
     }
   }
-  Dataset D_Right{this->get_Labels(), subValuesRight};
-  Dataset D_Left{this->get_Labels(), subValuesLeft};
-  vector<Dataset> Res{D_Left, D_Right};
-  return Res;
+  DataSet d_Right{this->get_Features(), sub_Values_Right};
+  DataSet d_Left{this->get_Features(), sub_Values_Left};
+  vector<DataSet> res{d_Left, d_Right};
+  return res;
 }
 
-/* Computes the Mean of a given Column of the Dataset */
+/* Computes the Mean of a given Column of the DataSet */
 /* Inputs  : int                                      */
 /* Outputs : float                                    */
-float Dataset::Column_Mean(int position) const {
-  vector<float> Current_Column = this->get_Column(position);
-  int len = Current_Column.size();
+float DataSet::column_Mean(int position) const {
+  vector<float> current_Column = this->get_Column(position);
+  int len = current_Column.size();
   //  check if there are values in the current Column
   if (len <= 0) {
     return 0.0;
   }
   float mean = 0.0;
-  for (float elem : Current_Column) {
+  for (float elem : current_Column) {
     mean += elem;
   }
   mean /= len;
   return mean;
 }
 
-/* Computes the Variance of a given Column of the  Dataset */
+/* Computes the Variance of a given Column of the  DataSet */
 /* Inputs  : int                                           */
 /* Outputs : float                                         */
-float Dataset::Column_Variance(int position) const {
-  vector<float> Current_Column = this->get_Column(position);
-  int len = Current_Column.size();
+float DataSet::column_Variance(int position) const {
+  vector<float> current_Column = this->get_Column(position);
+  int len = current_Column.size();
   //  check if there are values in the current Column
   if (len <= 0) {
     return 0.0;
   }
-  float mean = Column_Mean(position);
+  float mean = column_Mean(position);
   float variance = 0.0;
-  for (float elem : Current_Column) {
+  for (float elem : current_Column) {
     float difference = elem - mean;
     variance += difference * difference;
   }
@@ -202,14 +202,14 @@ float Dataset::Column_Variance(int position) const {
   return variance;
 }
 
-/* Computes the Global Variance of the  Dataset */
+/* Computes the Global Variance of the  DataSet */
 /* Inputs  :                                    */
 /* Outputs : float                              */
-float Dataset::Global_Variance() const {
-  int len = this->Label_length();
+float DataSet::global_Variance() const {
+  int len = this->features_Length();
   float var_res = 0;
   for (int i = 0; i < len; ++i) {
-    var_res += this->Column_Variance(i);
+    var_res += this->column_Variance(i);
   }
   return var_res;
 }

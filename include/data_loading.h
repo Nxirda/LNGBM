@@ -6,42 +6,40 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
-using namespace std;
-
-class Dataset {
+class DataSet {
 protected:
   // Parameters
-  vector<string> Labels;
-  vector<vector<float>> Values;
+  std::vector<std::string> features;
+  std::vector<std::vector<float>> samples;
 
 public:
   // Constructor
 
-  Dataset();
-  Dataset(string FilePath);
-  Dataset(vector<string> L, vector<vector<float>> V);
+  DataSet();
+  DataSet(std::string file_Path);
+  DataSet(std::vector<std::string> features, std::vector<std::vector<float>> values);
 
   // Destructor
 
-  ~Dataset();
+  ~DataSet();
 
   // Getters
 
-  vector<string> get_Labels() const;
-  vector<vector<float>> get_Values() const;
-  vector<float> get_Column(int position) const;
+  std::vector<std::string> get_Features() const;
+  std::vector<std::vector<float>> get_Samples() const;
+  std::vector<float> get_Column(int position) const;
 
   // Methods
   
   void print() const;
   bool empty() const;
 
-  int Label_length() const;
-  int Entries_size() const;
-  float Column_Mean(int position) const;
-  float Column_Variance(int position) const;
-  float Global_Variance() const;
-  vector<Dataset> split(int position, float criteria) const;
+  int features_Length() const;
+  int samples_Number() const;
+  float column_Mean(int position) const;
+  float column_Variance(int position) const;
+  float global_Variance() const;
+  std::vector<DataSet> split(int position, float criteria) const;
 };
 
 #endif

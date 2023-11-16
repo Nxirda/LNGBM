@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../include/decision_tree.h"
+#include "decision_tree.h"
 
 /********************/
 /*                  */
@@ -23,38 +23,40 @@ TreeNode::TreeNode() {}
 /* Outputs :                   */
 TreeNode::~TreeNode() {}
 
-/* Constructor with Dataset :                       */
-/* Inputs  : Object  of Dataset Class               */
-/* Outputs : TreeNode Object containing the Dataset */
-TreeNode::TreeNode(const Dataset &d) { this->data = d; }
+/* Constructor with DataSet :                       */
+/* Inputs  : Object  of DataSet Class               */
+/* Outputs : TreeNode Object containing the DataSet */
+TreeNode::TreeNode(const DataSet &d) { this->data = d; }
 
 /* Override "=" operator                 */
 /* Inputs  : Object of TreeNode Class    */
 /* Outputs : Object of TreeNode Class    */
-TreeNode &TreeNode::operator=(TreeNode const &TN) {
-  data = get_Dataset();
+TreeNode &TreeNode::operator=(TreeNode const &tn) {
+  data = tn.data;
   return *this;
 }
 
-/* Returns the Node's Dataset        */
+/* Returns the Node's DataSet        */
 /* Inputs  :                         */
-/* Outputs : Object of Dataset Class */
-Dataset TreeNode::get_Dataset() { return this->data; }
+/* Outputs : Object of DataSet Class */
+DataSet TreeNode::get_DataSet() { return this->data; }
 
-/* Returns the Variance of the Node's Dataset */
+/* Returns the Variance of the Node's DataSet */
 /* Inputs  :                                  */
 /* Outputs : float                            */
-float TreeNode::NodeVariance() { return this->get_Dataset().Global_Variance(); }
+float TreeNode::node_Variance() {
+  return this->get_DataSet().global_Variance();
+}
 
 /* return the Homogeneity as a boolean by comparing the variance */
-/* for every Column of the given Tree Node Dataset               */
+/* for every Column of the given Tree Node DataSet               */
 /* Inputs  :                                                     */
 /* Outputs : bool                                                */
-bool TreeNode::NodeHomogeneity() {
-  int len = this->get_Dataset().Label_length();
-  float var = this->get_Dataset().Column_Variance(0);
+bool TreeNode::node_Homogeneity() {
+  int len = this->get_DataSet().features_Length();
+  float var = this->get_DataSet().column_Variance(0);
   for (int i = 1; i < len; ++i) {
-    float tmp = this->get_Dataset().Column_Variance(i);
+    float tmp = this->get_DataSet().column_Variance(i);
     //  If column variance is not uniform then return false
     if (tmp != var) {
       return false;
@@ -69,24 +71,39 @@ bool TreeNode::NodeHomogeneity() {
 /*                  */
 /********************/
 
-/* Base Constructor with a Dataset parameter */
-/* Inputs  : Object of Dataset Class         */
+/* Default Constructor                     */
+/* Inputs  :                               */
+/* Outputs : Object of Decision Tree Class */
+DecisionTree::DecisionTree() {}
+
+/* Base Constructor with a DecisionTree parameter */
+/* Inputs  : Object of DecisionTree Class         */
+/* Outputs : Object of Decision Tree Class        */
+DecisionTree::DecisionTree(const DecisionTree &dt) {
+  parent = dt.parent;
+  curr_Node = dt.curr_Node;
+  left = std::make_unique<DecisionTree>(get_Left_Tree());
+  right = std::make_unique<DecisionTree>(get_Right_Tree());
+}
+
+/* Base Constructor with a DataSet parameter */
+/* Inputs  : Object of DataSet Class         */
 /* Outputs : Object of Decision Tree Class   */
-DecisionTree::DecisionTree(const Dataset &data) {
-  this->Parent = nullptr;
-  this->Curr_Node = std::move(new TreeNode{data});
-  this->Left = nullptr;
-  this->Right = nullptr;
+DecisionTree::DecisionTree(const DataSet &data) {
+  this->parent = nullptr;
+  this->curr_Node = std::move(new TreeNode{data}); // To be corrected
+  this->left = nullptr;
+  this->right = nullptr;
 }
 
 /* Override "=" operator                   */
 /* Inputs  : Object of Decision Tree Class */
 /* Outputs : Object of Decision Tree Class */
-DecisionTree &DecisionTree::operator=(const DecisionTree &DT) {
-  Parent = &get_ParentTree();
-  Curr_Node = &get_Current_Node();
-  Left = &get_LeftTree();
-  Right = &get_RightTree();
+DecisionTree &DecisionTree::operator=(DecisionTree &dt) {
+  parent = nullptr; // std::move(dt.get_Parent_Tree()); // To be corrected
+  curr_Node = dt.curr_Node;
+  left = nullptr;  // std::make_unique<DecisionTree>(dt.get_Left_Tree());
+  right = nullptr; // std::make_unique<DecisionTree>(dt.get_Right_Tree());
 
   return *this;
 }
@@ -94,63 +111,59 @@ DecisionTree &DecisionTree::operator=(const DecisionTree &DT) {
 /* Default Destructor */
 /* Inputs  :          */
 /* Outputs :          */
-DecisionTree::~DecisionTree() {
-  delete this->Curr_Node;
-  delete this->Left;
-  delete this->Right;
-}
+DecisionTree::~DecisionTree() {}; // delete this->curr_Node; }
 
 /* Returns the Current Node of the Tree      */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-TreeNode &DecisionTree::get_Current_Node() { return *this->Curr_Node; }
+TreeNode &DecisionTree::get_Current_Node() { return *this->curr_Node; }
 
 /* Returns the Parent Tree                   */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-DecisionTree &DecisionTree::get_ParentTree() { return *this->Parent; }
+DecisionTree &DecisionTree::get_Parent_Tree() { return *this->parent; }
 
 /* Returns the Left Sub Tree                 */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-DecisionTree &DecisionTree::get_LeftTree() { return *this->Left; }
+DecisionTree &DecisionTree::get_Left_Tree() { return *this->left; }
 
 /* Returns the Right Sub Tree                */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-DecisionTree &DecisionTree::get_RightTree() { return *this->Right; }
+DecisionTree &DecisionTree::get_Right_Tree() { return *this->right; }
 
 /* Sets a new Parent for the given tree      */
 /* Inputs  : pointer of Decision Tree Object */
 /* Outputs :                                 */
-void DecisionTree::add_Parent(DecisionTree *d) { this->Parent = std::move(d); }
+void DecisionTree::add_Parent(DecisionTree *d) { this->parent = d; }
 
 /* Sets a new left Subtree          */
-/* Inputs : Object of Dataset class */
+/* Inputs : Object of DataSet class */
 /* Output :                         */
-void DecisionTree::add_left(Dataset data) {
-  this->Left = std::move(new DecisionTree{data});
-  this->Left->add_Parent(this);
+void DecisionTree::add_Left(std::unique_ptr<DecisionTree> dt) {
+  this->left = std::move(dt);
+  this->left->add_Parent(this);
 }
 
 /* Sets a new right Subtree         */
-/* Inputs : Object of Dataset class */
+/* Inputs : Object of DataSet class */
 /* Output :                         */
-void DecisionTree::add_right(Dataset data) {
-  this->Right = std::move(new DecisionTree{data});
-  this->Right->add_Parent(this);
+void DecisionTree::add_Right(std::unique_ptr<DecisionTree> dt) {
+  this->right = std::move(dt);
+  this->right->add_Parent(this);
 }
 
 /* Print function for Decision Trees */
 /* Inputs  :                         */
 /* Outputs :                         */
 void DecisionTree::print_Tree() {
-  this->get_Current_Node().get_Dataset().print();
-  if (&this->get_LeftTree() != nullptr) {
-    this->get_LeftTree().print_Tree();
+  this->get_Current_Node().get_DataSet().print();
+  if (this->left) {
+    this->get_Left_Tree().print_Tree();
   }
-  if (&this->get_RightTree() != nullptr) {
-    this->get_RightTree().print_Tree();
+  if (this->right) {
+    this->get_Right_Tree().print_Tree();
   }
 }
 
@@ -158,46 +171,51 @@ void DecisionTree::print_Tree() {
 /* variance of child nodes                                 */
 /* Inputs  : int                                           */
 /* Outputs : float                                         */
-float DecisionTree::splitting_variance(int position) {
-  float split_criteria =
-      this->get_Current_Node().get_Dataset().Column_Mean(position);
-  vector<Dataset> Child_Nodes =
-      this->get_Current_Node().get_Dataset().split(position, split_criteria);
+float DecisionTree::splitting_Variance(int position) {
+  float split_Criteria =
+      this->get_Current_Node().get_DataSet().column_Mean(position);
 
-  float base_Population = this->get_Current_Node().get_Dataset().Entries_size();
+  std::vector<DataSet> child_Nodes =
+      this->get_Current_Node().get_DataSet().split(position, split_Criteria);
 
-  float Left_Variance = Child_Nodes[0].Global_Variance();
-  float Left_weighted_average = Child_Nodes[0].Entries_size() / base_Population;
-  float Right_Variance = Child_Nodes[1].Global_Variance();
-  float Right_weighted_average =
-      Child_Nodes[1].Entries_size() / base_Population;
+  float base_Population =
+      this->get_Current_Node().get_DataSet().samples_Number();
 
-  float weighted_average_var = Left_weighted_average * Left_Variance +
-                               Right_weighted_average * Right_Variance;
+  float left_Variance = child_Nodes[0].global_Variance();
+  float left_Weighted_Average =
+      child_Nodes[0].samples_Number() / base_Population;
 
-  return weighted_average_var;
+  float right_Variance = child_Nodes[1].global_Variance();
+  float right_Weighted_Average =
+      child_Nodes[1].samples_Number() / base_Population;
+
+  float weighted_Average_Var = left_Weighted_Average * left_Variance +
+                               right_Weighted_Average * right_Variance;
+
+  return weighted_Average_Var;
 }
 
 /* Search for the best attribute to split the dataset on at a given Node */
 /* Inputs :                                                              */
 /* Ouputs : String                                                       */
-std::string DecisionTree::FindBestAttribute() {
-  std::string BestAttribute = "";
-  float maxReductionInVar = INT_MAX;
+std::string DecisionTree::find_Best_Feature() {
+  std::string best_Feature = "";
+  float max_Reduction_In_Var = INT_MAX;
 
-  vector<string> labels = this->get_Current_Node().get_Dataset().get_Labels();
+  std::vector<std::string> features =
+      this->get_Current_Node().get_DataSet().get_Features();
 
-  for (int i = 0; i < labels.size(); ++i) {
-    float tmp_var = splitting_variance(i);
-    if (tmp_var < maxReductionInVar) {
-      maxReductionInVar = tmp_var;
-      BestAttribute = labels[i];
+  for (unsigned long int i = 0; i < features.size(); ++i) {
+    float tmp_var = splitting_Variance(i);
+    if (tmp_var < max_Reduction_In_Var) {
+      max_Reduction_In_Var = tmp_var;
+      best_Feature = features[i];
     }
   }
-  return BestAttribute;
+  return best_Feature;
 }
 
 /* Builds a Decision Tree recursively following a splitting criteria */
 /* Inputs  :                                                         */
 /* Outputs :                                                         */
-void DecisionTree::Build_Splitted_Tree(DecisionTree *DT) {}
+// void DecisionTree::build_Splitted_Tree(DecisionTree *dt) {}
