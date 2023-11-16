@@ -57,10 +57,9 @@ int main() {
   DecisionTree DS;
   DS = DT;
   DS.print_Tree();
-  
 
   cout << "=== Decision Tree Global Tests === \n";
-  cout << "= Add Left =\n";
+  cout << "= Add Left & Right =\n";
   vector<DataSet> div = DT.get_Current_Node().get_DataSet().split(0,5); 
 
   std::unique_ptr<DecisionTree> dt(new DecisionTree{div[0]});
@@ -68,6 +67,9 @@ int main() {
   std::unique_ptr<DecisionTree> dt2(new DecisionTree{div[1]});
   DS.add_Right(std::move(dt2));
   DS.print_Tree();
+
+  cout << "= find best feature test =\n";
+  cout << DS.find_Best_Feature() << endl;;
   
   // Building a one node Tree
   //DecisionTree DT{testing_DS};

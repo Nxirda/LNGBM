@@ -1,7 +1,7 @@
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "data_loading.h"
 
@@ -20,7 +20,7 @@ public:
 
   TreeNode();
   TreeNode(const DataSet &d);
-  TreeNode &operator=(TreeNode const& tn); // copy assignment
+  TreeNode &operator=(TreeNode const &tn); // copy assignment
 
   // Destructor
 
@@ -41,18 +41,18 @@ class DecisionTree {
 protected:
   // Parameters
 
-  std::shared_ptr<DecisionTree> parent; //Shared with at least two son Trees (for the top Node) might wanna recast it to be naked ptr
-  TreeNode *curr_Node; 
-  std::unique_ptr<DecisionTree> right; 
-  std::unique_ptr<DecisionTree> left;  
+  DecisionTree *parent;
+  TreeNode *curr_Node;
+  std::unique_ptr<DecisionTree> right;
+  std::unique_ptr<DecisionTree> left;
 
 public:
   // Constructor
 
   DecisionTree();
   DecisionTree(const DataSet &data);
-  DecisionTree(const DecisionTree &dt);      //Copy oerator
-  DecisionTree &operator=(DecisionTree &dt); //Copy assignment
+  DecisionTree(const DecisionTree &dt);      // Copy oerator
+  DecisionTree &operator=(DecisionTree &dt); // Copy assignment
 
   // Destructor
 
@@ -61,7 +61,7 @@ public:
   // Getters
 
   TreeNode &get_Current_Node();
-  std::shared_ptr<DecisionTree> get_Parent_Tree();
+  DecisionTree &get_Parent_Tree();
   DecisionTree &get_Right_Tree();
   DecisionTree &get_Left_Tree();
 
@@ -69,7 +69,7 @@ public:
 
   void add_Right(std::unique_ptr<DecisionTree> dt);
   void add_Left(std::unique_ptr<DecisionTree> dt);
-  void add_Parent(std::shared_ptr<DecisionTree> d);
+  void add_Parent(DecisionTree *d);
 
   // Methods
 

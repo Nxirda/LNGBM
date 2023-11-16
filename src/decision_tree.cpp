@@ -31,7 +31,7 @@ TreeNode::TreeNode(const DataSet &d) { this->data = d; }
 /* Override "=" operator                 */
 /* Inputs  : Object of TreeNode Class    */
 /* Outputs : Object of TreeNode Class    */
-TreeNode &TreeNode::operator=(TreeNode const& tn) {
+TreeNode &TreeNode::operator=(TreeNode const &tn) {
   data = tn.data;
   return *this;
 }
@@ -111,7 +111,7 @@ DecisionTree &DecisionTree::operator=(DecisionTree &dt) {
 /* Default Destructor */
 /* Inputs  :          */
 /* Outputs :          */
-DecisionTree::~DecisionTree() {};   //delete this->curr_Node; }
+DecisionTree::~DecisionTree() {}; // delete this->curr_Node; }
 
 /* Returns the Current Node of the Tree      */
 /* Inputs  :                                 */
@@ -121,9 +121,7 @@ TreeNode &DecisionTree::get_Current_Node() { return *this->curr_Node; }
 /* Returns the Parent Tree                   */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-std::shared_ptr<DecisionTree> DecisionTree::get_Parent_Tree() {
-  return this->parent;
-}
+DecisionTree &DecisionTree::get_Parent_Tree() { return *this->parent; }
 
 /* Returns the Left Sub Tree                 */
 /* Inputs  :                                 */
@@ -138,26 +136,22 @@ DecisionTree &DecisionTree::get_Right_Tree() { return *this->right; }
 /* Sets a new Parent for the given tree      */
 /* Inputs  : pointer of Decision Tree Object */
 /* Outputs :                                 */
-void DecisionTree::add_Parent(std::shared_ptr<DecisionTree> d) {
-  this->parent = std::move(d);
-}
+void DecisionTree::add_Parent(DecisionTree *d) { this->parent = d; }
 
 /* Sets a new left Subtree          */
 /* Inputs : Object of DataSet class */
 /* Output :                         */
 void DecisionTree::add_Left(std::unique_ptr<DecisionTree> dt) {
-  // this->left = std::move(new DecisionTree{data});
   this->left = std::move(dt);
-  //this->left->add_Parent(std::make_shared<DecisionTree>(*this));
+  this->left->add_Parent(this);
 }
 
 /* Sets a new right Subtree         */
 /* Inputs : Object of DataSet class */
 /* Output :                         */
 void DecisionTree::add_Right(std::unique_ptr<DecisionTree> dt) {
-  // this->right = std::move(new DecisionTree{data});
   this->right = std::move(dt);
-  //this->right->add_Parent(std::make_shared<DecisionTree>(*this));
+  this->right->add_Parent(this);
 }
 
 /* Print function for Decision Trees */
