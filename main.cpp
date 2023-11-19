@@ -1,5 +1,6 @@
-#include "data_loading.h"
-#include "decision_tree.h"
+#include <stdio.h>
+#include "DataSet.hpp"
+#include "DecisionTree.hpp"
 
 using namespace std;
 
@@ -9,12 +10,13 @@ using namespace std;
 /*                   */
 /*********************/
 
+
 int main() {
 
   /*cout << "=== DataSet Loading ===\n";
   // cout << " Enter the Path of the CSV : \n";
   // cin >>;
-  DataSet D{"../methode_ensemblistes_modelisation/datasets/d1.csv"};*/
+  DataSet D{"../data/datasets/d1.csv"};*/
 
   // Initialize labels
   vector<string> label;
@@ -44,9 +46,10 @@ int main() {
   cout << "= DataSet copy test = \n";
   DataSet truc = testing_DS;
   truc.print();
-
+  std::vector<int> idx {0,1,2,3}; 
   cout << " = Node copy tests =\n";
-  TreeNode tn{testing_DS};
+  std::shared_ptr<DataSet> tn_test = std::make_shared<DataSet> (testing_DS);
+  TreeNode tn{tn_test, idx};
   TreeNode ts;
   ts = tn;
   ts.get_DataSet().print();

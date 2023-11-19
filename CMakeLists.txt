@@ -10,10 +10,10 @@ set(CMAKE_CXX_STANDARD 17)
 add_compile_options(-Wall -Wextra -Werror -Wpedantic -O3)
 
 #Add the executable
-add_executable(Projet_run main.cpp src/data_loading.cpp src/decision_tree.cpp)
+add_executable(Projet_run main.cpp src/DataSet.cpp src/DecisionTree.cpp src/TreeNode.cpp)
 
 #Add the headers
-target_include_directories(Projet_run PUBLIC include/)
+target_include_directories(Projet_run PUBLIC include/ )
 
 
 

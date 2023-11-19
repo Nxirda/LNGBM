@@ -1,6 +1,10 @@
 #.vscode file
 .vscode/
 
+#Added bench files
+DataTypesBenchmarks.cpp
+QuickBench
+
 # CMake directories
 
 [Bb]uild

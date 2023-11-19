@@ -5,65 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "decision_tree.h"
-
-/********************/
-/*                  */
-/*    NODE PART     */
-/*                  */
-/********************/
-
-/* Default Constructor                */
-/* Inputs  :                          */
-/* Outputs : Object of TreeNode Class */
-TreeNode::TreeNode() {}
-
-/* Default Destructor          */
-/* Inputs  :                   */
-/* Outputs :                   */
-TreeNode::~TreeNode() {}
-
-/* Constructor with DataSet :                       */
-/* Inputs  : Object  of DataSet Class               */
-/* Outputs : TreeNode Object containing the DataSet */
-TreeNode::TreeNode(const DataSet &d) { this->data = d; }
-
-/* Override "=" operator                 */
-/* Inputs  : Object of TreeNode Class    */
-/* Outputs : Object of TreeNode Class    */
-TreeNode &TreeNode::operator=(TreeNode const &tn) {
-  data = tn.data;
-  return *this;
-}
-
-/* Returns the Node's DataSet        */
-/* Inputs  :                         */
-/* Outputs : Object of DataSet Class */
-DataSet TreeNode::get_DataSet() { return this->data; }
-
-/* Returns the Variance of the Node's DataSet */
-/* Inputs  :                                  */
-/* Outputs : float                            */
-float TreeNode::node_Variance() {
-  return this->get_DataSet().global_Variance();
-}
-
-/* return the Homogeneity as a boolean by comparing the variance */
-/* for every Column of the given Tree Node DataSet               */
-/* Inputs  :                                                     */
-/* Outputs : bool                                                */
-bool TreeNode::node_Homogeneity() {
-  int len = this->get_DataSet().features_Length();
-  float var = this->get_DataSet().column_Variance(0);
-  for (int i = 1; i < len; ++i) {
-    float tmp = this->get_DataSet().column_Variance(i);
-    //  If column variance is not uniform then return false
-    if (tmp != var) {
-      return false;
-    }
-  }
-  return true;
-}
+#include "DecisionTree.hpp"
+#include "TreeNode.hpp"
 
 /********************/
 /*                  */
@@ -90,8 +33,14 @@ DecisionTree::DecisionTree(const DecisionTree &dt) {
 /* Inputs  : Object of DataSet Class         */
 /* Outputs : Object of Decision Tree Class   */
 DecisionTree::DecisionTree(const DataSet &data) {
+  std::vector<int> idx;
+  for (int i = 0; i < data.samples_Number(); ++i) {
+    idx.push_back(i);
+  }
+  std::shared_ptr<DataSet> dataset = std::make_shared<DataSet>(data);
   this->parent = nullptr;
-  this->curr_Node = std::move(new TreeNode{data}); // To be corrected
+  this->curr_Node =
+      std::make_shared<TreeNode>(TreeNode{dataset, idx}); 
   this->left = nullptr;
   this->right = nullptr;
 }
@@ -111,7 +60,7 @@ DecisionTree &DecisionTree::operator=(DecisionTree &dt) {
 /* Default Destructor */
 /* Inputs  :          */
 /* Outputs :          */
-DecisionTree::~DecisionTree() {}; // delete this->curr_Node; }
+DecisionTree::~DecisionTree(){}; // delete this->curr_Node; }
 
 /* Returns the Current Node of the Tree      */
 /* Inputs  :                                 */
