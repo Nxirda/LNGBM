@@ -25,14 +25,20 @@ public:
 
   ~TreeNode();
 
+  // Setter
+
+  void set_Index(std::vector<int> idx);
+
   // Getters
 
   DataSet &get_DataSet();
+  std::vector<int> get_Index();
 
   // Methods
 
   float node_Variance();
   bool node_Homogeneity();
+  void node_Print();
 };
 
 #endif

@@ -45,6 +45,17 @@ DecisionTree::DecisionTree(const DataSet &data) {
   this->right = nullptr;
 }
 
+/* Constructor with for child nodes           */
+/* Inputs  : shared_ptr<DataSet>, vector<int> */
+/* Outputs : Object of Decision Tree Class    */
+DecisionTree::DecisionTree(const std::shared_ptr<DataSet> data, std::vector<int> idx) {
+  this->parent = nullptr;
+  this->curr_Node =
+      std::make_shared<TreeNode>(TreeNode{data, idx}); 
+  this->left = nullptr;
+  this->right = nullptr;
+}
+
 /* Override "=" operator                   */
 /* Inputs  : Object of Decision Tree Class */
 /* Outputs : Object of Decision Tree Class */
