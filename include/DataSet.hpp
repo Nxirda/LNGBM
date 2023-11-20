@@ -9,6 +9,7 @@
 class DataSet {
 protected:
   // Parameters
+  
   std::vector<std::string> features;
   std::vector<std::vector<float>> samples;
 
@@ -32,14 +33,16 @@ public:
   // Methods
   
   void print() const;
+  void print_With_Index(std::vector<int> idx) const;
   bool empty() const;
-
   int features_Length() const;
   int samples_Number() const;
-  float column_Mean(int position) const;
-  float column_Variance(int position) const;
-  float global_Variance() const;
-  std::vector<DataSet> split(int position, float criteria) const;
+
+  float column_Mean(int position, const std::vector<int> &idx) const;
+  float column_Variance(int position, const std::vector<int> &idx) const;
+  float global_Variance(const std::vector<int> &idx) const;
+
+  std::vector<std::vector<int>> split(int position, float criteria, const std::vector<int> &idx) const;
 };
 
 #endif

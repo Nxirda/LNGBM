@@ -5,65 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "decision_tree.h"
-
-/********************/
-/*                  */
-/*    NODE PART     */
-/*                  */
-/********************/
-
-/* Default Constructor                */
-/* Inputs  :                          */
-/* Outputs : Object of TreeNode Class */
-TreeNode::TreeNode() {}
-
-/* Default Destructor          */
-/* Inputs  :                   */
-/* Outputs :                   */
-TreeNode::~TreeNode() {}
-
-/* Constructor with DataSet :                       */
-/* Inputs  : Object  of DataSet Class               */
-/* Outputs : TreeNode Object containing the DataSet */
-TreeNode::TreeNode(const DataSet &d) { this->data = d; }
-
-/* Override "=" operator                 */
-/* Inputs  : Object of TreeNode Class    */
-/* Outputs : Object of TreeNode Class    */
-TreeNode &TreeNode::operator=(TreeNode const &tn) {
-  data = tn.data;
-  return *this;
-}
-
-/* Returns the Node's DataSet        */
-/* Inputs  :                         */
-/* Outputs : Object of DataSet Class */
-DataSet TreeNode::get_DataSet() { return this->data; }
-
-/* Returns the Variance of the Node's DataSet */
-/* Inputs  :                                  */
-/* Outputs : float                            */
-float TreeNode::node_Variance() {
-  return this->get_DataSet().global_Variance();
-}
-
-/* return the Homogeneity as a boolean by comparing the variance */
-/* for every Column of the given Tree Node DataSet               */
-/* Inputs  :                                                     */
-/* Outputs : bool                                                */
-bool TreeNode::node_Homogeneity() {
-  int len = this->get_DataSet().features_Length();
-  float var = this->get_DataSet().column_Variance(0);
-  for (int i = 1; i < len; ++i) {
-    float tmp = this->get_DataSet().column_Variance(i);
-    //  If column variance is not uniform then return false
-    if (tmp != var) {
-      return false;
-    }
-  }
-  return true;
-}
+#include "DecisionTree.hpp"
+#include "TreeNode.hpp"
 
 /********************/
 /*                  */
@@ -76,22 +19,29 @@ bool TreeNode::node_Homogeneity() {
 /* Outputs : Object of Decision Tree Class */
 DecisionTree::DecisionTree() {}
 
-/* Base Constructor with a DecisionTree parameter */
-/* Inputs  : Object of DecisionTree Class         */
-/* Outputs : Object of Decision Tree Class        */
-DecisionTree::DecisionTree(const DecisionTree &dt) {
-  parent = dt.parent;
-  curr_Node = dt.curr_Node;
-  left = std::make_unique<DecisionTree>(get_Left_Tree());
-  right = std::make_unique<DecisionTree>(get_Right_Tree());
-}
-
 /* Base Constructor with a DataSet parameter */
+/* Shall be used only for the first Node     */
 /* Inputs  : Object of DataSet Class         */
 /* Outputs : Object of Decision Tree Class   */
 DecisionTree::DecisionTree(const DataSet &data) {
+  std::vector<int> idx;
+  for (int i = 0; i < data.samples_Number(); ++i) {
+    idx.push_back(i);
+  }
+  std::shared_ptr<DataSet> dataset = std::make_shared<DataSet>(data);
   this->parent = nullptr;
-  this->curr_Node = std::move(new TreeNode{data}); // To be corrected
+  this->curr_Node = std::make_shared<TreeNode>(TreeNode{dataset, idx});
+  this->left = nullptr;
+  this->right = nullptr;
+}
+
+/* Constructor for child nodes                */
+/* Inputs  : shared_ptr<DataSet>, vector<int> */
+/* Outputs : Object of Decision Tree Class    */
+DecisionTree::DecisionTree(const std::shared_ptr<DataSet> data,
+                           std::vector<int> idx) {
+  this->parent = nullptr;
+  this->curr_Node = std::make_shared<TreeNode>(TreeNode{data, idx});
   this->left = nullptr;
   this->right = nullptr;
 }
@@ -111,7 +61,7 @@ DecisionTree &DecisionTree::operator=(DecisionTree &dt) {
 /* Default Destructor */
 /* Inputs  :          */
 /* Outputs :          */
-DecisionTree::~DecisionTree() {}; // delete this->curr_Node; }
+DecisionTree::~DecisionTree(){}; // delete this->curr_Node; }
 
 /* Returns the Current Node of the Tree      */
 /* Inputs  :                                 */
@@ -126,12 +76,12 @@ DecisionTree &DecisionTree::get_Parent_Tree() { return *this->parent; }
 /* Returns the Left Sub Tree                 */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-DecisionTree &DecisionTree::get_Left_Tree() { return *this->left; }
+DecisionTree *DecisionTree::get_Left_Tree() { return this->left.get(); }
 
 /* Returns the Right Sub Tree                */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-DecisionTree &DecisionTree::get_Right_Tree() { return *this->right; }
+DecisionTree *DecisionTree::get_Right_Tree() { return this->right.get(); }
 
 /* Sets a new Parent for the given tree      */
 /* Inputs  : pointer of Decision Tree Object */
@@ -158,12 +108,12 @@ void DecisionTree::add_Right(std::unique_ptr<DecisionTree> dt) {
 /* Inputs  :                         */
 /* Outputs :                         */
 void DecisionTree::print_Tree() {
-  this->get_Current_Node().get_DataSet().print();
+  this->get_Current_Node().node_Print();
   if (this->left) {
-    this->get_Left_Tree().print_Tree();
+    this->get_Left_Tree()->print_Tree();
   }
   if (this->right) {
-    this->get_Right_Tree().print_Tree();
+    this->get_Right_Tree()->print_Tree();
   }
 }
 
@@ -172,34 +122,46 @@ void DecisionTree::print_Tree() {
 /* Inputs  : int                                           */
 /* Outputs : float                                         */
 float DecisionTree::splitting_Variance(int position) {
-  float split_Criteria =
-      this->get_Current_Node().get_DataSet().column_Mean(position);
+  // Computes the split criteria, needs to be not hardcoded in the future
+  float split_Criteria = this->get_Current_Node().node_Column_Mean(position);
 
-  std::vector<DataSet> child_Nodes =
-      this->get_Current_Node().get_DataSet().split(position, split_Criteria);
+  // Computes the DataSet Row Indexes that child nodes can access
+  std::vector<std::vector<int>> child_Indexes =
+      this->get_Current_Node().node_Split(position, split_Criteria);
 
-  float base_Population =
-      this->get_Current_Node().get_DataSet().samples_Number();
+  float base_Population = this->get_Current_Node().get_Index().size();
 
-  float left_Variance = child_Nodes[0].global_Variance();
-  float left_Weighted_Average =
-      child_Nodes[0].samples_Number() / base_Population;
+  // Creating a left child
+  TreeNode left_Child{
+      std::make_shared<DataSet>(this->get_Current_Node().get_DataSet()),
+      child_Indexes[0]};
 
-  float right_Variance = child_Nodes[1].global_Variance();
+  // Creating a right child
+  TreeNode right_Child{
+      std::make_shared<DataSet>(this->get_Current_Node().get_DataSet()),
+      child_Indexes[1]};
+
+  // Computes Weighted Variance for left child
+  float left_Variance = left_Child.node_Variance();
+  float left_Weighted_Average = left_Child.get_Index().size() / base_Population;
+
+  // Computes Weighted Variance for right child
+  float right_Variance = right_Child.node_Variance();
   float right_Weighted_Average =
-      child_Nodes[1].samples_Number() / base_Population;
+      right_Child.get_Index().size() / base_Population;
 
+  // Computes weighted Average Variance for the two Nodes
   float weighted_Average_Var = left_Weighted_Average * left_Variance +
                                right_Weighted_Average * right_Variance;
 
   return weighted_Average_Var;
 }
 
-/* Search for the best attribute to split the dataset on at a given Node */
-/* Inputs :                                                              */
-/* Ouputs : String                                                       */
-std::string DecisionTree::find_Best_Feature() {
-  std::string best_Feature = "";
+/* Search for the best feature to split the dataset on at a given Node */
+/* Inputs :                                                            */
+/* Ouputs : int                                                        */
+int DecisionTree::find_Best_Split_Feature() {
+  int best_Feature = 0;
   float max_Reduction_In_Var = INT_MAX;
 
   std::vector<std::string> features =
@@ -209,7 +171,7 @@ std::string DecisionTree::find_Best_Feature() {
     float tmp_var = splitting_Variance(i);
     if (tmp_var < max_Reduction_In_Var) {
       max_Reduction_In_Var = tmp_var;
-      best_Feature = features[i];
+      best_Feature = i;
     }
   }
   return best_Feature;
@@ -218,4 +180,36 @@ std::string DecisionTree::find_Best_Feature() {
 /* Builds a Decision Tree recursively following a splitting criteria */
 /* Inputs  :                                                         */
 /* Outputs :                                                         */
-// void DecisionTree::build_Splitted_Tree(DecisionTree *dt) {}
+void DecisionTree::build_Splitted_Tree(int depth) {
+  if (depth > 0) {
+    int split_Feature = this->find_Best_Split_Feature();
+    std::cout << "Best feature id is : " << split_Feature << "\n";
+
+    float split_Criteria =
+        this->get_Current_Node().node_Column_Mean(split_Feature);
+    std::cout << "Split Criteria is : " << split_Criteria << "\n";
+
+    // Computing the Indexes of the Dataset for each childs
+    std::vector<std::vector<int>> child_Indexes =
+        this->get_Current_Node().node_Split(split_Feature, split_Criteria);
+
+    // Sharing the dataset (might have to change)
+    std::shared_ptr<DataSet> shared_DataSet =
+        std::make_shared<DataSet>(this->get_Current_Node().get_DataSet());
+
+    // Creating a left child unique ptr
+    auto left_Child =
+        std::make_unique<DecisionTree>(shared_DataSet, child_Indexes[0]);
+    this->add_Left(std::move(left_Child));
+
+    // Creating a right child unique ptr
+    auto right_Child =
+        std::make_unique<DecisionTree>(shared_DataSet, child_Indexes[1]);
+    this->add_Right(std::move(right_Child));
+
+    std::cout << " Node at Depth " << depth << " is \n";
+    this->get_Current_Node().node_Print();
+    this->get_Left_Tree()->build_Splitted_Tree(depth - 1);
+    this->get_Right_Tree()->build_Splitted_Tree(depth - 1);
+  }
+}

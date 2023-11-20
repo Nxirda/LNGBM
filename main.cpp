@@ -1,5 +1,6 @@
-#include "data_loading.h"
-#include "decision_tree.h"
+#include <stdio.h>
+#include "DataSet.hpp"
+#include "DecisionTree.hpp"
 
 using namespace std;
 
@@ -9,12 +10,13 @@ using namespace std;
 /*                   */
 /*********************/
 
+
 int main() {
 
   /*cout << "=== DataSet Loading ===\n";
   // cout << " Enter the Path of the CSV : \n";
   // cin >>;
-  DataSet D{"../methode_ensemblistes_modelisation/datasets/d1.csv"};*/
+  DataSet D{"../data/datasets/d1.csv"};*/
 
   // Initialize labels
   vector<string> label;
@@ -41,24 +43,29 @@ int main() {
 
   cout << "=== DataSet Loading & Tests ===\n";
 
-  cout << "= DataSet copy test = \n";
+  //cout << "= DataSet copy test = \n";
   DataSet truc = testing_DS;
-  truc.print();
-
-  cout << " = Node copy tests =\n";
-  TreeNode tn{testing_DS};
+  //truc.print();
+  std::vector<int> idx {0,1,2,3}; 
+  //cout << " = Node copy tests =\n";
+  std::shared_ptr<DataSet> tn_test = std::make_shared<DataSet> (testing_DS);
+  TreeNode tn{tn_test, idx};
   TreeNode ts;
   ts = tn;
-  ts.get_DataSet().print();
+  //ts.get_DataSet().print();
 
-  cout << " = Decision Tree Copy tests =\n";
+  //cout << " = Decision Tree Copy tests =\n";
   DecisionTree DT{testing_DS};
-  DT.print_Tree();
+  //DT.print_Tree();
   DecisionTree DS;
   DS = DT;
+  std::cout << "Base Tree is : \n";
   DS.print_Tree();
 
-  cout << "=== Decision Tree Global Tests === \n";
+  DT.build_Splitted_Tree(3);
+  //DT.print_Tree();
+
+  /*cout << "=== Decision Tree Global Tests === \n";
   cout << "= Add Left & Right =\n";
   vector<DataSet> div = DT.get_Current_Node().get_DataSet().split(0,5); 
 
@@ -69,7 +76,7 @@ int main() {
   DS.print_Tree();
 
   cout << "= find best feature test =\n";
-  cout << DS.find_Best_Feature() << endl;;
+  cout << DS.find_Best_Feature() << endl;;*/
   
   // Building a one node Tree
   //DecisionTree DT{testing_DS};
