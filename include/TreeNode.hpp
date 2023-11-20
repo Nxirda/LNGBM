@@ -36,9 +36,11 @@ public:
 
   // Methods
 
+  void node_Print();
   float node_Variance();
   bool node_Homogeneity();
-  void node_Print();
+  float node_Column_Mean(int position);
+  std::vector<std::vector<int>> node_Split(int position, float split_Criteria);
 };
 
 #endif
