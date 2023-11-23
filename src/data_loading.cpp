@@ -146,22 +146,29 @@ int Dataset::Entries_size() const { return this->get_Values().size(); }
 /* Return 2 Datasets representing the splitting of the given Dataset on the */
 /* given column label via a given limit (criteria)                          */
 /* Inputs : int, float                                                      */
-/* Ouputs : vector<Dataset>                                                 */
-vector<Dataset> Dataset::split(int position, float criteria) const {
+/* Ouputs : vector>unique_ptr<Dataset>>                                     */
+vector<unique_ptr<Dataset>> Dataset::split(int position, float criteria) const {
+  // Créer des vecteurs pour stocker les sous-ensembles du dataset
+  vector<unique_ptr<Dataset>> result;
 
   vector<vector<float>> subValuesRight;
   vector<vector<float>> subValuesLeft;
-  for (int row = 0; row < this->Entries_size(); ++row) {
-    if (this->get_Values()[row][position] < criteria) {
-      subValuesLeft.push_back(this->get_Values()[row]);
-    } else {
-      subValuesRight.push_back(this->get_Values()[row]);
+ // Itérer à travers chaque ligne du dataset
+  for (const vector<float>& row : this->get_Values()) {
+        // Vérifier si la position de la colonne spécifiée existe et si le critère est satisfait
+        if (row.size() > position && row[position] < criteria) {
+            // Si le critère est satisfait, ajouter la ligne au sous-ensemble de gauche
+            subValuesLeft.push_back(row);
+        } else {
+            // Si le critère n'est pas satisfait, ajouter la ligne au sous-ensemble de droite
+            subValuesRight.push_back(row);
+        }
     }
-  }
-  Dataset D_Right{this->get_Labels(), subValuesRight};
-  Dataset D_Left{this->get_Labels(), subValuesLeft};
-  vector<Dataset> Res{D_Left, D_Right};
-  return Res;
+    // Créer des pointeurs uniques vers des objets Dataset pour les sous-ensembles de gauche et de droite
+    result.push_back(make_unique<Dataset>(this->get_Labels(), subValuesLeft));
+    result.push_back(make_unique<Dataset>(this->get_Labels(), subValuesRight));
+
+    return result;
 }
 
 /* Computes the Mean of a given Column of the Dataset */

@@ -41,7 +41,7 @@ public:
   float Column_Mean(int position) const;
   float Column_Variance(int position) const;
   float Global_Variance() const;
-  vector<Dataset> split(int position, float criteria) const;
+  vector<unique_ptr<Dataset>> split(int position, float criteria) const;
 };
 
 #endif
