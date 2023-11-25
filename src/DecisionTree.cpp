@@ -24,13 +24,14 @@ DecisionTree::DecisionTree() {}
 /* Inputs  : Object of DataSet Class         */
 /* Outputs : Object of Decision Tree Class   */
 DecisionTree::DecisionTree(const DataSet &data) {
-  std::vector<int> idx;
+  std::vector<int> idx(data.samples_Number());
   for (int i = 0; i < data.samples_Number(); ++i) {
-    idx.push_back(i);
+    idx[i] = i;
   }
-  std::shared_ptr<DataSet> dataset = std::make_shared<DataSet>(data);
+  // std::shared_ptr<DataSet> dataset = std::make_shared<DataSet>(data);
   this->parent = nullptr;
-  this->curr_Node = std::make_shared<TreeNode>(TreeNode{dataset, idx});
+  this->curr_Node = std::make_shared<TreeNode>(
+      TreeNode{std::make_shared<DataSet>(data), idx});
   this->left = nullptr;
   this->right = nullptr;
 }
@@ -38,7 +39,7 @@ DecisionTree::DecisionTree(const DataSet &data) {
 /* Constructor for child nodes                */
 /* Inputs  : shared_ptr<DataSet>, vector<int> */
 /* Outputs : Object of Decision Tree Class    */
-DecisionTree::DecisionTree(const std::shared_ptr<DataSet> data,
+DecisionTree::DecisionTree(const std::shared_ptr<DataSet> &data,
                            std::vector<int> idx) {
   this->parent = nullptr;
   this->curr_Node = std::make_shared<TreeNode>(TreeNode{data, idx});

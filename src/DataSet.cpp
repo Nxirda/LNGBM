@@ -150,7 +150,7 @@ int DataSet::features_Length() const { return this->get_Features().size(); }
 /* Return the height (= number of samples) of the DataSet*/
 /* Inputs :                                              */
 /* Ouputs : int                                          */
-int DataSet::samples_Number() const { return this->get_Samples().size(); }
+int DataSet::samples_Number() const { return this->samples.size(); }
 
 /* Returns the specified column of the dataset */
 /* Inputs : int                                */

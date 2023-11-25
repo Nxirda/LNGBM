@@ -10,86 +10,40 @@ using namespace std;
 /*                   */
 /*********************/
 
+uint64_t rdtsc() {
+  unsigned int lo, hi;
+  __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
+  return ((uint64_t)hi << 32) | lo;
+}
 
 int main() {
 
-  /*cout << "=== DataSet Loading ===\n";
-  // cout << " Enter the Path of the CSV : \n";
-  // cin >>;
-  DataSet D{"../data/datasets/d1.csv"};*/
+  cout << "=== DataSet Loading ===\n";
 
-  // Initialize labels
-  vector<string> label;
-  label.push_back("Test1");
-  label.push_back("Test2");
-  label.push_back("Test3");
+  uint64_t t0 = rdtsc();
+  DataSet DS{"../data/datasets/d1.csv"};
+  uint64_t t1 = rdtsc();
+  std::cout << "Loading the dataset took : " << t1 - t0 << " CPU cycles\n";
 
-  // Initialize the Datas
-  vector<vector<float>> Datas;
+  uint64_t t_Shared_DS = rdtsc();
+  std::shared_ptr<DataSet> DS2 = std::make_shared<DataSet>(DS);
+  uint64_t t_Shared_DS_F = rdtsc();
+  std::cout << "Making shared ptr of dataset took : " << t_Shared_DS_F - t_Shared_DS << " CPU cycles\n";
 
-  // Create a vector of size n with all values as 2nd parameter.
-  vector<float> vect(3, 10);
-  vector<float> vect2(3, 4);
-  vector<float> vect3(3, 2);
-  vector<float> vect4(3, 7);
+  uint64_t t4 = rdtsc();
+  TreeNode TN{DS2};
+  uint64_t t5 = rdtsc();
+  std::cout << "Making a Node of the dataset took : " << t5 - t4 << " CPU cycles\n";
 
-  // Fill the Datas Vector
-  Datas.push_back(vect);
-  Datas.push_back(vect2);
-  Datas.push_back(vect3);
-  Datas.push_back(vect4);
+  //uint64_t t2 = rdtsc();
+  //DecisionTree DT{DS};
+  //uint64_t t3 = rdtsc();
+  //std::cout << "Buidling one node Tree of the dataset took : " << t3 - t2 << " CPU cycles\n";
 
-  DataSet testing_DS{label, Datas};
-
-  cout << "=== DataSet Loading & Tests ===\n";
-
-  //cout << "= DataSet copy test = \n";
-  DataSet truc = testing_DS;
-  //truc.print();
-  std::vector<int> idx {0,1,2,3}; 
-  //cout << " = Node copy tests =\n";
-  std::shared_ptr<DataSet> tn_test = std::make_shared<DataSet> (testing_DS);
-  TreeNode tn{tn_test, idx};
-  TreeNode ts;
-  ts = tn;
-  //ts.get_DataSet().print();
-
-  //cout << " = Decision Tree Copy tests =\n";
-  DecisionTree DT{testing_DS};
-  //DT.print_Tree();
-  DecisionTree DS;
-  DS = DT;
-  std::cout << "Base Tree is : \n";
-  DS.print_Tree();
-
-  DT.build_Splitted_Tree(3);
-  //DT.print_Tree();
-
-  /*cout << "=== Decision Tree Global Tests === \n";
-  cout << "= Add Left & Right =\n";
-  vector<DataSet> div = DT.get_Current_Node().get_DataSet().split(0,5); 
-
-  std::unique_ptr<DecisionTree> dt(new DecisionTree{div[0]});
-  DS.add_Left(std::move(dt));
-  std::unique_ptr<DecisionTree> dt2(new DecisionTree{div[1]});
-  DS.add_Right(std::move(dt2));
-  DS.print_Tree();
-
-  cout << "= find best feature test =\n";
-  cout << DS.find_Best_Feature() << endl;;*/
-  
-  // Building a one node Tree
-  //DecisionTree DT{testing_DS};
-  //cout << DT.find_Best_Feature() << endl;
-
-  /*cout << "Decision Tree is :\n";
-  DT.get_Current_Node().get_DataSet().print();
-
-  cout << "Copy column test \n";
-  //vector<float> column = DT.get_Current_Node().get_DataSet().get_Column(0);
-  DT.FindBestAttribute();
-  rec_Naive_Splitting(&DT);
-  DT.print_Tree();*/
+  //uint64_t t4 = rdtsc();
+  //DT.build_Splitted_Tree(1);
+  //uint64_t t5 = rdtsc();
+  //std::cout << "Splitting at depth 5 took : " << t5 - t4 << " CPU cycles\n";
 
   return 0;
 }

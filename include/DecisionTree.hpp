@@ -24,8 +24,8 @@ public:
 
   DecisionTree();
   DecisionTree(const DataSet &data);
-  DecisionTree(const std::shared_ptr<DataSet> data, std::vector<int> idx);
-  //DecisionTree(const DecisionTree &dt);      // Copy operator
+  DecisionTree(const std::shared_ptr<DataSet> &data, std::vector<int> idx);
+  // DecisionTree(const DecisionTree &dt);      // Copy operator
   DecisionTree &operator=(DecisionTree &dt); // Copy assignment
 
   // Destructor

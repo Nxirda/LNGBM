@@ -19,7 +19,20 @@ TreeNode::~TreeNode() {}
 /* Constructor with DataSet and vector index:       */
 /* Inputs  : Object of DataSet Class, vector        */
 /* Outputs : TreeNode Object containing the DataSet */
-TreeNode::TreeNode(std::shared_ptr<DataSet> data, std::vector<int> &idx) {
+TreeNode::TreeNode(std::shared_ptr<DataSet> data) {
+  std::vector<int> idx(data->samples_Number());
+  for (int i = 0; i < data->samples_Number(); ++i) {
+    idx[i] = i;
+  }
+  this->data = data;
+  this->index = idx; // std::move(idx);
+}
+
+/* Constructor with DataSet and vector index:       */
+/* Inputs  : Object of DataSet Class, vector        */
+/* Outputs : TreeNode Object containing the DataSet */
+TreeNode::TreeNode(const std::shared_ptr<DataSet> &data,
+                   std::vector<int> &idx) {
   this->data = data;
   this->index = idx; // std::move(idx);
 }
@@ -83,10 +96,10 @@ bool TreeNode::node_Homogeneity() {
 /* Returns the indexes after the split of the Node's DataSet */
 /* Inputs  : int, float                                      */
 /* Outputs : vector<vector<int>>                             */
-std::vector<std::vector<int>> TreeNode::node_Split(int position, float split_Criteria){
-    return this->get_DataSet().split(position, split_Criteria, this->get_Index());
+std::vector<std::vector<int>> TreeNode::node_Split(int position,
+                                                   float split_Criteria) {
+  return this->get_DataSet().split(position, split_Criteria, this->get_Index());
 }
-
 
 /* Prints the Node */
 /* Inputs :        */
