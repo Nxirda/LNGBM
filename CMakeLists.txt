@@ -4,10 +4,10 @@ cmake_minimum_required(VERSION 3.10)
 project(PPN)
 
 #Enable modern C++
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 
 #Add compilation options 
-add_compile_options(-Wall -Wextra -Werror -Wpedantic -O3)
+add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3)
 
 #Add the executable
 add_executable(Projet_run main.cpp src/DataSet.cpp src/DecisionTree.cpp src/TreeNode.cpp)

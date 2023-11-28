@@ -4,6 +4,7 @@
 #include <stdexcept> // std::runtime_error
 #include <string>
 #include <vector>
+#include <numeric>
 
 #include "DataSet.hpp"
 
@@ -140,12 +141,12 @@ std::vector<std::vector<float>> DataSet::get_Samples() const {
 /* Return True if there are no values in the DataSet */
 /* Inputs :                                          */
 /* Ouputs : boolean                                  */
-bool DataSet::empty() const { return this->get_Samples().empty(); }
+bool DataSet::empty() const { return this->samples.empty(); }
 
 /* Return the length (= number of features) of the DataSet */
 /* Inputs :                                                */
 /* Ouputs : int                                            */
-int DataSet::features_Length() const { return this->get_Features().size(); }
+int DataSet::features_Length() const { return this->features.size(); }
 
 /* Return the height (= number of samples) of the DataSet*/
 /* Inputs :                                              */
@@ -161,23 +162,22 @@ std::vector<float> DataSet::get_Column(int position) const {
     return Col;
   }
   for (int j = 0; j < this->samples_Number(); ++j) {
-    Col.push_back(this->get_Samples()[j][position]);
+    Col.push_back(this->samples[j][position]);
   }
   return Col;
 }
 
-/* Return 2 DataSets representing the splitting of the given DataSet on the */
-/* given column feature position via a given limit (criteria)               */
+/* Return 2 vector which contains the index of each subtree datasets after  */
+/* split, which is based on the criteria on a row at the col position       */
 /* Inputs : int, float                                                      */
-/* Ouputs : vector<DataSet>                                                 */
+/* Ouputs : vector<vector<int>>                                             */
 std::vector<std::vector<int>> DataSet::split(int position, float criteria,
                                              const std::vector<int> &idx) const {
 
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
-  // for (int row = 0; row < this->samples_Number(); ++row) {
   for (int row : idx) {
-    if (this->get_Samples()[row][position] < criteria) {
+    if (this->samples[row][position] < criteria) {
       sub_Index_Left.push_back(row);
     } else {
       sub_Index_Right.push_back(row);
@@ -199,14 +199,7 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
 
   std::vector<float> current_Column = this->get_Column(position);
 
-  float mean = 0.0;
-  for (int i : idx) {
-    mean += current_Column[i];
-  }
-  /*
-  for (float elem : current_Column) {
-    mean += elem;
-  }*/
+  float mean = std::reduce(current_Column.begin(), current_Column.end(), 0l);
   mean /= len;
   return mean;
 }
@@ -231,10 +224,6 @@ float DataSet::column_Variance(int position,
     float difference = current_Column[i] - mean;
     variance += difference * difference;
   }
-  /*for (float elem : current_Column) {
-    float difference = elem - mean;
-    variance += difference * difference;
-  }*/
   variance /= len;
   return variance;
 }

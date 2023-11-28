@@ -24,9 +24,7 @@ public:
 
   DecisionTree();
   DecisionTree(const DataSet &data);
-  DecisionTree(const std::shared_ptr<DataSet> &data, std::vector<int> idx);
-  // DecisionTree(const DecisionTree &dt);      // Copy operator
-  DecisionTree &operator=(DecisionTree &dt); // Copy assignment
+  DecisionTree(std::shared_ptr<TreeNode> tree_Node, std::vector<int> idx);
 
   // Destructor
 
@@ -48,12 +46,11 @@ public:
   // Methods
 
   void build_Splitted_Tree(int depth);
-  int find_Best_Split_Feature();
   void print_Tree();
 
 private:
   // Methods only used inside the class
-
+  int find_Best_Split_Feature();
   float splitting_Variance(int position);
 };
 
