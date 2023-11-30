@@ -1,5 +1,6 @@
-#include "include/data_loading.h"
-#include "include/decision_tree.h"
+#include <stdio.h>
+#include "DataSet.hpp"
+#include "DecisionTree.hpp"
 
 using namespace std;
 
@@ -9,84 +10,13 @@ using namespace std;
 /*                   */
 /*********************/
 
-/* Divides the dataset in two subsets depending on the label size */
-std::vector<Dataset> Data_Splitting_in_two(DecisionTree *DT) {
-  // Naive version for testing
-  std::vector<std::string> subLabels1;
-  std::vector<std::vector<float>> subSet1;
-
-  std::vector<std::string> subLabels2;
-  std::vector<std::vector<float>> subSet2;
-
-  Dataset data = DT->get_Current_Node().get_Dataset();
-  for (int i = 0; i < data.Label_length(); ++i) {
-
-    /* Splitting the labels */
-    if (i < data.Label_length() / 2) {
-      subLabels1.push_back(data.get_Labels()[i]);
-    } else {
-      subLabels2.push_back(data.get_Labels()[i]);
-    }
-  }
-  /* Splitting the datas accordingly */
-  // We get the current line (easier to manipulate)
-  for (int i = 0; i < data.Entries_size(); ++i) {
-    vector<float> curr_line;
-    for (int j = 0; j < data.Label_length(); ++j) {
-      curr_line.push_back(data.get_Values()[i][j]);
-    }
-
-    vector<float> left;
-    vector<float> right;
-
-    // We define an iterator that splits de columns in two parts (half)
-    vector<float>::iterator middleItr(curr_line.begin() + curr_line.size() / 2);
-
-    // Loop to put the datas in the half it belongs to
-    for (auto it = curr_line.begin(); it != curr_line.end(); ++it) {
-      if (std::distance(it, middleItr) > 0) {
-        left.push_back(*it);
-      } else {
-        right.push_back(*it);
-      }
-    }
-
-    //
-    subSet1.push_back(left);
-    subSet2.push_back(right);
-  }
-
-  // Create two "new" Datasets
-  Dataset First_Half{subLabels1, subSet1};
-  Dataset Second_Half{subLabels2, subSet2};
-
-  // Cast the two half in a vector (could be an array at some point)
-  std::vector<Dataset> res;
-  res.push_back(First_Half);
-  res.push_back(Second_Half);
-
-  return (res);
-}
-
-/* Calls the splitting function recursively on the tree */
-void rec_Naive_Splitting(DecisionTree *DT) {
-  //While Dataset as more than 1 column
-  if (DT->get_Current_Node().get_Dataset().Label_length() > 1) {
-    vector<Dataset> Data_Splitted = Data_Splitting_in_two(DT);
-    DT->add_left(Data_Splitted[0]);
-    DT->add_right(Data_Splitted[1]);
-    rec_Naive_Splitting(&DT->get_LeftTree());
-    rec_Naive_Splitting(&DT->get_RightTree());
-  }
-}
-
 
 int main() {
 
-  /*cout << "=== Dataset Loading ===\n";
+  /*cout << "=== DataSet Loading ===\n";
   // cout << " Enter the Path of the CSV : \n";
   // cin >>;
-  Dataset D{"../methode_ensemblistes_modelisation/datasets/d1.csv"};*/
+  DataSet D{"../data/datasets/d1.csv"};*/
 
   // Initialize labels
   vector<string> label;
@@ -109,36 +39,54 @@ int main() {
   Datas.push_back(vect3);
   Datas.push_back(vect4);
 
-  Dataset testing_DS{label, Datas};
+  DataSet testing_DS{label, Datas};
 
-  cout << "=== Dataset Loading & Tests ===\n";
+  cout << "=== DataSet Loading & Tests ===\n";
 
-  cout << "Dataset copy test \n";
-  Dataset truc = testing_DS;
-  truc.print();
+  //cout << "= DataSet copy test = \n";
+  DataSet truc = testing_DS;
+  //truc.print();
+  std::vector<int> idx {0,1,2,3}; 
+  //cout << " = Node copy tests =\n";
+  std::shared_ptr<DataSet> tn_test = std::make_shared<DataSet> (testing_DS);
+  TreeNode tn{tn_test, idx};
+  TreeNode ts;
+  ts = tn;
+  //ts.get_DataSet().print();
 
-  cout << "Node copy test \n";
-  TreeNode tn{testing_DS};
-  TreeNode ts = tn;
-  ts.get_Dataset().print();
-
-  cout << "Data set is :\n";
-  testing_DS.print();
-
-  cout << "Splitting Test : \n";
-  vector<Dataset> div = testing_DS.split(0, 5);
-  div[0].print();
-  div[1].print();
-
-  // Building a one node Tree
+  //cout << " = Decision Tree Copy tests =\n";
   DecisionTree DT{testing_DS};
-  cout << DT.FindBestAttribute() << endl;
+  //DT.print_Tree();
+  DecisionTree DS;
+  DS = DT;
+  std::cout << "Base Tree is : \n";
+  DS.print_Tree();
+
+  DT.build_Splitted_Tree(3);
+  //DT.print_Tree();
+
+  /*cout << "=== Decision Tree Global Tests === \n";
+  cout << "= Add Left & Right =\n";
+  vector<DataSet> div = DT.get_Current_Node().get_DataSet().split(0,5); 
+
+  std::unique_ptr<DecisionTree> dt(new DecisionTree{div[0]});
+  DS.add_Left(std::move(dt));
+  std::unique_ptr<DecisionTree> dt2(new DecisionTree{div[1]});
+  DS.add_Right(std::move(dt2));
+  DS.print_Tree();
+
+  cout << "= find best feature test =\n";
+  cout << DS.find_Best_Feature() << endl;;*/
+  
+  // Building a one node Tree
+  //DecisionTree DT{testing_DS};
+  //cout << DT.find_Best_Feature() << endl;
 
   /*cout << "Decision Tree is :\n";
-  DT.get_Current_Node().get_Dataset().print();
+  DT.get_Current_Node().get_DataSet().print();
 
   cout << "Copy column test \n";
-  //vector<float> column = DT.get_Current_Node().get_Dataset().get_Column(0);
+  //vector<float> column = DT.get_Current_Node().get_DataSet().get_Column(0);
   DT.FindBestAttribute();
   rec_Naive_Splitting(&DT);
   DT.print_Tree();*/
