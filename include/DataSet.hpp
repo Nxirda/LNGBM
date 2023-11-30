@@ -27,7 +27,7 @@ public:
   // Getters
 
   std::vector<std::string> get_Features() const;
-  std::vector<float> get_Column(int position) const;
+  std::vector<float> get_Column(int position, const std::vector<int> &idx) const;
   std::vector<std::vector<float>> get_Samples() const;
  
 
@@ -40,9 +40,10 @@ public:
   int features_Length() const;
   int samples_Number() const;
 
-  float global_Variance(const std::vector<int> &idx) const;
+  //float global_Variance(const std::vector<int> &idx) const;
+  //float global_Mean(const std::vector<int> &idx) const;
   float column_Mean(int position, const std::vector<int> &idx) const;
-  float column_Variance(int position, const std::vector<int> &idx) const;
+  float column_Variance(const std::vector<int> &idx) const;
   
   std::vector<std::vector<int>> split(int position, float criteria, const std::vector<int> &idx) const;
 };

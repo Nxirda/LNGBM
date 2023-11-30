@@ -1,10 +1,10 @@
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <sstream>   // std::stringstream
 #include <stdexcept> // std::runtime_error
 #include <string>
 #include <vector>
-#include <numeric>
 
 #include "DataSet.hpp"
 
@@ -156,13 +156,14 @@ int DataSet::samples_Number() const { return this->samples.size(); }
 /* Returns the specified column of the dataset */
 /* Inputs : int                                */
 /* Ouputs : vector<float>                      */
-std::vector<float> DataSet::get_Column(int position) const {
+std::vector<float> DataSet::get_Column(int position,
+                                       const std::vector<int> &idx) const {
   std::vector<float> Col;
   if (position > this->features_Length()) {
     return Col;
   }
-  for (int j = 0; j < this->samples_Number(); ++j) {
-    Col.push_back(this->samples[j][position]);
+  for (int row : idx) {
+    Col.push_back(this->samples[row][position]);
   }
   return Col;
 }
@@ -171,8 +172,9 @@ std::vector<float> DataSet::get_Column(int position) const {
 /* split, which is based on the criteria on a row at the col position       */
 /* Inputs : int, float                                                      */
 /* Ouputs : vector<vector<int>>                                             */
-std::vector<std::vector<int>> DataSet::split(int position, float criteria,
-                                             const std::vector<int> &idx) const {
+std::vector<std::vector<int>>
+DataSet::split(int position, float criteria,
+               const std::vector<int> &idx) const {
 
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
@@ -197,7 +199,7 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
     return 0.0;
   }
 
-  std::vector<float> current_Column = this->get_Column(position);
+  std::vector<float> current_Column = this->get_Column(position, idx);
 
   float mean = std::reduce(current_Column.begin(), current_Column.end(), 0l);
   mean /= len;
@@ -207,35 +209,56 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
 /* Computes the Variance of a given Column of the  DataSet */
 /* Inputs  : int                                           */
 /* Outputs : float                                         */
-float DataSet::column_Variance(int position,
-                               const std::vector<int> &idx) const {
+float DataSet::column_Variance(const std::vector<int> &idx) const {
   int len = idx.size();
   //  check if there are values in the current Column
-  if (len < 0 || position > this->features_Length() || position < 0) {
+  if (len <= 0) {
     return 0.0;
   }
 
-  std::vector<float> current_Column = this->get_Column(position);
+  std::vector<float> current_Column = this->get_Column(this->features_Length()-1, idx);
 
-  float mean = column_Mean(position, idx);
+  float mean = column_Mean(this->features_Length()-1, idx);
   float variance = 0.0;
 
-  for (int i : idx) {
-    float difference = current_Column[i] - mean;
+  for (int i : current_Column) {
+    //float difference = current_Column[i] - mean;
+    float difference = i - mean;
     variance += difference * difference;
   }
   variance /= len;
   return variance;
 }
 
+/*
+float DataSet::global_Mean(const std::vector<int> &idx) const{
+  int mean = 0.0;
+  int len = this->features_Length();
+   for (int i = 0; i < len; ++i) {
+    for(int j : idx){
+      mean += this->samples[j][i];
+    }
+  }
+  mean = mean/(len*idx.size());
+  return mean;
+}*/
+
 /* Computes the Global Variance of the  DataSet */
 /* Inputs  :                                    */
-/* Outputs : float                              */
+/* Outputs : float
 float DataSet::global_Variance(const std::vector<int> &idx) const {
   int len = this->features_Length();
   float var_res = 0;
+  int width = idx.size();
+
+  float mean = global_Mean(idx);
   for (int i = 0; i < len; ++i) {
-    var_res += this->column_Variance(i, idx);
+    for(int j : idx){
+      float temp = this->samples[j][i] - mean;
+      temp *= temp;
+      var_res += temp;
+    }
   }
+  var_res = var_res/(len*width);
   return var_res;
-}
+}*/

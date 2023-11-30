@@ -64,7 +64,7 @@ std::vector<int> TreeNode::get_Index() { return this->index; }
 /* Inputs  : int                              */
 /* Outputs : float                            */
 float TreeNode::node_Variance() {
-  return this->data->global_Variance(this->get_Index());
+  return this->data->column_Variance(this->get_Index());
 }
 
 /* Returns the Mean of the Node's DataSet */
@@ -79,10 +79,11 @@ float TreeNode::node_Column_Mean(int position) {
 /* Inputs  :                                                    */
 /* Outputs : bool                                               */
 bool TreeNode::node_Homogeneity() {
-  std::vector<float> labels = this->data->get_Column(this->data->features_Length());
+  std::vector<float> labels =
+      this->data->get_Column(this->data->features_Length(), this->get_Index());
   int base = labels[0];
-  for(float curr_Label : labels){
-    if(curr_Label != base){
+  for (float curr_Label : labels) {
+    if (curr_Label != base) {
       return false;
     }
   }

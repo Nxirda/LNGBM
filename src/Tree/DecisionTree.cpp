@@ -42,7 +42,7 @@ DecisionTree::DecisionTree(const DataSet &data) {
 DecisionTree::DecisionTree(std::shared_ptr<TreeNode> tree_Node,
                            std::vector<int> idx) {
   this->parent = nullptr;
-  this->curr_Node = std::make_shared<TreeNode> (*tree_Node);
+  this->curr_Node = std::make_shared<TreeNode>(*tree_Node);
   this->curr_Node.get()->set_Index(idx);
   this->left = nullptr;
   this->right = nullptr;
@@ -51,12 +51,16 @@ DecisionTree::DecisionTree(std::shared_ptr<TreeNode> tree_Node,
 /* Default Destructor */
 /* Inputs  :          */
 /* Outputs :          */
-DecisionTree::~DecisionTree(){}; // delete this->curr_Node; }
+DecisionTree::~DecisionTree(){};
 
 /* Returns the Current Node of the Tree      */
 /* Inputs  :                                 */
 /* Outputs : pointer of Decision Tree Object */
-TreeNode &DecisionTree::get_Current_Node() { return *this->curr_Node; }
+// TreeNode &DecisionTree::get_Current_Node() { return *this->curr_Node; }
+
+std::shared_ptr<TreeNode> DecisionTree::get_Current_Node() {
+  return this->curr_Node;
+}
 
 /* Returns the Parent Tree                   */
 /* Inputs  :                                 */
@@ -84,6 +88,7 @@ void DecisionTree::add_Parent(DecisionTree *d) { this->parent = d; }
 void DecisionTree::add_Left(std::unique_ptr<DecisionTree> dt) {
   this->left = std::move(dt);
   this->left->add_Parent(this);
+  this->left->add_Operator(this->split_Operator);
 }
 
 /* Sets a new right Subtree         */
@@ -92,6 +97,11 @@ void DecisionTree::add_Left(std::unique_ptr<DecisionTree> dt) {
 void DecisionTree::add_Right(std::unique_ptr<DecisionTree> dt) {
   this->right = std::move(dt);
   this->right->add_Parent(this);
+  this->right->add_Operator(this->split_Operator);
+}
+
+void DecisionTree::add_Operator(IOperator *wanted_Operator) {
+  this->split_Operator = wanted_Operator;
 }
 
 /* Print function for Decision Trees */
@@ -111,7 +121,7 @@ void DecisionTree::print_Tree() {
 /* variance of child nodes                                 */
 /* Inputs  : int                                           */
 /* Outputs : float                                         */
-float DecisionTree::splitting_Variance(int position) {
+/* float DecisionTree::splitting_Variance(int position) {
   // Computes the split criteria, needs to be not hardcoded in the future
   float split_Criteria = this->curr_Node->node_Column_Mean(position);
 
@@ -122,10 +132,9 @@ float DecisionTree::splitting_Variance(int position) {
   float base_Population = this->curr_Node->get_Index().size();
 
   // Creating a left child
-  TreeNode left_Child{
-      std::make_shared<DataSet>(this->curr_Node->get_DataSet()),
-      child_Indexes[0]};
-  
+  TreeNode left_Child{std::make_shared<DataSet>(this->curr_Node->get_DataSet()),
+                      child_Indexes[0]};
+
   // Creating a right child
   TreeNode right_Child{
       std::make_shared<DataSet>(this->curr_Node->get_DataSet()),
@@ -145,12 +154,12 @@ float DecisionTree::splitting_Variance(int position) {
                                right_Weighted_Average * right_Variance;
 
   return weighted_Average_Var;
-}
+} */
 
 /* Search for the best feature to split the dataset on at a given Node */
 /* Inputs :                                                            */
 /* Ouputs : int                                                        */
-int DecisionTree::find_Best_Split_Feature() {
+/* int DecisionTree::find_Best_Split_Feature() {
   int best_Feature = 0;
   float max_Reduction_In_Var = INT_MAX;
 
@@ -165,18 +174,17 @@ int DecisionTree::find_Best_Split_Feature() {
     }
   }
   return best_Feature;
-}
+} */
 
 /* Builds a Decision Tree recursively following a splitting criteria */
 /* Inputs  :                                                         */
 /* Outputs :                                                         */
 void DecisionTree::build_Splitted_Tree(int depth) {
   if (depth > 0) {
-    //
-    int split_Feature = this->find_Best_Split_Feature();
-
-    float split_Criteria =
-        this->curr_Node->node_Column_Mean(split_Feature);
+    this->split_Operator->set_Tree(this);
+    int split_Feature = this->split_Operator->find_Best_Split_Feature();
+    // Has to be changed
+    float split_Criteria = this->split_Operator->get_Best_Split_Criteria();
 
     // Computing the Indexes of the Dataset for each childs
     std::vector<std::vector<int>> child_Indexes =
@@ -192,6 +200,7 @@ void DecisionTree::build_Splitted_Tree(int depth) {
         std::make_unique<DecisionTree>(curr_Node, child_Indexes[1]);
     this->add_Right(std::move(right_Child));
 
+    // Recursive part
     this->left->build_Splitted_Tree(depth - 1);
     this->right->build_Splitted_Tree(depth - 1);
   }
