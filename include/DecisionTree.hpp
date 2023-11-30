@@ -33,7 +33,6 @@ public:
 
   // Getters
 
-  // TreeNode &get_Current_Node();
   std::shared_ptr<TreeNode> get_Current_Node();
   DecisionTree &get_Parent_Tree();
   DecisionTree *get_Right_Tree();
@@ -51,10 +50,6 @@ public:
   void build_Splitted_Tree(int depth);
   void print_Tree();
 
-private:
-  // Methods only used inside the class
-  // int find_Best_Split_Feature();
-  // float splitting_Variance(int position);
 };
 
 #endif

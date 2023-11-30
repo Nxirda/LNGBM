@@ -40,8 +40,6 @@ public:
   int features_Length() const;
   int samples_Number() const;
 
-  //float global_Variance(const std::vector<int> &idx) const;
-  //float global_Mean(const std::vector<int> &idx) const;
   float column_Mean(int position, const std::vector<int> &idx) const;
   float column_Variance(const std::vector<int> &idx) const;
   

@@ -3,10 +3,18 @@
 #include "DecisionTree.hpp" // <- only in the cpps other wise circular dependances
 #include "ReductionInVar.hpp"
 
-/**/
+/*
+Constructor
+Input  : DecisionTree*
+Output :
+*/
 ReductionInVar::ReductionInVar(DecisionTree *tree) { this->tree = tree; }
 
-/**/
+/*
+Setter for the tree pointer
+Input  : DecisionTree*
+Output : bool
+*/
 bool ReductionInVar::set_Tree(DecisionTree *tree) {
   this->tree = tree;
   this->split_Criteria = 0.0;
@@ -16,28 +24,45 @@ bool ReductionInVar::set_Tree(DecisionTree *tree) {
   return false;
 }
 
-/**/
-ReductionInVar::~ReductionInVar() { /*free(this->tree);*/
-}
+/*
+Destructor
+Input  :
+Output :
+*/
+ReductionInVar::~ReductionInVar() {}
 
-/**/
+/*
+Print function to see the name of the operator
+(For debugging mainly)
+Input  :
+Output :
+*/
 void ReductionInVar::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
-  // this->tree->print_Tree();
 }
 
-/**/
+/*
+Returns the best splitting criteria for RIV algorithm
+Input  :
+Output : float
+*/
 float ReductionInVar::get_Best_Split_Criteria() { return this->split_Criteria; }
 
-/**/
+/*
+Sets the split criteria as the value given
+Input  : float
+Output :
+*/
 void ReductionInVar::set_Split_Criteria(float value) {
   this->split_Criteria = value;
 }
 
-/* Returns the variance of a split as the weighted average */
-/* variance of child nodes                                 */
-/* Inputs  : int                                           */
-/* Outputs : float                                         */
+/*
+Returns the variance of a split as the weighted average
+variance of child nodes
+Inputs  : int
+Outputs : float
+*/
 float ReductionInVar::splitting_Variance(int position) {
   // Computes the split criteria, needs to be not hardcoded in the future
   float split_Criteria =
@@ -75,9 +100,11 @@ float ReductionInVar::splitting_Variance(int position) {
   return weighted_Average_Var;
 }
 
-/* Search for the best feature to split the dataset on at a given Node */
-/* Inputs :                                                            */
-/* Ouputs : int                                                        */
+/*
+Search for the best feature to split the dataset on at a given Node
+Inputs :
+Ouputs : int
+*/
 int ReductionInVar::find_Best_Split_Feature() {
   int best_Feature = 0;
   float max_Reduction_In_Var = INT_MAX;

@@ -35,7 +35,6 @@ public:
 
   void print() override;
   int find_Best_Split_Feature() override;
-  // void build_Splitted_Tree(int depth) override;
 
   float splitting_Variance(int position);
 };

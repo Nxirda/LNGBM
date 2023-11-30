@@ -10,10 +10,12 @@
 
 // https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
 
-/* Take the path of the file to read                         */
-/* Instanciates an object of type DataSet from the given CSV */
-/* Inputs : String                                           */
-/* Ouputs : Object of DataSet Cass                           */
+/* 
+Take the path of the file to read                         
+Instanciates an object of type DataSet from the given CSV 
+Inputs : String                                           
+Ouputs : Object of DataSet Cass                           
+*/
 DataSet::DataSet(std::string file_Path) {
   // input filestream
   std::ifstream file;
@@ -66,18 +68,22 @@ DataSet::DataSet(std::string file_Path) {
   file.close();
 }
 
-/* Explicit Constructor, takes two vectors and builds a DataSet Object */
-/* Inputs : vector<string>, vector<vector<float>>                      */
-/* Ouputs : Object of DataSet Class                                    */
+/* 
+Explicit Constructor, takes two vectors and builds a DataSet Object 
+Inputs : vector<string>, vector<vector<float>>                      
+Ouputs : Object of DataSet Class                                    
+*/
 DataSet::DataSet(std::vector<std::string> features,
                  std::vector<std::vector<float>> samples) {
   this->features = features;
   this->samples = samples;
 }
 
-/* Default Constructor              */
-/* Inputs :                         */
-/* Ouputs : Object of DataSet Class */
+/* 
+Default Constructor              
+Inputs :                         
+Ouputs : Object of DataSet Class 
+*/
 DataSet::DataSet() {}
 
 /* Default Destructor */
@@ -85,9 +91,11 @@ DataSet::DataSet() {}
 /* Ouputs :           */
 DataSet::~DataSet() {}
 
-/* Naive print function of the DataSet */
-/* Inputs :                            */
-/* Ouputs :                            */
+/* 
+Naive print function of the DataSet 
+Inputs :                            
+Ouputs :                            
+*/
 void DataSet::print() const {
   // Logical but prints the features
   for (long unsigned int i = 0; i < this->features.size(); ++i) {
@@ -104,10 +112,12 @@ void DataSet::print() const {
   std::cout << "\n";
 }
 
-/* Print function of the DataSet with Index */
-/* Used by TreeNode Class                   */
-/* Inputs : vector<int>                     */
-/* Ouputs :                                 */
+/* 
+Print function of the DataSet with Index 
+Used by TreeNode Class                   
+Inputs : vector<int>                     
+Ouputs :                                 
+*/
 void DataSet::print_With_Index(std::vector<int> idx) const {
   // Logical but prints the features
   for (long unsigned int i = 0; i < this->features.size(); ++i) {
@@ -124,38 +134,50 @@ void DataSet::print_With_Index(std::vector<int> idx) const {
   std::cout << "\n";
 }
 
-/* Returns the features of the DataSet */
-/* Inputs :                            */
-/* Ouputs : vector<string>             */
+/* 
+Returns the features of the DataSet 
+Inputs :
+Ouputs : vector<string>             
+*/
 std::vector<std::string> DataSet::get_Features() const {
   return this->features;
 }
 
-/* Returns the Values of the DataSet */
-/* Inputs :                          */
-/* Ouputs : vector<vector<float>>    */
+/*
+Returns the Values of the DataSet
+Inputs :
+Ouputs : vector<vector<float>>
+*/
 std::vector<std::vector<float>> DataSet::get_Samples() const {
   return this->samples;
 }
 
-/* Return True if there are no values in the DataSet */
-/* Inputs :                                          */
-/* Ouputs : boolean                                  */
+/*
+Return True if there are no values in the DataSet
+Inputs
+Ouputs : boolean
+*/
 bool DataSet::empty() const { return this->samples.empty(); }
 
-/* Return the length (= number of features) of the DataSet */
-/* Inputs :                                                */
-/* Ouputs : int                                            */
+/*
+Return the length (= number of features) of the DataSet
+Inputs :
+Ouputs : int
+*/
 int DataSet::features_Length() const { return this->features.size(); }
 
-/* Return the height (= number of samples) of the DataSet*/
-/* Inputs :                                              */
-/* Ouputs : int                                          */
+/*
+Return the height (= number of samples) of the DataSet
+Inputs :
+Ouputs : int
+*/
 int DataSet::samples_Number() const { return this->samples.size(); }
 
-/* Returns the specified column of the dataset */
-/* Inputs : int                                */
-/* Ouputs : vector<float>                      */
+/*
+Returns the specified column of the dataset
+Inputs : int
+Ouputs : vector<float>
+*/
 std::vector<float> DataSet::get_Column(int position,
                                        const std::vector<int> &idx) const {
   std::vector<float> Col;
@@ -168,10 +190,11 @@ std::vector<float> DataSet::get_Column(int position,
   return Col;
 }
 
-/* Return 2 vector which contains the index of each subtree datasets after  */
-/* split, which is based on the criteria on a row at the col position       */
-/* Inputs : int, float                                                      */
-/* Ouputs : vector<vector<int>>                                             */
+/*
+Return 2 vector which contains the index of each subtree datasets after
+split, which is based on the criteria on a row at the col position
+Inputs : int, float
+Ouputs : vector<vector<int>>*/
 std::vector<std::vector<int>>
 DataSet::split(int position, float criteria,
                const std::vector<int> &idx) const {
@@ -189,9 +212,11 @@ DataSet::split(int position, float criteria,
   return res;
 }
 
-/* Computes the Mean of a given Column of the DataSet */
-/* Inputs  : int                                      */
-/* Outputs : float                                    */
+/*
+Computes the Mean of a given Column of the DataSet
+Inputs  : int
+Outputs : float
+*/
 float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
   int len = idx.size();
   // check if there are values in the current Column at the specified indexes
@@ -206,9 +231,12 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
   return mean;
 }
 
-/* Computes the Variance of a given Column of the  DataSet */
-/* Inputs  : int                                           */
-/* Outputs : float                                         */
+/*
+Computes the Variance of the  DataSet on the labels
+idx represents the index that the object above can use
+Inputs  : std:vector<int>
+Outputs : float
+*/
 float DataSet::column_Variance(const std::vector<int> &idx) const {
   int len = idx.size();
   //  check if there are values in the current Column
@@ -216,49 +244,16 @@ float DataSet::column_Variance(const std::vector<int> &idx) const {
     return 0.0;
   }
 
-  std::vector<float> current_Column = this->get_Column(this->features_Length()-1, idx);
+  std::vector<float> current_Column =
+      this->get_Column(this->features_Length() - 1, idx);
 
-  float mean = column_Mean(this->features_Length()-1, idx);
+  float mean = column_Mean(this->features_Length() - 1, idx);
   float variance = 0.0;
 
   for (int i : current_Column) {
-    //float difference = current_Column[i] - mean;
     float difference = i - mean;
     variance += difference * difference;
   }
   variance /= len;
   return variance;
 }
-
-/*
-float DataSet::global_Mean(const std::vector<int> &idx) const{
-  int mean = 0.0;
-  int len = this->features_Length();
-   for (int i = 0; i < len; ++i) {
-    for(int j : idx){
-      mean += this->samples[j][i];
-    }
-  }
-  mean = mean/(len*idx.size());
-  return mean;
-}*/
-
-/* Computes the Global Variance of the  DataSet */
-/* Inputs  :                                    */
-/* Outputs : float
-float DataSet::global_Variance(const std::vector<int> &idx) const {
-  int len = this->features_Length();
-  float var_res = 0;
-  int width = idx.size();
-
-  float mean = global_Mean(idx);
-  for (int i = 0; i < len; ++i) {
-    for(int j : idx){
-      float temp = this->samples[j][i] - mean;
-      temp *= temp;
-      var_res += temp;
-    }
-  }
-  var_res = var_res/(len*width);
-  return var_res;
-}*/
