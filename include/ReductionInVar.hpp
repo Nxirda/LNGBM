@@ -10,13 +10,15 @@ private:
   // Parameters
 
   const std::string name = "RIV";
-  DecisionTree *tree;
+  //DecisionTree *tree;
+  std::shared_ptr<TreeNode> tree_Node;
   float split_Criteria;
 
 public:
   // Constructor
 
-  ReductionInVar(DecisionTree *tree);
+  //ReductionInVar(DecisionTree *tree);
+  ReductionInVar(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor
 
@@ -28,7 +30,8 @@ public:
 
   // Setter
 
-  bool set_Tree(DecisionTree *tree) override;
+  //bool set_Tree(DecisionTree *tree) override;
+  bool set_Node(std::shared_ptr<TreeNode> tree_Node);
   void set_Split_Criteria(float value) override;
 
   // Methods

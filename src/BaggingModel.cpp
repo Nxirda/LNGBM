@@ -16,7 +16,7 @@ void BaggingModel::fit(const DataSet &data) {
 
   this->main_Tree = std::make_unique<DecisionTree>(data);
 
-  this->split_Metric = new ReductionInVar(this->main_Tree.get());
+  this->split_Metric = new ReductionInVar(this->main_Tree->get_Current_Node());
 
   this->main_Tree->add_Operator(this->split_Metric);
 
@@ -25,6 +25,7 @@ void BaggingModel::fit(const DataSet &data) {
 
 /**/
 void BaggingModel::predict(const DataSet &data) {
-  this->main_Tree->set_Test_DataSet(data);
+  std::shared_ptr test_DataSet = std::make_shared<DataSet>(data);
+  this->main_Tree->set_Test_DataSet(test_DataSet);
   this->main_Tree->predict_Test_DataSet();
 }

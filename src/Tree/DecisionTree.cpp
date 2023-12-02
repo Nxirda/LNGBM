@@ -47,7 +47,7 @@ Outputs : Object of Decision Tree Class
 DecisionTree::DecisionTree(std::shared_ptr<TreeNode> tree_Node,
                            std::vector<int> idx) {
   this->parent = nullptr;
-  this->curr_Node = std::make_shared<TreeNode>(*tree_Node);
+  this->curr_Node = tree_Node;
   this->curr_Node.get()->set_Index(idx);
   this->left = nullptr;
   this->right = nullptr;
@@ -74,7 +74,7 @@ Returns the Parent Tree
 Inputs  :
 Outputs : pointer of Decision Tree Object
 */
-DecisionTree &DecisionTree::get_Parent_Tree() { return *this->parent; }
+DecisionTree *DecisionTree::get_Parent_Tree() { return this->parent; }
 
 /*
 Returns the Left Sub Tree
@@ -151,7 +151,7 @@ void DecisionTree::build_Splitted_Tree(int depth) {
 
   if (depth > 0 && (curr_Node->node_Homogeneity() == false)) {
 
-    this->split_Operator->set_Tree(this);
+    this->split_Operator->set_Node(this->curr_Node);
 
     int split_Feature = this->split_Operator->find_Best_Split_Feature();
 
@@ -182,8 +182,8 @@ void DecisionTree::build_Splitted_Tree(int depth) {
 }
 
 /**/
-void DecisionTree::set_Test_DataSet(const DataSet &data) {
-  this->curr_Node->set_DataSet(std::make_shared<DataSet>(data));
+void DecisionTree::set_Test_DataSet(std::shared_ptr<DataSet> data) {
+  this->curr_Node->set_DataSet(data);
 }
 
 /**/
@@ -195,13 +195,13 @@ void DecisionTree::predict_Test_DataSet() {
 
   if (this->get_Left_Tree()) {
     this->left->curr_Node->set_Index(child_Indexes[0]);
-    /* this->left->curr_Node->set_DataSet(curr_Node->get_DataSet());
-    this->left->predict_Test_DataSet(); */
+    this->left->curr_Node->set_DataSet(curr_Node->get_DataSet());
+    this->left->predict_Test_DataSet(); 
   }
 
   if (this->get_Right_Tree()) {
     this->right->curr_Node->set_Index(child_Indexes[1]);
-    /* this->right->curr_Node->set_DataSet(curr_Node->get_DataSet());
-    this->left->predict_Test_DataSet(); */
-  } 
+    this->right->curr_Node->set_DataSet(curr_Node->get_DataSet());
+    this->left->predict_Test_DataSet(); 
+  }
 }

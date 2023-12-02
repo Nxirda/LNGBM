@@ -34,7 +34,7 @@ public:
   // Getters
 
   std::shared_ptr<TreeNode> get_Current_Node();
-  DecisionTree &get_Parent_Tree();
+  DecisionTree *get_Parent_Tree();
   DecisionTree *get_Right_Tree();
   DecisionTree *get_Left_Tree();
 
@@ -46,7 +46,7 @@ public:
   void add_Operator(IOperator *wanted_Operator);
 
   // Methods
-  void set_Test_DataSet(const DataSet &data);
+  void set_Test_DataSet(std::shared_ptr<DataSet> data);
   void predict_Test_DataSet();
   void build_Splitted_Tree(int depth);
   void print_Tree();

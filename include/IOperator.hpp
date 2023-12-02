@@ -4,20 +4,20 @@
 #include <string>
 #include <memory>
 
-class DecisionTree;
+class TreeNode;
 
 // Interface to build Operators on
 class IOperator {
 
 private:
   const std::string name;
-  std::unique_ptr<DecisionTree> tree;
+  std::shared_ptr<TreeNode> tree_Node;
   float split_Criteria;
 
 public:
   virtual ~IOperator(){};
-  virtual bool set_Tree(DecisionTree *tree) {
-    if (tree)
+  virtual bool set_Node(std::shared_ptr<TreeNode> tree_Node) {
+    if (tree_Node)
       return true;
     return false;
   };

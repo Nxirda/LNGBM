@@ -68,7 +68,7 @@ int main() {
   std::cout << "Splitting at depth 5 took                  : "
             << (t7 - t6) / cpu_frequency << " seconds\n"; */
 
-  int n = 9;
+  int n = 10;
   uint64_t t2 = rdtsc();
   BaggingModel model{"RIV", n};
   model.fit(DS);
@@ -78,14 +78,13 @@ int main() {
   std::cout << "Splitting at depth "<< n <<" took                  : "
             << (t3 - t2) / cpu_frequency << " seconds\n";
 
- /*  uint64_t t4 = rdtsc();
+  uint64_t t4 = rdtsc();
   model.predict(DS);
   uint64_t t5 = rdtsc();
   std::cout << "Predicting at depth "<< n <<" took                 : " << t5 - t4
             << " CPU cycles\n";
   std::cout << "Predicting at depth "<< n <<" took                 : "
             << (t5 - t4) / cpu_frequency << " seconds\n"; 
- */
-
+ 
   return 0;
 }
