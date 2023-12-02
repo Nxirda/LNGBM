@@ -194,7 +194,8 @@ std::vector<float> DataSet::get_Column(int position,
 Return 2 vector which contains the index of each subtree datasets after
 split, which is based on the criteria on a row at the col position
 Inputs : int, float
-Ouputs : vector<vector<int>>*/
+Ouputs : vector<vector<int>>
+*/
 std::vector<std::vector<int>>
 DataSet::split(int position, float criteria,
                const std::vector<int> &idx) const {
@@ -225,7 +226,6 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
   }
 
   std::vector<float> current_Column = this->get_Column(position, idx);
-
   float mean = std::reduce(current_Column.begin(), current_Column.end(), 0l);
   mean /= len;
   return mean;
@@ -245,9 +245,9 @@ float DataSet::column_Variance(const std::vector<int> &idx) const {
   }
 
   std::vector<float> current_Column =
-      this->get_Column(this->features_Length() - 1, idx);
+      this->get_Column(this->features_Length() -1 , idx);
 
-  float mean = column_Mean(this->features_Length() - 1, idx);
+  float mean = column_Mean(this->features_Length() -1, idx);
   float variance = 0.0;
 
   for (int i : current_Column) {

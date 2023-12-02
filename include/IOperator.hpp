@@ -1,6 +1,9 @@
 #ifndef I_OPERATOR_H_
 #define I_OPERATOR_H_
 
+#include <string>
+#include <memory>
+
 class DecisionTree;
 
 // Interface to build Operators on

@@ -42,14 +42,14 @@ public:
 
   void add_Right(std::unique_ptr<DecisionTree> dt);
   void add_Left(std::unique_ptr<DecisionTree> dt);
-  void add_Parent(DecisionTree *d);
+  void add_Parent(DecisionTree *dt);
   void add_Operator(IOperator *wanted_Operator);
 
   // Methods
-
+  void set_Test_DataSet(const DataSet &data);
+  void predict_Test_DataSet();
   void build_Splitted_Tree(int depth);
   void print_Tree();
-
 };
 
 #endif

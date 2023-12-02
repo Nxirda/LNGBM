@@ -75,14 +75,12 @@ float ReductionInVar::splitting_Variance(int position) {
   float base_Population = this->tree->get_Current_Node()->get_Index().size();
 
   // Creating a left child
-  TreeNode left_Child{
-      std::make_shared<DataSet>(this->tree->get_Current_Node()->get_DataSet()),
-      child_Indexes[0]};
+  TreeNode left_Child{this->tree->get_Current_Node()->get_DataSet(),
+                      child_Indexes[0]};
 
   // Creating a right child
-  TreeNode right_Child{
-      std::make_shared<DataSet>(this->tree->get_Current_Node()->get_DataSet()),
-      child_Indexes[1]};
+  TreeNode right_Child{this->tree->get_Current_Node()->get_DataSet(),
+                       child_Indexes[1]};
 
   // Computes Weighted Variance for left child
   float left_Variance = left_Child.node_Variance();
@@ -110,9 +108,10 @@ int ReductionInVar::find_Best_Split_Feature() {
   float max_Reduction_In_Var = INT_MAX;
 
   std::vector<std::string> features =
-      this->tree->get_Current_Node()->get_DataSet().get_Features();
+      this->tree->get_Current_Node()->get_DataSet()->get_Features();
 
-  for (unsigned long int i = 0; i < features.size(); ++i) {
+  //-2 here on feature size because we dont want to fit on the labels
+  for (unsigned long int i = 0; i < features.size() - 1; ++i) {
     float tmp_var = splitting_Variance(i);
     if (tmp_var < max_Reduction_In_Var) {
       max_Reduction_In_Var = tmp_var;

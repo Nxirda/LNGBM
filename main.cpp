@@ -1,6 +1,9 @@
 #include "DataSet.hpp"
 #include "DecisionTree.hpp"
 #include "ReductionInVar.hpp"
+
+#include "BaggingModel.hpp"
+
 #include <stdio.h>
 
 using namespace std;
@@ -29,7 +32,7 @@ int main() {
   std::cout << "Loading the dataset took                   : "
             << (t1 - t0) / cpu_frequency << " seconds\n";
 
-  uint64_t t_Shared_DS = rdtsc();
+  /* uint64_t t_Shared_DS = rdtsc();
   std::shared_ptr<DataSet> DS2 = std::make_shared<DataSet>(DS);
   uint64_t t_Shared_DS_F = rdtsc();
   std::cout << "Making shared ptr of dataset took          : "
@@ -63,7 +66,26 @@ int main() {
   std::cout << "Splitting at depth 5 took                  : " << t7 - t6
             << " CPU cycles\n";
   std::cout << "Splitting at depth 5 took                  : "
-            << (t7 - t6) / cpu_frequency << " seconds\n";
+            << (t7 - t6) / cpu_frequency << " seconds\n"; */
+
+  int n = 9;
+  uint64_t t2 = rdtsc();
+  BaggingModel model{"RIV", n};
+  model.fit(DS);
+  uint64_t t3 = rdtsc();
+  std::cout << "Splitting at depth "<< n <<" took                  : " << t3 - t2
+            << " CPU cycles\n";
+  std::cout << "Splitting at depth "<< n <<" took                  : "
+            << (t3 - t2) / cpu_frequency << " seconds\n";
+
+ /*  uint64_t t4 = rdtsc();
+  model.predict(DS);
+  uint64_t t5 = rdtsc();
+  std::cout << "Predicting at depth "<< n <<" took                 : " << t5 - t4
+            << " CPU cycles\n";
+  std::cout << "Predicting at depth "<< n <<" took                 : "
+            << (t5 - t4) / cpu_frequency << " seconds\n"; 
+ */
 
   return 0;
 }
