@@ -1,7 +1,4 @@
 #include "DataSet.hpp"
-#include "DecisionTree.hpp"
-#include "ReductionInVar.hpp"
-
 #include "BaggingModel.hpp"
 
 #include <stdio.h>
@@ -27,9 +24,9 @@ int main() {
   uint64_t t0 = rdtsc();
   DataSet DS{"../data/datasets/d1.csv"};
   uint64_t t1 = rdtsc();
-  std::cout << "Loading the dataset took                   : " << t1 - t0
+  std::cout << "Loading the dataset took                    : " << t1 - t0
             << " CPU cycles\n";
-  std::cout << "Loading the dataset took                   : "
+  std::cout << "Loading the dataset took                    : "
             << (t1 - t0) / cpu_frequency << " seconds\n";
 
   /* uint64_t t_Shared_DS = rdtsc();
@@ -69,8 +66,9 @@ int main() {
             << (t7 - t6) / cpu_frequency << " seconds\n"; */
 
   int n = 10;
+
   uint64_t t2 = rdtsc();
-  BaggingModel model{"RIV", n};
+  BaggingModel model{"USELESS_ATM", n};
   model.fit(DS);
   uint64_t t3 = rdtsc();
   std::cout << "Splitting at depth "<< n <<" took                  : " << t3 - t2

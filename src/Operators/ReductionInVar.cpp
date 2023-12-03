@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "DecisionTree.hpp" // <- only in the cpps other wise circular dependances
+#include "TreeNode.hpp"
 #include "ReductionInVar.hpp"
 
 /*
@@ -8,7 +8,6 @@ Constructor
 Input  : DecisionTree*
 Output :
 */
-//ReductionInVar::ReductionInVar(DecisionTree *tree) { this->tree = tree; }
 ReductionInVar::ReductionInVar(std::shared_ptr<TreeNode> tree_Node) {this->tree_Node = tree_Node;}
 
 /*
@@ -111,7 +110,7 @@ int ReductionInVar::find_Best_Split_Feature() {
   std::vector<std::string> features =
       this->tree_Node->get_DataSet()->get_Features();
 
-  //-2 here on feature size because we dont want to fit on the labels
+  //-1 here on feature size because we dont want to fit on the labels
   for (unsigned long int i = 0; i < features.size() - 1; ++i) {
     float tmp_var = splitting_Variance(i);
     if (tmp_var < max_Reduction_In_Var) {

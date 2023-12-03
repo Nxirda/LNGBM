@@ -1,5 +1,8 @@
-#include <BaggingModel.hpp>
-#include <ReductionInVar.hpp> //then we will have an enum for the operators
+#include "BaggingModel.hpp"
+#include "ReductionInVar.hpp" //then we will have an enum for the operators
+#include "MAE.hpp"
+#include "MAPE.hpp"
+#include "RMSE.hpp"
 
 /**/
 BaggingModel::BaggingModel(std::string split_Metric, int max_Depth) {
@@ -16,7 +19,11 @@ void BaggingModel::fit(const DataSet &data) {
 
   this->main_Tree = std::make_unique<DecisionTree>(data);
 
-  this->split_Metric = new ReductionInVar(this->main_Tree->get_Current_Node());
+  //this->split_Metric = new ReductionInVar(this->main_Tree->get_Current_Node());
+  //this->split_Metric = new MAE(this->main_Tree->get_Current_Node());
+  //this->split_Metric = new MAPE(this->main_Tree->get_Current_Node());
+  this->split_Metric = new RMSE(this->main_Tree->get_Current_Node());
+
 
   this->main_Tree->add_Operator(this->split_Metric);
 
@@ -25,7 +32,10 @@ void BaggingModel::fit(const DataSet &data) {
 
 /**/
 void BaggingModel::predict(const DataSet &data) {
+
   std::shared_ptr test_DataSet = std::make_shared<DataSet>(data);
+  
   this->main_Tree->set_Test_DataSet(test_DataSet);
+  
   this->main_Tree->predict_Test_DataSet();
 }
