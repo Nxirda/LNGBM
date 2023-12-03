@@ -7,8 +7,8 @@
 class MAE : public IOperator {
 
 private:
-    // Parameters
-    
+  // Parameters
+
   const std::string name = "MAE";
   std::shared_ptr<TreeNode> tree_Node;
   float split_Criteria;

@@ -15,7 +15,7 @@ private:
 
 public:
   // Constructor
-
+  RMSE() = delete;
   RMSE(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor
@@ -36,7 +36,7 @@ public:
   void print() override;
   int find_Best_Split_Feature() override;
 
-  float splitting_MAE(int position);
+  float splitting_RMSE(int position);
 };
 
 #endif

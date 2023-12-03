@@ -56,14 +56,16 @@ Output :
 void RMSE::set_Split_Criteria(float value) { this->split_Criteria = value; }
 
 /**/
-float RMSE::splitting_MAE(int position) {
+float RMSE::splitting_RMSE(int position) {
 
   // Computes the split criteria, needs to be not hardcoded in the future
+  float right_RMSE = 0;
+  float left_RMSE = 0;
+
   float split_Criteria = this->tree_Node->node_Column_Mean(position);
 
   // Computes the DataSet Row Indexes that child nodes can access
-  std::vector<std::vector<int>> child_Indexes =
-      this->tree_Node->node_Split(position, split_Criteria);
+  std::vector<std::vector<int>> child_Indexes = this->tree_Node->node_Split(position, split_Criteria);
 
   float base_Population = this->tree_Node->get_Index().size();
 
@@ -74,27 +76,29 @@ float RMSE::splitting_MAE(int position) {
   TreeNode right_Child{this->tree_Node->get_DataSet(), child_Indexes[1]};
 
   // Get the labels
-  std::vector<float> labels = this->tree_Node->get_DataSet()->get_Column(
-      tree_Node->get_DataSet()->features_Length() - 1,
-      this->tree_Node->get_Index());
+  std::vector<float> labels =
+      this->tree_Node->get_DataSet()->get_Labels(this->tree_Node->get_Index());
+
+  int size = (int)labels.size();
 
   // Computes the Mean Absolute Error for left child
   float left_Prediction = left_Child.compute_Predicted_Value();
-  float left_RMSE = 0;
+
   for (int idx : child_Indexes[0]) {
-    left_RMSE += pow((abs(labels[idx] - left_Prediction)), 2);
+    if (idx < size)
+      left_RMSE += pow((abs(labels[idx] - left_Prediction)), 2);
   }
 
   // Computes the Mean Absolute Error for left child
   float right_Prediction = right_Child.compute_Predicted_Value();
-  float right_RMSE = 0;
+
   for (int idx : child_Indexes[1]) {
-    right_RMSE += pow((abs(labels[idx] - right_Prediction)), 2);
+    if (idx < size)
+      right_RMSE += pow((abs(labels[idx] - right_Prediction)), 2);
   }
 
   // Compute the result of MAE for the split at position
-  float res = (left_RMSE + right_RMSE) / base_Population;
-  res = sqrt(res);
+  float res = sqrt((left_RMSE + right_RMSE) / base_Population);
   return res;
 }
 
@@ -105,21 +109,22 @@ Ouputs : int
 */
 int RMSE::find_Best_Split_Feature() {
   int best_Feature = 0;
+  float tmp_var = 0;
   // We try to minimize the mean absolute error for a split
   float min_RMSE = INT_MAX;
 
   std::vector<std::string> features =
       this->tree_Node->get_DataSet()->get_Features();
 
-  //-1 here on feature size because we dont want to fit on the labels
   for (unsigned long int i = 0; i < features.size() - 1; ++i) {
-    float tmp_var = splitting_MAE(i);
+    tmp_var = splitting_RMSE(i);
     if (tmp_var < min_RMSE) {
       min_RMSE = tmp_var;
       best_Feature = i;
     }
   }
-  this->set_Split_Criteria(this->tree_Node->node_Column_Mean(best_Feature));
+  float mean = this->tree_Node->node_Column_Mean(best_Feature);
+  this->set_Split_Criteria(mean);
 
   return best_Feature;
 }

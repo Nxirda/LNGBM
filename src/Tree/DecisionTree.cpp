@@ -19,7 +19,12 @@ Default Constructor
 Inputs  :
 Outputs : Object of Decision Tree Class
 */
-DecisionTree::DecisionTree() {}
+DecisionTree::DecisionTree() {
+  this->curr_Node = std::make_shared<TreeNode>();
+  this->parent = nullptr;
+  this->left = nullptr;
+  this->right = nullptr;
+}
 
 /*
 Base Constructor with a DataSet parameter
@@ -28,7 +33,7 @@ Inputs  : Object of DataSet Class
 Outputs : Object of Decision Tree Class
 */
 DecisionTree::DecisionTree(const DataSet &data) {
-  std::vector<int> idx(data.samples_Number());
+  std::vector<int> idx(data.samples_Number() - 1);
   for (long unsigned int i = 0; i < idx.size(); ++i) {
     idx[i] = i;
   }
@@ -104,6 +109,8 @@ Output :
 */
 void DecisionTree::add_Left(std::unique_ptr<DecisionTree> dt) {
   this->left = std::move(dt);
+  // this->left->curr_Node = std::make_shared<TreeNode>(
+  //     this->curr_Node->get_DataSet(), dt->get_Current_Node()->get_Index());
   this->left->add_Parent(this);
   this->left->add_Operator(this->split_Operator);
 }
@@ -115,6 +122,8 @@ Output :
 */
 void DecisionTree::add_Right(std::unique_ptr<DecisionTree> dt) {
   this->right = std::move(dt);
+  // this->right->curr_Node = std::make_shared<TreeNode>(
+  //     this->curr_Node->get_DataSet(), dt->get_Current_Node()->get_Index());
   this->right->add_Parent(this);
   this->right->add_Operator(this->split_Operator);
 }
@@ -130,6 +139,7 @@ Outputs :
 */
 void DecisionTree::print_Tree() {
   // this->curr_Node->node_Print();
+  std::cout << this->curr_Node->get_Index().size();
   this->curr_Node->node_Print_Criteria();
   if (this->left) {
     this->get_Left_Tree()->print_Tree();
@@ -162,13 +172,18 @@ void DecisionTree::build_Splitted_Tree(int depth) {
         this->curr_Node->node_Split(split_Feature, split_Criteria);
 
     // Creating a left child
+    auto left_Node = std::make_shared<TreeNode>(this->curr_Node->get_DataSet(),
+                                                child_Indexes[0]);
     auto left_Child =
-        std::make_unique<DecisionTree>(curr_Node, child_Indexes[0]);
+        std::make_unique<DecisionTree>(std::move(left_Node), child_Indexes[0]);
+
     this->add_Left(std::move(left_Child));
 
     // Creating a right child
+    auto right_Node = std::make_shared<TreeNode>(this->curr_Node->get_DataSet(),
+                                                 child_Indexes[1]);
     auto right_Child =
-        std::make_unique<DecisionTree>(curr_Node, child_Indexes[1]);
+        std::make_unique<DecisionTree>(std::move(right_Node), child_Indexes[1]);
     this->add_Right(std::move(right_Child));
 
     // Set the infos in the Current Node for parsing test dataset
@@ -187,21 +202,40 @@ void DecisionTree::set_Test_DataSet(std::shared_ptr<DataSet> data) {
 }
 
 /**/
-void DecisionTree::predict_Test_DataSet() {
+void DecisionTree::parse_Test_DataSet() {
 
   std::vector<std::vector<int>> child_Indexes =
       this->curr_Node->node_Split(this->curr_Node->get_Split_Column(),
                                   this->curr_Node->get_Split_Criteria());
 
   if (this->get_Left_Tree()) {
+
     this->left->curr_Node->set_Index(child_Indexes[0]);
-    this->left->curr_Node->set_DataSet(curr_Node->get_DataSet());
-    this->left->predict_Test_DataSet(); 
+    this->left->parse_Test_DataSet();
   }
 
   if (this->get_Right_Tree()) {
+
     this->right->curr_Node->set_Index(child_Indexes[1]);
-    this->right->curr_Node->set_DataSet(curr_Node->get_DataSet());
-    this->left->predict_Test_DataSet(); 
+
+    this->left->parse_Test_DataSet();
   }
+}
+
+/**/
+void DecisionTree::predict_Test_Labels() {
+  int size = this->curr_Node->get_DataSet()->samples_Number();
+  std::cout << this->curr_Node->get_Index().size() << "\n";
+  // if (!this->get_Left_Tree() && !this->get_Right_Tree()) {
+    std::cout << this->curr_Node->get_Predicted_Value() << "\n";
+  for (auto i : this->curr_Node->get_Index()) {
+    if (i < size)
+      this->curr_Node->get_DataSet()->update_Label_Value(
+          i, this->curr_Node->get_Predicted_Value());
+  }
+  //}
+  if (this->get_Left_Tree())
+    this->left->predict_Test_Labels();
+  if (this->get_Right_Tree())
+    this->right->predict_Test_Labels();
 }

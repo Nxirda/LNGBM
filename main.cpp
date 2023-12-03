@@ -17,7 +17,16 @@ uint64_t rdtsc() {
   return ((uint64_t)hi << 32) | lo;
 }
 
-int main() {
+int main(int argc, char** argv) {
+
+  if(argc < 3){
+    std::cout << "Usage is : "<< argv[0] << " [Split Metric] [Depth]\n";
+    std::cout << "\n";
+    std::cout << "== Split Metrics Available are ==\n";
+    BaggingModel m{};
+    m.print_Available_Operators();
+    return 1;
+  }
 
   cout << "=== DataSet Loading ===\n";
   double cpu_frequency = 1.4e9;
@@ -64,25 +73,30 @@ int main() {
             << " CPU cycles\n";
   std::cout << "Splitting at depth 5 took                  : "
             << (t7 - t6) / cpu_frequency << " seconds\n"; */
-
-  int n = 10;
+  
+  std::string metric = argv[1];
+  int depth = std::stoi(argv[2]);
 
   uint64_t t2 = rdtsc();
-  BaggingModel model{"USELESS_ATM", n};
+  BaggingModel model{metric, depth};
   model.fit(DS);
   uint64_t t3 = rdtsc();
-  std::cout << "Splitting at depth "<< n <<" took                  : " << t3 - t2
+  std::cout << "Splitting at depth "<< depth <<" took                  : " << t3 - t2
             << " CPU cycles\n";
-  std::cout << "Splitting at depth "<< n <<" took                  : "
+  std::cout << "Splitting at depth "<< depth <<" took                  : "
             << (t3 - t2) / cpu_frequency << " seconds\n";
 
+  DataSet Test{};
+  Test.load("../data/datasets/d1.csv");
+
+  //Test.Load
   uint64_t t4 = rdtsc();
-  model.predict(DS);
+  model.predict(Test);
   uint64_t t5 = rdtsc();
-  std::cout << "Predicting at depth "<< n <<" took                 : " << t5 - t4
+  std::cout << "Predicting at depth "<< depth <<" took                 : " << t5 - t4
             << " CPU cycles\n";
-  std::cout << "Predicting at depth "<< n <<" took                 : "
-            << (t5 - t4) / cpu_frequency << " seconds\n"; 
+  std::cout << "Predicting at depth "<< depth <<" took                 : "
+            << (t5 - t4) / cpu_frequency << " seconds\n";   
  
   return 0;
 }

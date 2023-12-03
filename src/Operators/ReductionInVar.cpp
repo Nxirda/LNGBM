@@ -110,8 +110,7 @@ int ReductionInVar::find_Best_Split_Feature() {
   std::vector<std::string> features =
       this->tree_Node->get_DataSet()->get_Features();
 
-  //-1 here on feature size because we dont want to fit on the labels
-  for (unsigned long int i = 0; i < features.size() - 1; ++i) {
+  for (unsigned long int i = 0; i < features.size() ; ++i) {
     float tmp_var = splitting_Variance(i);
     if (tmp_var < max_Reduction_In_Var) {
       max_Reduction_In_Var = tmp_var;

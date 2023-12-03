@@ -75,21 +75,22 @@ float MAE::splitting_MAE(int position) {
   TreeNode right_Child{this->tree_Node->get_DataSet(), child_Indexes[1]};
 
   // Get the labels
-  std::vector<float> labels = this->tree_Node->get_DataSet()->get_Column(
-      tree_Node->get_DataSet()->features_Length() - 1, this->tree_Node->get_Index());
-
+  std::vector<float> labels = this->tree_Node->get_DataSet()->get_Labels(this->tree_Node->get_Index());
+  int size = (int)labels.size();
   // Computes the Mean Absolute Error for left child
   float left_Prediction = left_Child.compute_Predicted_Value();
   float left_MAE = 0;
   for (int idx : child_Indexes[0]) {
-    left_MAE += abs(labels[idx] - left_Prediction);
+    if(idx < size)
+      left_MAE += abs(labels[idx] - left_Prediction);
   }
 
   // Computes the Mean Absolute Error for left child
   float right_Prediction = right_Child.compute_Predicted_Value();
   float right_MAE = 0;
   for (int idx : child_Indexes[1]) {
-    right_MAE += abs(labels[idx] - right_Prediction);
+    if(idx < size)
+      right_MAE += abs(labels[idx] - right_Prediction);
   }
 
   // Compute the result of MAE for the split at position
@@ -110,8 +111,7 @@ int MAE::find_Best_Split_Feature() {
   std::vector<std::string> features =
       this->tree_Node->get_DataSet()->get_Features();
 
-  //-1 here on feature size because we dont want to fit on the labels
-  for (unsigned long int i = 0; i < features.size() - 1; ++i) {
+  for (unsigned long int i = 0; i < features.size() ; ++i) {
     float tmp_var = splitting_MAE(i);
     if (tmp_var < min_MAE) {
       min_MAE = tmp_var;

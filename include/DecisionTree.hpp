@@ -47,7 +47,9 @@ public:
 
   // Methods
   void set_Test_DataSet(std::shared_ptr<DataSet> data);
-  void predict_Test_DataSet();
+  void parse_Test_DataSet();
+  void predict_Test_Labels();
+
   void build_Splitted_Tree(int depth);
   void print_Tree();
 };

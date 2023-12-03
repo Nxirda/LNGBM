@@ -26,7 +26,7 @@ Inputs  : Object of DataSet Class, vector
 Outputs : TreeNode Object containing the DataSet
 */
 TreeNode::TreeNode(std::shared_ptr<DataSet> data) {
-  std::vector<int> idx(data->samples_Number());
+  std::vector<int> idx(data->samples_Number()-1);
   for (int i = 0; i < data->samples_Number(); ++i) {
     idx[i] = i;
   }
@@ -73,7 +73,9 @@ Sets the Node's Index vector
 Inputs  :  vector<int>
 Outputs :
 */
-void TreeNode::set_Index(std::vector<int> idx) { this->index = std::move(idx); }
+void TreeNode::set_Index(std::vector<int> idx) { 
+  this->index = idx;
+}
 
 /**/
 void TreeNode::set_DataSet(std::shared_ptr<DataSet> data) {
@@ -132,8 +134,7 @@ Inputs  :
 Outputs : bool
 */
 bool TreeNode::node_Homogeneity() {
-  std::vector<float> labels = this->data->get_Column(
-      this->data->features_Length() - 1, this->get_Index());
+  std::vector<float> labels = this->data->get_Labels(this->get_Index());
 
   int base = labels[0];
   for (float curr_Label : labels) {
@@ -156,7 +157,8 @@ std::vector<std::vector<int>> TreeNode::node_Split(int position,
 
 /**/
 float TreeNode::compute_Predicted_Value() {
-  return this->node_Column_Mean(this->data->features_Length() -1);
+  return this->get_DataSet()->labels_Mean(this->get_Index());
+
 }
 
 /*

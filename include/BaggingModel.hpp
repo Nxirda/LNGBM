@@ -18,7 +18,7 @@ private:
 
 public:
   // Constructor
-
+  BaggingModel();
   BaggingModel(std::string split_Metric, int max_Depth);
 
   //Destructor
@@ -29,6 +29,7 @@ public:
 
   void fit(const DataSet &data);
   void predict(const DataSet &datas);
+  void print_Available_Operators();
 };
 
 #endif
