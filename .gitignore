@@ -44,3 +44,6 @@ cmake-build-*
 *.exe
 *.out
 *.app
+
+# Datafiles generated for quick benchmarks
+*.dat

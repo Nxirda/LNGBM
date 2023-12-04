@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "DataSet.hpp"
+#include "IOperator.hpp"
 #include "TreeNode.hpp"
 
 #ifndef DECISION_TREE_H_
@@ -13,7 +14,7 @@
 class DecisionTree {
 protected:
   // Parameters
-
+  IOperator *split_Operator = nullptr;
   DecisionTree *parent;
   std::shared_ptr<TreeNode> curr_Node;
   std::unique_ptr<DecisionTree> right;
@@ -24,9 +25,7 @@ public:
 
   DecisionTree();
   DecisionTree(const DataSet &data);
-  DecisionTree(const std::shared_ptr<DataSet> data, std::vector<int> idx);
-  //DecisionTree(const DecisionTree &dt);      // Copy operator
-  DecisionTree &operator=(DecisionTree &dt); // Copy assignment
+  DecisionTree(std::shared_ptr<TreeNode> tree_Node, std::vector<int> idx);
 
   // Destructor
 
@@ -34,7 +33,7 @@ public:
 
   // Getters
 
-  TreeNode &get_Current_Node();
+  std::shared_ptr<TreeNode> get_Current_Node();
   DecisionTree &get_Parent_Tree();
   DecisionTree *get_Right_Tree();
   DecisionTree *get_Left_Tree();
@@ -44,17 +43,13 @@ public:
   void add_Right(std::unique_ptr<DecisionTree> dt);
   void add_Left(std::unique_ptr<DecisionTree> dt);
   void add_Parent(DecisionTree *d);
+  void add_Operator(IOperator *wanted_Operator);
 
   // Methods
 
   void build_Splitted_Tree(int depth);
-  int find_Best_Split_Feature();
   void print_Tree();
 
-private:
-  // Methods only used inside the class
-
-  float splitting_Variance(int position);
 };
 
 #endif

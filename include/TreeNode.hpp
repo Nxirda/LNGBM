@@ -18,6 +18,7 @@ public:
   // Constructor
 
   TreeNode();
+  TreeNode(std::shared_ptr<DataSet> data);
   TreeNode(std::shared_ptr<DataSet> data, std::vector<int> &idx);
   TreeNode &operator=(TreeNode const &tn); // copy assignment
 
