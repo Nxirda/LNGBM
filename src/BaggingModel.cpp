@@ -57,7 +57,7 @@ void BaggingModel::fit(const DataSet &data) {
 
   this->main_Tree->build_Splitted_Tree(this->max_Depth);
 
-  this->main_Tree->print_Tree();
+  //this->main_Tree->print_Tree();
 
   delete (this->split_Metric);
 }
@@ -68,21 +68,11 @@ void BaggingModel::predict(const DataSet &data) {
   std::shared_ptr test_DataSet = std::make_shared<DataSet>(data);
 
   this->main_Tree->set_Test_DataSet(test_DataSet);
-
+  // ^_ Here we have a vector predicted value where everything is 0 in it
   this->main_Tree->parse_Test_DataSet();
 
-  this->main_Tree->print_Tree();
-
-  std::vector<int> idxs{1, 10, 50, 1000, 3493, 332, 1133, 0};
-
-  std::cout << "====================================\n";
   this->main_Tree->predict_Test_Labels();
 
-  for (auto i :
-       this->main_Tree->get_Current_Node()->get_DataSet()->get_Labels(idxs)) {
-    std::cout << i << "\n";
-
-  }
 }
 
 void BaggingModel::print_Available_Operators() {

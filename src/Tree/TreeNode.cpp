@@ -105,7 +105,7 @@ std::vector<int> TreeNode::get_Index() { return this->index; }
 float TreeNode::get_Split_Criteria() { return this->split_Criteria; }
 
 /**/
-float TreeNode::get_Split_Column() { return this->split_Column; }
+int TreeNode::get_Split_Column() { return this->split_Column; }
 
 /**/
 float TreeNode::get_Predicted_Value() { return this->predicted_Value; }
@@ -134,6 +134,9 @@ Inputs  :
 Outputs : bool
 */
 bool TreeNode::node_Homogeneity() {
+  if(this->get_Index().size() <= 0){
+    return false;
+  }
   std::vector<float> labels = this->data->get_Labels(this->get_Index());
 
   int base = labels[0];
@@ -152,7 +155,13 @@ Outputs : vector<vector<int>>
 */
 std::vector<std::vector<int>> TreeNode::node_Split(int position,
                                                    float split_Criteria) {
-  return this->data->split(position, split_Criteria, this->get_Index());
+  if(position < this->data->features_Length() && split_Criteria > 0)
+  {
+    return this->data->split(position, split_Criteria, this->get_Index());
+  }else{
+     return this->data->split(0, 0, this->get_Index());
+  }
+  
 }
 
 /**/
