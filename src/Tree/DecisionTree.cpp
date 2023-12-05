@@ -10,7 +10,7 @@
 
 /********************/
 /*                  */
-/*    TREE PART     */
+/*    TREE CLASS    */
 /*                  */
 /********************/
 
@@ -163,78 +163,101 @@ Outputs :
 */
 void DecisionTree::print_Tree() {
   // this->curr_Node->node_Print();
-  //std::cout << this->curr_Node->get_Index().size();
+  // std::cout << this->curr_Node->get_Index().size();
   this->curr_Node->node_Print_Criteria();
   if (this->left) {
-    this->get_Left_Tree()->print_Tree();
+    this->left->print_Tree();
   }
   if (this->right) {
-    this->get_Right_Tree()->print_Tree();
+    this->right->print_Tree();
   }
 }
 
 /*
 Builds a Decision Tree recursively following a splitting criteria
-Inputs  :
+and stopping at the given depth
+Inputs  : int
 Outputs :
 */
 void DecisionTree::build_Splitted_Tree(int depth) {
 
   float predicted_Value = this->curr_Node->compute_Predicted_Value();
-  this->curr_Node->set_Predicted_Value(predicted_Value);
 
-  if (depth > 0 && (curr_Node->node_Homogeneity() == false)) {
+  if (depth > 0 && (curr_Node->node_Homogeneity() == false) &&
+      (predicted_Value >= 0)) {
 
+    if (this->parent) {
+      if (predicted_Value ==
+          this->get_Parent_Tree()->get_Current_Node()->get_Predicted_Value()) {
+        return;
+      }
+    }
+    this->curr_Node->set_Predicted_Value(predicted_Value);
     this->split_Operator->set_Node(this->curr_Node);
 
+    // Set the infos in the Current Node for parsing test dataset
     int split_Feature = this->split_Operator->find_Best_Split_Feature();
-
     float split_Criteria = this->split_Operator->get_Best_Split_Criteria();
+
+    this->curr_Node->set_Split_Column(split_Feature);
+    this->curr_Node->set_Split_Criteria(split_Criteria);
 
     // Computing the Indexes of the Dataset for each childs
     std::vector<std::vector<int>> child_Indexes =
         this->curr_Node->node_Split(split_Feature, split_Criteria);
 
     // Creating a left child
-    auto left_Node = std::make_shared<TreeNode>(this->curr_Node->get_DataSet(),
-                                                child_Indexes[0]);
-    auto left_Child =
-        std::make_unique<DecisionTree>(std::move(left_Node), child_Indexes[0]);
+    if (child_Indexes[0].empty() == false) {
+      auto left_Node = std::make_shared<TreeNode>(
+          this->curr_Node->get_DataSet(), child_Indexes[0]);
 
-    this->add_Left(std::move(left_Child));
+      auto left_Child =
+          std::make_unique<DecisionTree>(left_Node, child_Indexes[0]);
+
+      this->add_Left(std::move(left_Child));
+
+      // Recursive part
+      this->left->build_Splitted_Tree(depth - 1);
+    }
 
     // Creating a right child
-    auto right_Node = std::make_shared<TreeNode>(this->curr_Node->get_DataSet(),
-                                                 child_Indexes[1]);
-    auto right_Child =
-        std::make_unique<DecisionTree>(std::move(right_Node), child_Indexes[1]);
-    this->add_Right(std::move(right_Child));
+    if (child_Indexes[1].empty() == false) {
+      auto right_Node = std::make_shared<TreeNode>(
+          this->curr_Node->get_DataSet(), child_Indexes[1]);
 
-    // Set the infos in the Current Node for parsing test dataset
-    this->curr_Node->set_Split_Column(split_Feature);
-    this->curr_Node->set_Split_Criteria(split_Criteria);
+      auto right_Child =
+          std::make_unique<DecisionTree>(right_Node, child_Indexes[1]);
+      this->add_Right(std::move(right_Child));
 
-    // Recursive part
-    this->left->build_Splitted_Tree(depth - 1);
-    this->right->build_Splitted_Tree(depth - 1);
+      // Recursive part
+      this->right->build_Splitted_Tree(depth - 1);
+    }
   }
 }
 
-/**/
+/*
+Sets a test DataSet in the tree to be parsed after we already
+fitted on a DataSet
+Inputs  : shared_ptr<DataSet>
+Outputs :
+*/
 void DecisionTree::set_Test_DataSet(std::shared_ptr<DataSet> data) {
   this->curr_Node->set_DataSet(data);
 
   // Make a vector which size correspond to the number of samples we have
-  int len = this->curr_Node->get_Index().size()-1;
-  
+  int len = this->curr_Node->get_Index().size();
+
   std::vector<float> predicted_Labels(len, 0);
   this->add_Predicted_Labels(
       std::make_shared<std::vector<float>>(predicted_Labels));
-
-
 }
 
-/**/
+/*
+Parse the DataSet in the tree so each element is classified
+in the right Node
+Inputs  :
+Outputs :
+*/
 void DecisionTree::parse_Test_DataSet() {
 
   int position = this->curr_Node->get_Split_Column();
@@ -256,15 +279,20 @@ void DecisionTree::parse_Test_DataSet() {
   }
 }
 
-/**/
+/*
+Computes the values predictions for the test DataSet
+and store them in the predicted_Label parameter
+Inputs  :
+Outputs :
+*/
 void DecisionTree::predict_Test_Labels() {
+
   int size = this->get_Predicted_Labels()->size();
 
-  // std::cout << this->curr_Node->get_Predicted_Value() << " YO \n";
-  if (this->curr_Node->get_Predicted_Value() != 0) {
-    for (auto i : this->curr_Node->get_Index()) {
-      if (i < size){
-        this->predicted_Labels->at(i) =
+  if (this->curr_Node->get_Predicted_Value() >= 0) {
+    for (auto idx : this->curr_Node->get_Index()) {
+      if (idx < size) {
+        this->predicted_Labels->at(idx) =
             this->curr_Node->get_Predicted_Value();
       }
     }
@@ -274,5 +302,55 @@ void DecisionTree::predict_Test_Labels() {
   }
   if (this->get_Right_Tree()) {
     this->right->predict_Test_Labels();
+  }
+}
+
+/*
+Sums the predicted_Lables value of the given tree
+into the object
+Inputs  : DecisionTree *
+Outputs :
+*/
+void DecisionTree::sum_Predicted_Labels(DecisionTree *dt) {
+  float dt_Prediction = 0;
+  float curr_Prediction = this->get_Current_Node()->get_Predicted_Value();
+
+  if (dt) {
+    dt_Prediction = dt->get_Current_Node()->get_Predicted_Value();
+  }
+
+  this->curr_Node->set_Predicted_Value(dt_Prediction + curr_Prediction);
+
+  if (this->left) {
+    if (dt->left) {
+      this->left->sum_Predicted_Labels(dt->get_Left_Tree());
+    }
+  }
+
+  if (this->right) {
+    if (dt->right) {
+      this->right->sum_Predicted_Labels(dt->get_Right_Tree());
+    }
+  }
+}
+
+/*
+Divide every predicted Values stored in the nodes by n
+Inputs  : int
+Outputs :
+*/
+void DecisionTree::divide_Predicted_Labels(int n) {
+  if (n <= 0) {
+    return;
+  }
+  float curr_Prediction = this->get_Current_Node()->get_Predicted_Value();
+  this->curr_Node->set_Predicted_Value(curr_Prediction / n);
+
+  if (this->left) {
+    this->left->divide_Predicted_Labels(n - 1);
+  }
+
+  if (this->right) {
+    this->right->divide_Predicted_Labels(n - 1);
   }
 }

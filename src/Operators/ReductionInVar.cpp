@@ -3,17 +3,23 @@
 #include "TreeNode.hpp"
 #include "ReductionInVar.hpp"
 
+/********************/
+/*                  */
+/*    RIV CLASS     */
+/*                  */
+/********************/
+
 /*
 Constructor
-Input  : DecisionTree*
-Output :
+Inputs  : DecisionTree*
+Outputs :
 */
 ReductionInVar::ReductionInVar(std::shared_ptr<TreeNode> tree_Node) {this->tree_Node = tree_Node;}
 
 /*
 Setter for the tree pointer
-Input  : DecisionTree*
-Output : bool
+Inputs  : DecisionTree*
+Outputs : bool
 */
 bool ReductionInVar::set_Node(std::shared_ptr<TreeNode> tree_Node) {
   this->tree_Node = tree_Node;
@@ -26,16 +32,16 @@ bool ReductionInVar::set_Node(std::shared_ptr<TreeNode> tree_Node) {
 
 /*
 Destructor
-Input  :
-Output :
+Inputs  :
+Outputs :
 */
 ReductionInVar::~ReductionInVar() {}
 
 /*
 Print function to see the name of the operator
 (For debugging mainly)
-Input  :
-Output :
+Inputs  :
+Outputs :
 */
 void ReductionInVar::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
@@ -43,15 +49,15 @@ void ReductionInVar::print() {
 
 /*
 Returns the best splitting criteria for RIV algorithm
-Input  :
-Output : float
+Inputs  :
+Outputs : float
 */
 float ReductionInVar::get_Best_Split_Criteria() { return this->split_Criteria; }
 
 /*
 Sets the split criteria as the value given
-Input  : float
-Output :
+Inputs  : float
+Outputs :
 */
 void ReductionInVar::set_Split_Criteria(float value) {
   this->split_Criteria = value;
@@ -68,11 +74,12 @@ float ReductionInVar::splitting_Variance(int position) {
   float split_Criteria =
       this->tree_Node->node_Column_Mean(position);
 
+  float base_Population = this->tree_Node->get_Index().size();
+
+
   // Computes the DataSet Row Indexes that child nodes can access
   std::vector<std::vector<int>> child_Indexes =
       this->tree_Node->node_Split(position, split_Criteria);
-
-  float base_Population = this->tree_Node->get_Index().size();
 
   // Creating a left child
   TreeNode left_Child{this->tree_Node->get_DataSet(),
