@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
   cout << "=== DataSet Loading ===\n";
   double cpu_frequency = 1.4e9;
   uint64_t t0 = rdtsc();
-  DataSet DS{"../data/datasets/d1.csv"};
+  DataSet DS{"../data/datasets/d1_Test.csv"};
   uint64_t t1 = rdtsc();
   std::cout << "Loading the dataset took                    : " << t1 - t0
             << " CPU cycles\n";
@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
             << (t3 - t2) / cpu_frequency << " seconds\n";
 
   DataSet Test{};
-  Test.load("../data/datasets/d1.csv");
+  Test.load("../data/datasets/d1_Test.csv");
 
   //Test.Load
   uint64_t t4 = rdtsc();
@@ -97,6 +97,6 @@ int main(int argc, char** argv) {
             << " CPU cycles\n";
   std::cout << "Predicting at depth "<< depth <<" took                 : "
             << (t5 - t4) / cpu_frequency << " seconds\n";   
- 
+  
   return 0;
 }

@@ -349,7 +349,7 @@ float DataSet::labels_Mean(const std::vector<int> &idx) const{
   std::vector<float> current_Labels = this->get_Labels(idx);
 
   float mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0l);
-  return mean / current_Labels.size();
+  return (mean / current_Labels.size());
 }
 
 /*

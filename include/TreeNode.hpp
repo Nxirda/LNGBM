@@ -46,7 +46,7 @@ public:
   std::vector<int> get_Index();
 
   float get_Split_Criteria();
-  float get_Split_Column();
+  int get_Split_Column();
   float get_Predicted_Value();
 
   // Methods

@@ -34,6 +34,8 @@ Outputs : Object of Decision Tree Class
 */
 DecisionTree::DecisionTree(const DataSet &data) {
   std::vector<int> idx(data.samples_Number() - 1);
+  std::vector<float> test(0, 0);
+
   for (long unsigned int i = 0; i < idx.size(); ++i) {
     idx[i] = i;
   }
@@ -42,6 +44,7 @@ DecisionTree::DecisionTree(const DataSet &data) {
       TreeNode{std::make_shared<DataSet>(data), idx});
   this->left = nullptr;
   this->right = nullptr;
+  this->predicted_Labels = std::make_shared<std::vector<float>>(test);
 }
 
 /*
@@ -96,11 +99,30 @@ Outputs : pointer of Decision Tree Object
 DecisionTree *DecisionTree::get_Right_Tree() { return this->right.get(); }
 
 /*
+Returns the Predicted Labels vector
+Inputs  :
+Outputs : shared_ptr<vector<float>>
+*/
+std::shared_ptr<std::vector<float>> DecisionTree::get_Predicted_Labels() {
+  return this->predicted_Labels;
+}
+
+/*
 Sets a new Parent for the given tree
 Inputs  : pointer of Decision Tree Object
 Outputs :
 */
 void DecisionTree::add_Parent(DecisionTree *d) { this->parent = d; }
+
+/*
+Sets the predicted labels for the given tree
+Inputs  : shared_ptr<vector<float>>
+Outputs :
+*/
+void DecisionTree::add_Predicted_Labels(
+    std::shared_ptr<std::vector<float>> predicted_Labels) {
+  this->predicted_Labels = predicted_Labels;
+}
 
 /*
 Sets a new left Subtree
@@ -113,6 +135,7 @@ void DecisionTree::add_Left(std::unique_ptr<DecisionTree> dt) {
   //     this->curr_Node->get_DataSet(), dt->get_Current_Node()->get_Index());
   this->left->add_Parent(this);
   this->left->add_Operator(this->split_Operator);
+  this->left->add_Predicted_Labels(this->get_Predicted_Labels());
 }
 
 /*
@@ -126,6 +149,7 @@ void DecisionTree::add_Right(std::unique_ptr<DecisionTree> dt) {
   //     this->curr_Node->get_DataSet(), dt->get_Current_Node()->get_Index());
   this->right->add_Parent(this);
   this->right->add_Operator(this->split_Operator);
+  this->right->add_Predicted_Labels(this->get_Predicted_Labels());
 }
 
 void DecisionTree::add_Operator(IOperator *wanted_Operator) {
@@ -139,7 +163,7 @@ Outputs :
 */
 void DecisionTree::print_Tree() {
   // this->curr_Node->node_Print();
-  std::cout << this->curr_Node->get_Index().size();
+  //std::cout << this->curr_Node->get_Index().size();
   this->curr_Node->node_Print_Criteria();
   if (this->left) {
     this->get_Left_Tree()->print_Tree();
@@ -199,43 +223,56 @@ void DecisionTree::build_Splitted_Tree(int depth) {
 /**/
 void DecisionTree::set_Test_DataSet(std::shared_ptr<DataSet> data) {
   this->curr_Node->set_DataSet(data);
+
+  // Make a vector which size correspond to the number of samples we have
+  int len = this->curr_Node->get_Index().size()-1;
+  
+  std::vector<float> predicted_Labels(len, 0);
+  this->add_Predicted_Labels(
+      std::make_shared<std::vector<float>>(predicted_Labels));
+
+
 }
 
 /**/
 void DecisionTree::parse_Test_DataSet() {
 
+  int position = this->curr_Node->get_Split_Column();
+  float criteria = this->curr_Node->get_Split_Criteria();
+
   std::vector<std::vector<int>> child_Indexes =
-      this->curr_Node->node_Split(this->curr_Node->get_Split_Column(),
-                                  this->curr_Node->get_Split_Criteria());
+      this->curr_Node->node_Split(position, criteria);
 
-  if (this->get_Left_Tree()) {
-
+  if (this->left) {
     this->left->curr_Node->set_Index(child_Indexes[0]);
+    this->left->add_Predicted_Labels(this->get_Predicted_Labels());
     this->left->parse_Test_DataSet();
   }
 
-  if (this->get_Right_Tree()) {
-
+  if (this->right) {
     this->right->curr_Node->set_Index(child_Indexes[1]);
-
-    this->left->parse_Test_DataSet();
+    this->right->add_Predicted_Labels(this->get_Predicted_Labels());
+    this->right->parse_Test_DataSet();
   }
 }
 
 /**/
 void DecisionTree::predict_Test_Labels() {
-  int size = this->curr_Node->get_DataSet()->samples_Number();
-  std::cout << this->curr_Node->get_Index().size() << "\n";
-  // if (!this->get_Left_Tree() && !this->get_Right_Tree()) {
-    std::cout << this->curr_Node->get_Predicted_Value() << "\n";
-  for (auto i : this->curr_Node->get_Index()) {
-    if (i < size)
-      this->curr_Node->get_DataSet()->update_Label_Value(
-          i, this->curr_Node->get_Predicted_Value());
+  int size = this->get_Predicted_Labels()->size();
+
+  // std::cout << this->curr_Node->get_Predicted_Value() << " YO \n";
+  if (this->curr_Node->get_Predicted_Value() != 0) {
+    for (auto i : this->curr_Node->get_Index()) {
+      if (i < size){
+        this->predicted_Labels->at(i) =
+            this->curr_Node->get_Predicted_Value();
+      }
+    }
   }
-  //}
-  if (this->get_Left_Tree())
+  if (this->get_Left_Tree()) {
     this->left->predict_Test_Labels();
-  if (this->get_Right_Tree())
+  }
+  if (this->get_Right_Tree()) {
     this->right->predict_Test_Labels();
+  }
 }
