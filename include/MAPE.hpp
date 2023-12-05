@@ -1,26 +1,26 @@
-#ifndef RIV_H_
-#define RIV_H_
+#ifndef MAPE_H_
+#define MAPE_H_
 
 #include "IOperator.hpp"
 #include <string>
 
-class ReductionInVar : public IOperator {
+class MAPE : public IOperator {
 
 private:
   // Parameters
 
-  const std::string name = "RIV";
+  const std::string name = "MAPE";
   std::shared_ptr<TreeNode> tree_Node;
   float split_Criteria;
 
 public:
   // Constructor
 
-  ReductionInVar(std::shared_ptr<TreeNode> tree_Node);
+  MAPE(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor
 
-  ~ReductionInVar() override;
+  ~MAPE() override;
 
   // Getter
 
@@ -36,7 +36,7 @@ public:
   void print() override;
   int find_Best_Split_Feature() override;
 
-  float splitting_Variance(int position);
+  float splitting_MAE(int position);
 };
 
 #endif

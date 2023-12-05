@@ -19,6 +19,7 @@ protected:
   std::shared_ptr<TreeNode> curr_Node;
   std::unique_ptr<DecisionTree> right;
   std::unique_ptr<DecisionTree> left;
+  std::shared_ptr<std::vector<float>> predicted_Labels = nullptr;
 
 public:
   // Constructor
@@ -34,22 +35,27 @@ public:
   // Getters
 
   std::shared_ptr<TreeNode> get_Current_Node();
-  DecisionTree &get_Parent_Tree();
+  DecisionTree *get_Parent_Tree();
   DecisionTree *get_Right_Tree();
   DecisionTree *get_Left_Tree();
+  std::shared_ptr<std::vector<float>> get_Predicted_Labels();
 
   // Setters
 
   void add_Right(std::unique_ptr<DecisionTree> dt);
   void add_Left(std::unique_ptr<DecisionTree> dt);
-  void add_Parent(DecisionTree *d);
+  void add_Parent(DecisionTree *dt);
   void add_Operator(IOperator *wanted_Operator);
+  void add_Predicted_Labels(std::shared_ptr<std::vector<float>> predicted_Labels);
 
   // Methods
 
+  void set_Test_DataSet(std::shared_ptr<DataSet> data);
+  void parse_Test_DataSet();
+  void predict_Test_Labels();
+
   void build_Splitted_Tree(int depth);
   void print_Tree();
-
 };
 
 #endif

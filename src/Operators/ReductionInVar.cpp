@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "DecisionTree.hpp" // <- only in the cpps other wise circular dependances
+#include "TreeNode.hpp"
 #include "ReductionInVar.hpp"
 
 /*
@@ -8,17 +8,17 @@ Constructor
 Input  : DecisionTree*
 Output :
 */
-ReductionInVar::ReductionInVar(DecisionTree *tree) { this->tree = tree; }
+ReductionInVar::ReductionInVar(std::shared_ptr<TreeNode> tree_Node) {this->tree_Node = tree_Node;}
 
 /*
 Setter for the tree pointer
 Input  : DecisionTree*
 Output : bool
 */
-bool ReductionInVar::set_Tree(DecisionTree *tree) {
-  this->tree = tree;
+bool ReductionInVar::set_Node(std::shared_ptr<TreeNode> tree_Node) {
+  this->tree_Node = tree_Node;
   this->split_Criteria = 0.0;
-  if (this->tree) {
+  if (this->tree_Node) {
     return true;
   }
   return false;
@@ -66,23 +66,21 @@ Outputs : float
 float ReductionInVar::splitting_Variance(int position) {
   // Computes the split criteria, needs to be not hardcoded in the future
   float split_Criteria =
-      this->tree->get_Current_Node()->node_Column_Mean(position);
+      this->tree_Node->node_Column_Mean(position);
 
   // Computes the DataSet Row Indexes that child nodes can access
   std::vector<std::vector<int>> child_Indexes =
-      this->tree->get_Current_Node()->node_Split(position, split_Criteria);
+      this->tree_Node->node_Split(position, split_Criteria);
 
-  float base_Population = this->tree->get_Current_Node()->get_Index().size();
+  float base_Population = this->tree_Node->get_Index().size();
 
   // Creating a left child
-  TreeNode left_Child{
-      std::make_shared<DataSet>(this->tree->get_Current_Node()->get_DataSet()),
-      child_Indexes[0]};
+  TreeNode left_Child{this->tree_Node->get_DataSet(),
+                      child_Indexes[0]};
 
   // Creating a right child
-  TreeNode right_Child{
-      std::make_shared<DataSet>(this->tree->get_Current_Node()->get_DataSet()),
-      child_Indexes[1]};
+  TreeNode right_Child{this->tree_Node->get_DataSet(),
+                       child_Indexes[1]};
 
   // Computes Weighted Variance for left child
   float left_Variance = left_Child.node_Variance();
@@ -110,9 +108,9 @@ int ReductionInVar::find_Best_Split_Feature() {
   float max_Reduction_In_Var = INT_MAX;
 
   std::vector<std::string> features =
-      this->tree->get_Current_Node()->get_DataSet().get_Features();
+      this->tree_Node->get_DataSet()->get_Features();
 
-  for (unsigned long int i = 0; i < features.size(); ++i) {
+  for (unsigned long int i = 0; i < features.size() ; ++i) {
     float tmp_var = splitting_Variance(i);
     if (tmp_var < max_Reduction_In_Var) {
       max_Reduction_In_Var = tmp_var;
@@ -120,7 +118,7 @@ int ReductionInVar::find_Best_Split_Feature() {
     }
   }
   this->set_Split_Criteria(
-      this->tree->get_Current_Node()->node_Column_Mean(best_Feature));
+      this->tree_Node->node_Column_Mean(best_Feature));
 
   return best_Feature;
 }

@@ -10,11 +10,11 @@
 
 // https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
 
-/* 
-Take the path of the file to read                         
-Instanciates an object of type DataSet from the given CSV 
-Inputs : String                                           
-Ouputs : Object of DataSet Cass                           
+/*
+Take the path of the file to read
+Instanciates an object of type DataSet from the given CSV
+Inputs : String
+Ouputs : Object of DataSet Cass
 */
 DataSet::DataSet(std::string file_Path) {
   // input filestream
@@ -39,8 +39,12 @@ DataSet::DataSet(std::string file_Path) {
 
     // Extract each column name
     while (getline(ss, colname, ',')) {
-      // Initialize DataSet Labels
-      this->features.push_back(colname);
+      // Skip last column because it's the target name and it's not really
+      // usefull
+      if (!ss.eof()) {
+        // Initialize DataSet Labels
+        this->features.push_back(colname);
+      }
     }
   }
 
@@ -52,9 +56,13 @@ DataSet::DataSet(std::string file_Path) {
 
     // tmp vector : represent a row in the matrix
     std::vector<float> tmp;
-
     while (ss >> val) {
-      tmp.push_back(val);
+      // Last value of CSV are labels
+      if (ss.eof()) {
+        this->labels.push_back(val);
+      } else {
+        tmp.push_back(val);
+      }
 
       if (ss.peek() == ',') {
         ss.ignore();
@@ -68,21 +76,86 @@ DataSet::DataSet(std::string file_Path) {
   file.close();
 }
 
-/* 
-Explicit Constructor, takes two vectors and builds a DataSet Object 
-Inputs : vector<string>, vector<vector<float>>                      
-Ouputs : Object of DataSet Class                                    
+/*
+Take the path of the file to read
+Instanciates an object of type DataSet from the given CSV
+Inputs : String
+Ouputs : Object of DataSet Cass
 */
-DataSet::DataSet(std::vector<std::string> features,
-                 std::vector<std::vector<float>> samples) {
-  this->features = features;
-  this->samples = samples;
+void DataSet::load(std::string file_Path) {
+  // input filestream
+  std::ifstream file;
+  file.open(file_Path);
+
+  // Make sure the file is open
+  if (!file.is_open()) {
+    throw std::runtime_error("Could not open given file");
+  }
+
+  std::string line;
+  std::string colname;
+
+  // If no error state flag
+  if (file.good()) {
+    // Extract the first row in the file
+    getline(file, line);
+
+    // Create a stringstream from line
+    std::stringstream ss(line);
+
+    // Extract each column name
+    while (getline(ss, colname, ',')) {
+      // Skip last column because it's the target name and it's not really
+      // usefull
+      if (!ss.eof()) {
+        // Initialize DataSet Labels
+        this->features.push_back(colname);
+      }
+    }
+  }
+
+  float val;
+  // Read the other rows
+  while (getline(file, line)) {
+    // string stream of current line
+    std::stringstream ss(line);
+
+    // tmp vector : represent a row in the matrix
+    std::vector<float> tmp;
+    while (ss >> val) {
+        tmp.push_back(val);
+
+      if (ss.peek() == ',') {
+        ss.ignore();
+      }
+    }
+    // Place the row in the 2D Matrix
+    this->samples.push_back(tmp);
+  }
+
+  std::cout << "DONT FORGET TO DELETE THIS IN LOAD FUNCTION\n";
+  this->labels = std::vector<float>(this->samples.size(), 0);
+
+  // Close file
+  file.close();
 }
 
-/* 
-Default Constructor              
-Inputs :                         
-Ouputs : Object of DataSet Class 
+/*
+Explicit Constructor, takes two vectors and builds a DataSet Object
+Inputs : vector<string>, vector<vector<float>>
+Ouputs : Object of DataSet Class
+*/
+DataSet::DataSet(std::vector<std::string> features,
+                 std::vector<std::vector<float>> samples, std::vector<float> labels) {
+  this->features = features;
+  this->samples = samples;
+  this->labels = labels;
+}
+
+/*
+Default Constructor
+Inputs :
+Ouputs : Object of DataSet Class
 */
 DataSet::DataSet() {}
 
@@ -91,10 +164,10 @@ DataSet::DataSet() {}
 /* Ouputs :           */
 DataSet::~DataSet() {}
 
-/* 
-Naive print function of the DataSet 
-Inputs :                            
-Ouputs :                            
+/*
+Naive print function of the DataSet
+Inputs :
+Ouputs :
 */
 void DataSet::print() const {
   // Logical but prints the features
@@ -107,16 +180,18 @@ void DataSet::print() const {
     for (long unsigned int j = 0; j < this->samples[0].size(); ++j) {
       std::cout << samples[i][j] << "|\t";
     }
+    std::cout << labels[i] << "|\t";
     std::cout << "\n";
   }
+
   std::cout << "\n";
 }
 
-/* 
-Print function of the DataSet with Index 
-Used by TreeNode Class                   
-Inputs : vector<int>                     
-Ouputs :                                 
+/*
+Print function of the DataSet with Index
+Used by TreeNode Class
+Inputs : vector<int>
+Ouputs :
 */
 void DataSet::print_With_Index(std::vector<int> idx) const {
   // Logical but prints the features
@@ -129,15 +204,16 @@ void DataSet::print_With_Index(std::vector<int> idx) const {
     for (long unsigned int j = 0; j < this->samples[i].size(); ++j) {
       std::cout << samples[i][j] << "|\t";
     }
+    std::cout << labels[i] << "|\t";
     std::cout << "\n";
   }
   std::cout << "\n";
 }
 
-/* 
-Returns the features of the DataSet 
+/*
+Returns the features of the DataSet
 Inputs :
-Ouputs : vector<string>             
+Ouputs : vector<string>
 */
 std::vector<std::string> DataSet::get_Features() const {
   return this->features;
@@ -150,6 +226,15 @@ Ouputs : vector<vector<float>>
 */
 std::vector<std::vector<float>> DataSet::get_Samples() const {
   return this->samples;
+}
+
+/**/
+std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
+  std::vector<float> Col(0);
+  for (int row : idx) {
+    Col.push_back(this->labels[row]);
+  }
+  return Col;
 }
 
 /*
@@ -180,27 +265,49 @@ Ouputs : vector<float>
 */
 std::vector<float> DataSet::get_Column(int position,
                                        const std::vector<int> &idx) const {
-  std::vector<float> Col;
-  if (position > this->features_Length()) {
+  
+  std::vector<float> Col(0);
+
+  if(idx.empty()){//(position > len) {//|| position < 0){
     return Col;
   }
-  for (int row : idx) {
-    Col.push_back(this->samples[row][position]);
+
+  long unsigned int len = idx.size();
+
+  //if(position < this->features_Length()){
+  //  return Col;
+  //}
+  //float len = idx.size();
+ 
+  for(long unsigned int i = 0; i < len ; ++i){
+    Col.push_back(this->samples[idx[i]][position]);
   }
+
   return Col;
+}
+
+/**/
+void DataSet::initialize_Labels(std::vector<float> column) {
+  this->labels = column;
+}
+
+void DataSet::update_Label_Value(int position, float value){
+  this->labels[position] = value;
 }
 
 /*
 Return 2 vector which contains the index of each subtree datasets after
 split, which is based on the criteria on a row at the col position
 Inputs : int, float
-Ouputs : vector<vector<int>>*/
+Ouputs : vector<vector<int>>
+*/
 std::vector<std::vector<int>>
 DataSet::split(int position, float criteria,
                const std::vector<int> &idx) const {
 
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
+
   for (int row : idx) {
     if (this->samples[row][position] < criteria) {
       sub_Index_Left.push_back(row);
@@ -218,17 +325,31 @@ Inputs  : int
 Outputs : float
 */
 float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
+
+  float mean = 0;
+
+  if(idx.empty()){
+    return mean;
+  }
+
   int len = idx.size();
-  // check if there are values in the current Column at the specified indexes
-  if (len < 0 || position > this->features_Length() || position < 0) {
-    return 0.0;
+  
+  if (len < 0 ){ 
+    return mean;
   }
 
   std::vector<float> current_Column = this->get_Column(position, idx);
-
-  float mean = std::reduce(current_Column.begin(), current_Column.end(), 0l);
+  mean = std::reduce(current_Column.begin(), current_Column.end(), 0l);
   mean /= len;
   return mean;
+}
+
+/**/
+float DataSet::labels_Mean(const std::vector<int> &idx) const{
+  std::vector<float> current_Labels = this->get_Labels(idx);
+
+  float mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0l);
+  return (mean / current_Labels.size());
 }
 
 /*
@@ -244,13 +365,12 @@ float DataSet::column_Variance(const std::vector<int> &idx) const {
     return 0.0;
   }
 
-  std::vector<float> current_Column =
-      this->get_Column(this->features_Length() - 1, idx);
+  std::vector<float> current_Labels = this->get_Labels(idx);
 
-  float mean = column_Mean(this->features_Length() - 1, idx);
+  float mean = this->labels_Mean(idx);
   float variance = 0.0;
 
-  for (int i : current_Column) {
+  for (float i : current_Labels) {
     float difference = i - mean;
     variance += difference * difference;
   }
