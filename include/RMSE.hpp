@@ -1,26 +1,26 @@
-#ifndef RIV_H_
-#define RIV_H_
+#ifndef RMSE_H_
+#define RMSE_H_
 
 #include "IOperator.hpp"
 #include <string>
 
-class ReductionInVar : public IOperator {
+class RMSE : public IOperator {
 
 private:
   // Parameters
 
-  const std::string name = "RIV";
+  const std::string name = "MAPE";
   std::shared_ptr<TreeNode> tree_Node;
   float split_Criteria;
 
 public:
   // Constructor
-
-  ReductionInVar(std::shared_ptr<TreeNode> tree_Node);
+  RMSE() = delete;
+  RMSE(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor
 
-  ~ReductionInVar() override;
+  ~RMSE() override;
 
   // Getter
 
@@ -36,7 +36,7 @@ public:
   void print() override;
   int find_Best_Split_Feature() override;
 
-  float splitting_Variance(int position);
+  float splitting_RMSE(int position);
 };
 
 #endif
