@@ -9,9 +9,9 @@ class ReductionInVar : public IOperator {
 private:
   // Parameters
 
+  float split_Criteria;
   const std::string name = "RIV";
   std::shared_ptr<TreeNode> tree_Node;
-  float split_Criteria;
 
 public:
   // Constructor
@@ -28,14 +28,14 @@ public:
 
   // Setter
 
-  bool set_Node(std::shared_ptr<TreeNode> tree_Node);
   void set_Split_Criteria(float value) override;
+  bool set_Node(std::shared_ptr<TreeNode> tree_Node);
 
   // Methods
 
   void print() override;
-  int find_Best_Split_Feature() override;
 
+  int find_Best_Split_Feature() override;
   float splitting_Variance(int position);
 };
 

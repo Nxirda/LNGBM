@@ -55,7 +55,11 @@ Output :
 */
 void RMSE::set_Split_Criteria(float value) { this->split_Criteria = value; }
 
-/**/
+/*
+Computes the Root Mean Square Error of a split on a given column
+Inputs  : int
+Outputs : float
+*/
 float RMSE::splitting_RMSE(int position) {
 
   // Computes the split criteria, needs to be not hardcoded in the future
