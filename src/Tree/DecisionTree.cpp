@@ -347,10 +347,10 @@ void DecisionTree::divide_Predicted_Labels(int n) {
   this->curr_Node->set_Predicted_Value(curr_Prediction / n);
 
   if (this->left) {
-    this->left->divide_Predicted_Labels(n - 1);
+    this->left->divide_Predicted_Labels(n);
   }
 
   if (this->right) {
-    this->right->divide_Predicted_Labels(n - 1);
+    this->right->divide_Predicted_Labels(n);
   }
 }
