@@ -65,26 +65,6 @@ Outputs :
 */
 BaggingModel::~BaggingModel() { delete (this->split_Metric); };
 
-/**/
-/* void BaggingModel::fit(const DataSet &data) {
-  // For now it only construct one tree
-  std::cout << "=== " << this->metric << " ===\n";
-
-  // Create the tree
-  this->main_Tree = std::make_unique<DecisionTree>(data);
-
-  // Set the right node in the metric
-  this->split_Metric->set_Node(this->main_Tree->get_Current_Node());
-
-  this->main_Tree->add_Operator(this->split_Metric);
-
-  this->main_Tree->build_Splitted_Tree(this->max_Depth);
-
-  // this->main_Tree->print_Tree();
-
-  delete (this->split_Metric);
-} */
-
 /*
 train the model on the DataSet with the operator and depth fixed
 Inputs  : const DataSet, int
@@ -99,6 +79,7 @@ void BaggingModel::train(const DataSet &data, int n) {
   // std::shared_ptr test_DataSet =
   //     std::make_shared<DataSet>(test_Data); // Temporary ofc
 
+  // Initialise the Main Tree
   this->main_Tree = std::make_unique<DecisionTree>(data);
 
   this->split_Metric->set_Node(this->main_Tree->get_Current_Node());
@@ -108,11 +89,18 @@ void BaggingModel::train(const DataSet &data, int n) {
   this->main_Tree->build_Splitted_Tree(this->max_Depth);
 
   for (int i = 1; i < n; ++i) {
+
+    // Create bootstrap sample
+    std::vector<int> new_Index = this->bootstrap_DataSet();
+
+    // Handle random forest
+
     // train_DataSet = ...
     // test_DataSet = ...
 
     // Decision Tree Initialisation :
     DecisionTree dt = DecisionTree(data);
+    dt.get_Current_Node()->set_Index(new_Index);
 
     this->split_Metric->set_Node(dt.get_Current_Node());
 
@@ -121,8 +109,10 @@ void BaggingModel::train(const DataSet &data, int n) {
     dt.build_Splitted_Tree(this->max_Depth);
 
     // Partial sum stored in main tree at each iter
+    // Test for aggregating, ppbly wrong
     this->main_Tree->sum_Predicted_Labels(&dt);
   }
+  // Other part of aggregation test
   this->main_Tree->divide_Predicted_Labels(n);
   this->main_Tree->print_Tree();
 }
@@ -146,7 +136,7 @@ void BaggingModel::predict(const DataSet &data) {
 
 /*
 Get the prediction we made on the dataset with the operator and depth fixed
-Inputs  : 
+Inputs  :
 Outputs : vector<float>
 */
 std::vector<float> BaggingModel::get_Prediction() {
@@ -156,10 +146,44 @@ std::vector<float> BaggingModel::get_Prediction() {
 /*
 Prints the available operator for this library
 Inputs  :
-Outputs : 
+Outputs :
 */
 void BaggingModel::print_Available_Operators() {
   for (auto const &pair : operator_Dictionnary) {
     std::cout << "{" << pair.first << "}\n";
   }
 }
+
+/*
+Computes a vector of random index in the main_Tree DataSet
+Inputs  :
+Outputs : 
+*/
+std::vector<int> BaggingModel::bootstrap_DataSet() {
+  int len = this->main_Tree->get_Current_Node()->get_Index().size();
+  std::vector<int> bootstrap_Index(len);
+  for(int i = 0; i < len; i++){
+    bootstrap_Index[i] = rand() % len;
+  }
+  return bootstrap_Index;
+}
+
+/**/
+/* void BaggingModel::fit(const DataSet &data) {
+  // For now it only construct one tree
+  std::cout << "=== " << this->metric << " ===\n";
+
+  // Create the tree
+  this->main_Tree = std::make_unique<DecisionTree>(data);
+
+  // Set the right node in the metric
+  this->split_Metric->set_Node(this->main_Tree->get_Current_Node());
+
+  this->main_Tree->add_Operator(this->split_Metric);
+
+  this->main_Tree->build_Splitted_Tree(this->max_Depth);
+
+  // this->main_Tree->print_Tree();
+
+  delete (this->split_Metric);
+} */
