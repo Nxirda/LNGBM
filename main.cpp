@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
 
   // Bagging Test
   uint64_t t6 = rdtsc();
-  model2.train(DS2, 10);
+  model2.train(DS2, 25);
   uint64_t t7 = rdtsc();
   std::cout << "Bagging at depth " << depth
             << " took                 : " << t7 - t6 << " CPU cycles\n";

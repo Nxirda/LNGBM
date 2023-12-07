@@ -26,7 +26,7 @@ Inputs  : Object of DataSet Class, vector
 Outputs : TreeNode Object containing the DataSet
 */
 TreeNode::TreeNode(std::shared_ptr<DataSet> data) {
-  std::vector<int> idx(data->samples_Number() - 1);
+  std::vector<int> idx(data->samples_Number());
   for (int i = 0; i < data->samples_Number(); ++i) {
     idx[i] = i;
   }
@@ -201,6 +201,16 @@ float TreeNode::compute_Predicted_Value() {
     return -1;
   }
   return this->get_DataSet()->labels_Mean(this->get_Index());
+}
+
+/**/
+std::vector<int> TreeNode::bootstrap_DataSet() {
+  int len = this->get_Index().size();
+  std::vector<int> bootstrap_Index(len);
+  for(int i = 0; i < len; i++){
+    bootstrap_Index[i] = rand() % len;
+  }
+  return bootstrap_Index;
 }
 
 /*

@@ -3,6 +3,19 @@
 #include "RMSE.hpp"
 #include "TreeNode.hpp"
 
+/********************/
+/*                  */
+/*    RMSE CLASS    */
+/*                  */
+/********************/
+
+/*
+Constructor
+Input  : DecisionTree*
+Output :
+*/
+RMSE::RMSE() { this->tree_Node = nullptr; }
+
 /*
 Constructor
 Input  : DecisionTree*

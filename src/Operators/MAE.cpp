@@ -14,6 +14,13 @@ Constructor
 Inputs  : DecisionTree*
 Outputs :
 */
+MAE::MAE() { this->tree_Node = nullptr; }
+
+/*
+Constructor
+Inputs  : DecisionTree*
+Outputs :
+*/
 MAE::MAE(std::shared_ptr<TreeNode> tree_Node) { this->tree_Node = tree_Node; }
 
 /*

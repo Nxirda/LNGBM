@@ -14,7 +14,7 @@ add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3)
 add_subdirectory(src)
 
 #Add the executable
-add_executable(Projet_run main.cpp)# src/DataSet.cpp src/DecisionTree.cpp src/TreeNode.cpp src/ReductionInVar.cpp)
+add_executable(Projet_run main.cpp)
 
 #Add the headers
 target_include_directories(Projet_run PUBLIC include/ )

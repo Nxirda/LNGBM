@@ -59,6 +59,7 @@ public:
   bool node_Homogeneity();
   float compute_Predicted_Value();
   float node_Column_Mean(int position);
+  std::vector<int> bootstrap_DataSet();
   std::vector<std::vector<int>> node_Split(int position, float split_Criteria);
 };
 

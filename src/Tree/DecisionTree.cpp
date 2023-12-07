@@ -354,3 +354,13 @@ void DecisionTree::divide_Predicted_Labels(int n) {
     this->right->divide_Predicted_Labels(n);
   }
 }
+
+/**/
+std::vector<int> DecisionTree::bootstrap_DataSet() {
+  int len = this->get_Current_Node()->get_Index().size();
+  std::vector<int> bootstrap_Index(len);
+  for(int i = 0; i < len; i++){
+    bootstrap_Index[i] = rand() % len;
+  }
+  return bootstrap_Index;
+}
