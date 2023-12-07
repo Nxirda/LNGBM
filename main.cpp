@@ -106,9 +106,10 @@ int main(int argc, char **argv) {
   DataSet DS2{"../data/datasets/d1_Test.csv"};
   DataSet test_DS2{};
   test_DS2.load("../data/datasets/d1_Test.csv");
+
   // Bagging Test
   uint64_t t6 = rdtsc();
-  model2.train(DS2, 10);
+  model2.train(DS2, 25);
   uint64_t t7 = rdtsc();
   std::cout << "Bagging at depth " << depth
             << " took                 : " << t7 - t6 << " CPU cycles\n";
@@ -116,7 +117,15 @@ int main(int argc, char **argv) {
             << " took                 : " << (t7 - t6) / cpu_frequency
             << " seconds\n";
 
+  uint64_t t8 = rdtsc();
   model2.predict(test_DS2);
+  uint64_t t9 = rdtsc();
+  std::cout << "Predicting at depth "<< depth <<" took                 : " << t9
+  - t8
+            << " CPU cycles\n";
+  std::cout << "Predicting at depth "<< depth <<" took                 : "
+            << (t9 - t8) / cpu_frequency << " seconds\n";    
+
 
   std::vector<float> result = model2.get_Prediction();
   for (auto idx : result){

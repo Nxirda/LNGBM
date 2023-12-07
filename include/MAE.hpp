@@ -15,7 +15,7 @@ private:
 
 public:
   // Constructor
-
+  MAE();
   MAE(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor

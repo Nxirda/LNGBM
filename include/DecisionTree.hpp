@@ -65,6 +65,7 @@ public:
   void divide_Predicted_Labels(int n);
   void sum_Predicted_Labels(DecisionTree *dt);
 
+  std::vector<int> bootstrap_DataSet();
 };
 
 #endif

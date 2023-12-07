@@ -15,7 +15,7 @@ private:
 
 public:
   // Constructor
-  RMSE() = delete;
+  RMSE();
   RMSE(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor

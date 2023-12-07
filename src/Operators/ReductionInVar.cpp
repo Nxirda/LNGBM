@@ -14,6 +14,14 @@ Constructor
 Inputs  : DecisionTree*
 Outputs :
 */
+ReductionInVar::ReductionInVar() {this->tree_Node = nullptr;}
+
+
+/*
+Constructor
+Inputs  : DecisionTree*
+Outputs :
+*/
 ReductionInVar::ReductionInVar(std::shared_ptr<TreeNode> tree_Node) {this->tree_Node = tree_Node;}
 
 /*

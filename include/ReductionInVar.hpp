@@ -15,7 +15,7 @@ private:
 
 public:
   // Constructor
-
+  ReductionInVar();
   ReductionInVar(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor

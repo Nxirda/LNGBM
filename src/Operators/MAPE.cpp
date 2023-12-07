@@ -14,6 +14,13 @@ Constructor
 Inputs  : DecisionTree*
 Outputs :
 */
+MAPE::MAPE() { this->tree_Node = nullptr; }
+
+/*
+Constructor
+Inputs  : DecisionTree*
+Outputs :
+*/
 MAPE::MAPE(std::shared_ptr<TreeNode> tree_Node) { this->tree_Node = tree_Node; }
 
 /*

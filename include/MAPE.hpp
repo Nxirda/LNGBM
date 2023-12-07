@@ -15,7 +15,7 @@ private:
 
 public:
   // Constructor
-
+  MAPE();
   MAPE(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor
