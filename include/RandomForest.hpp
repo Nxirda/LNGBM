@@ -1,3 +1,6 @@
+#ifndef RANDOM_FOREST_H_
+#define RANDOM_FOREST_H_
+
 #include <map>
 #include <vector>
 
@@ -37,3 +40,5 @@ public:
   void generate_Forest(int size);
   void predict_Results(std::shared_ptr<DataSet> dataset);
 };
+
+#endif

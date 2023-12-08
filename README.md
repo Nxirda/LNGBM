@@ -1,5 +1,13 @@
 # LAPACK DGTERF performance prediction via Machine Learning
 
+# Build : Dependencies
+
+You will need gtest 
+
+```sh
+sudo apt-get install libgtest-dev
+```
+
 # Build :
 
 ```sh

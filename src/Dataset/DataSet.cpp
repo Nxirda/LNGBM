@@ -20,7 +20,7 @@
 Take the path of the file to read
 Instanciates an object of type DataSet from the given CSV
 Inputs : String
-Ouputs : Object of DataSet Cass
+Ouputs : Object of DataSet Class
 */
 DataSet::DataSet(std::string file_Path) {
   // input filestream
@@ -86,7 +86,7 @@ DataSet::DataSet(std::string file_Path) {
 Take the path of the file to read
 Instanciates an object of type DataSet from the given CSV
 Inputs : String
-Ouputs : Object of DataSet Cass
+Ouputs : Object of DataSet Class
 */
 void DataSet::load(std::string file_Path) {
   // input filestream
@@ -129,6 +129,7 @@ void DataSet::load(std::string file_Path) {
     // tmp vector : represent a row in the matrix
     std::vector<float> tmp;
     while (ss >> val) {
+      // Ignore label column
       if (!ss.eof())
         tmp.push_back(val);
 
@@ -165,7 +166,11 @@ Default Constructor
 Inputs :
 Ouputs : Object of DataSet Class
 */
-DataSet::DataSet() {}
+DataSet::DataSet() {
+  this->labels = std::vector<float>();
+  this->features = std::vector<std::string>();
+  this->samples = std::vector<std::vector<float>>();
+}
 
 /* Default Destructor */
 /* Inputs :           */
@@ -240,7 +245,8 @@ std::vector<std::vector<float>> DataSet::get_Samples() const {
 std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
   std::vector<float> Col(0);
   for (int row : idx) {
-    Col.push_back(this->labels[row]);
+    if (row <= this->labels_Number())
+      Col.push_back(this->labels[row]);
   }
   return Col;
 }
@@ -290,28 +296,11 @@ std::vector<float> DataSet::get_Column(int position,
   long unsigned int len = idx.size();
 
   for (long unsigned int i = 0; i < len; ++i) {
-    Col.push_back(this->samples[idx[i]][position]);
+    if ((int)i < this->samples_Number())
+      Col.push_back(this->samples[idx[i]][position]);
   }
 
   return Col;
-}
-
-/*
-Sets the Labels of the DataSet
-Inputs  : vector<float>
-Outputs :
-*/
-void DataSet::initialize_Labels(std::vector<float> column) {
-  this->labels = column;
-}
-
-/*
-Updates the label value at a given position
-Inputs  : int, float
-Outputs :
-*/
-void DataSet::update_Label_Value(int position, float value) {
-  this->labels[position] = value;
 }
 
 /*
@@ -351,9 +340,9 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
     return mean;
   }
 
-  int len = idx.size();
-
   std::vector<float> current_Column = this->get_Column(position, idx);
+  int len = current_Column.size();
+
   mean = std::reduce(current_Column.begin(), current_Column.end(), 0.0);
   mean /= len;
   return mean;
@@ -371,9 +360,8 @@ float DataSet::labels_Mean(const std::vector<int> &idx) const {
     return mean;
   }
 
-  int len = idx.size();
-
   std::vector<float> current_Labels = this->get_Labels(idx);
+  int len = current_Labels.size();
 
   mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0.0);
   mean /= len;
@@ -387,14 +375,13 @@ Inputs  : std:vector<int>
 Outputs : float
 */
 float DataSet::column_Variance(const std::vector<int> &idx) const {
-  int len = idx.size();
   //  check if there are values in the current Column
-  if (len <= 0) {
+  if (idx.size() <= 0) {
     return 0.0;
   }
 
   std::vector<float> current_Labels = this->get_Labels(idx);
-
+  int len = current_Labels.size();
   float mean = this->labels_Mean(idx);
   float variance = 0.0;
 

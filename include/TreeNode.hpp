@@ -1,10 +1,10 @@
+#ifndef TREE_NODE_H_
+#define TREE_NODE_H_
+
 #include <iostream>
 #include <memory>
 
 #include "DataSet.hpp"
-
-#ifndef TREE_NODE_H_
-#define TREE_NODE_H_
 
 // Node Class
 class TreeNode {
