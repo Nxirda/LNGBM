@@ -128,7 +128,7 @@ TEST(Computation, ColumnVariance) {
     float difference = i - mean;
     variance += difference * difference;
   }
-  variance /=  d.get_Labels(idx).size();
+  variance /= d.get_Labels(idx).size();
 
   ASSERT_EQ(d.column_Variance(idx), variance);
 
@@ -137,7 +137,10 @@ TEST(Computation, ColumnVariance) {
   ASSERT_EQ(d.column_Variance(idx), variance);
 }
 
-TEST(Computation, Split) { DataSet d; }
+TEST(Computation, Split) {
+  DataSet d;
+  ASSERT_FALSE(d.empty());
+}
 
 //
 TEST(Size, empty) {

@@ -78,7 +78,7 @@ void RandomForest::predict_Results(std::shared_ptr<DataSet> test_DataSet) {
 
     it->second->predict_Test_Labels();
 
-    //Checks if we can add
+    // Checks if we can add
     if (accumulator.size() <= 0) {
       accumulator = *it->second->get_Predicted_Labels();
     } else {
@@ -89,17 +89,17 @@ void RandomForest::predict_Results(std::shared_ptr<DataSet> test_DataSet) {
         std::transform(accumulator.begin(), accumulator.end(),
                        it->second->get_Predicted_Labels()->begin(),
                        accumulator.begin(), std::plus<float>());
-      }else{
+      } else {
         perror("Random Forest : one tree didnt predict on all the values");
         return;
       }
     }
   }
-  if(size != 0){
-    for(unsigned long int i= 0; i<accumulator.size(); ++i){
-        accumulator[i] /= this->get_size();
+  if (size != 0) {
+    for (unsigned long int i = 0; i < accumulator.size(); ++i) {
+      accumulator[i] /= this->get_size();
     }
   }
-  
+
   this->results = accumulator;
 }

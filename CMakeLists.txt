@@ -19,7 +19,7 @@ add_subdirectory(src)
 add_executable(Projet_run main.cpp)
 
 #Add the headers
-target_include_directories(Projet_run PUBLIC include/ )
+#target_include_directories(Projet_run PUBLIC include/ )
 
 #Add the Libraries
 target_link_libraries(Projet_run PUBLIC Source_Lib)

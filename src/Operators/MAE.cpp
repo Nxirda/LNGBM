@@ -94,6 +94,7 @@ float MAE::splitting_MAE(int position) {
   std::vector<float> labels =
       this->tree_Node->get_DataSet()->get_Labels(this->tree_Node->get_Index());
   int size = (int)labels.size();
+  
   // Computes the Mean Absolute Error for left child
   float left_Prediction = left_Child.compute_Predicted_Value();
   float left_MAE = 0;
