@@ -1,3 +1,6 @@
+#ifndef DECISION_TREE_H_
+#define DECISION_TREE_H_
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -6,9 +9,6 @@
 #include "DataSet.hpp"
 #include "IOperator.hpp"
 #include "TreeNode.hpp"
-
-#ifndef DECISION_TREE_H_
-#define DECISION_TREE_H_
 
 // Binary Search Tree Class
 class DecisionTree {
@@ -61,11 +61,6 @@ public:
   void predict_Test_Labels();
 
   void build_Splitted_Tree(int depth);
-
-  void divide_Predicted_Labels(int n);
-  void sum_Predicted_Labels(DecisionTree *dt);
-
-  std::vector<int> bootstrap_DataSet();
 };
 
 #endif

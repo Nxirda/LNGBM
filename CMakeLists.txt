@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+# ===== Testing Part =====
+
 #Set the project name
 project(PPN)
 
@@ -17,7 +19,29 @@ add_subdirectory(src)
 add_executable(Projet_run main.cpp)
 
 #Add the headers
-target_include_directories(Projet_run PUBLIC include/ )
+#target_include_directories(Projet_run PUBLIC include/ )
 
 #Add the Libraries
 target_link_libraries(Projet_run PUBLIC Source_Lib)
+
+# ===== Testing Part =====
+
+#Find Google test package
+find_package(GTest REQUIRED)
+
+#To be able to launch tests with ctest
+enable_testing()
+
+add_executable(Tests test/DataSet_Test.cpp src/)
+
+add_test(myTest Tests)
+
+add_subdirectory(test)
+
+target_include_directories(Tests PUBLIC include/ )
+
+target_link_libraries(Tests PUBLIC Test_Lib)
+target_link_libraries(Tests PUBLIC GTest::GTest GTest::Main)
+target_link_libraries(Tests PUBLIC Source_Lib)
+
+gtest_discover_tests(Tests)

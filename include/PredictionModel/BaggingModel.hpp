@@ -2,7 +2,6 @@
 #define BAGGING_MODEL_H_
 
 #include "DataSet.hpp"
-//#include "DecisionTree.hpp"
 #include "IOperator.hpp"
 #include "RandomForest.hpp"
 

@@ -40,9 +40,8 @@ public:
 
   void print() const;
   bool empty() const;
+
   void print_With_Index(std::vector<int> idx) const;
-  void initialize_Labels(std::vector<float> column);
-  void update_Label_Value(int position, float value);
 
   int labels_Number() const;
   int samples_Number() const;
