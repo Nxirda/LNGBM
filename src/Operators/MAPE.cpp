@@ -14,28 +14,28 @@ Constructor
 Inputs  : DecisionTree*
 Outputs :
 */
-MAPE::MAPE() { this->tree_Node = nullptr; }
+MAPE::MAPE() {}
 
 /*
 Constructor
 Inputs  : DecisionTree*
 Outputs :
 */
-MAPE::MAPE(std::shared_ptr<TreeNode> tree_Node) { this->tree_Node = tree_Node; }
-
+/* MAPE::MAPE(std::shared_ptr<TreeNode> tree_Node) { this->tree_Node = tree_Node; }
+ */
 /*
 Setter for the tree pointer
 Inputs  : DecisionTree*
 Outputs : bool
 */
-bool MAPE::set_Node(std::shared_ptr<TreeNode> tree_Node) {
+/* bool MAPE::set_Node(std::shared_ptr<TreeNode> tree_Node) {
   this->tree_Node = tree_Node;
   this->split_Criteria = 0.0;
   if (this->tree_Node) {
     return true;
   }
   return false;
-}
+} */
 
 /*
 Destructor
@@ -59,14 +59,14 @@ Returns the best splitting criteria for RIV algorithm
 Inputs  :
 Outputs : float
 */
-float MAPE::get_Best_Split_Criteria() { return this->split_Criteria; }
+float MAPE::get_Best_Split_Criterion() const { return this->split_Criterion; }
 
 /*
 Sets the split criteria as the value given
 Inputs  : float
 Outputs :
 */
-void MAPE::set_Split_Criteria(float value) { this->split_Criteria = value; }
+void MAPE::set_Split_Criterion(float value) { this->split_Criterion = value; }
 
 /*
 Computes the Mean Absolute Percentage Error of a split on a given column

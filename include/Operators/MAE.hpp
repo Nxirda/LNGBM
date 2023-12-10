@@ -9,14 +9,14 @@ class MAE : public IOperator {
 private:
   // Parameters
 
-  float split_Criteria;
+  float split_Criterion;
   const std::string name = "MAE";
-  std::shared_ptr<TreeNode> tree_Node;
+  // std::shared_ptr<TreeNode> tree_Node;
 
 public:
   // Constructor
   MAE();
-  MAE(std::shared_ptr<TreeNode> tree_Node);
+  // MAE(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor
 
@@ -24,19 +24,19 @@ public:
 
   // Getter
 
-  float get_Best_Split_Criteria() override;
+  //float get_Best_Split_Criterion() const override;
 
   // Setter
 
-  void set_Split_Criteria(float value) override;
-  bool set_Node(std::shared_ptr<TreeNode> tree_Node);
+  //void set_Split_Criterion(float value) override;
+  // bool set_Node(std::shared_ptr<TreeNode> tree_Node);
 
   // Methods
 
   void print() override;
 
-  int find_Best_Split_Feature() override;
-  float splitting_MAE(int position);
+  std::tuple<int, float> find_Best_Split(const DataSet &data, std::vector<int> index) const override;
+  float splitting_MAE(int position, const DataSet &data, std::vector<int> index) const;
 };
 
 #endif

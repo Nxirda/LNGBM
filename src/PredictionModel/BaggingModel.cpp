@@ -73,8 +73,8 @@ Outputs :
 void BaggingModel::train(const DataSet &data, int n) {
   std::cout << "=== " << this->metric << " ===\n";
 
-  std::vector<float> predictions;
-  std::vector<float> aggregation_Of_Results;
+  /* std::vector<float> predictions;
+  std::vector<float> aggregation_Of_Results; */
 
   std::shared_ptr<DataSet> dataset = std::make_shared<DataSet>(data);
 
@@ -88,9 +88,10 @@ predict the labels for the given dataset with the operator and depth fixed
 Inputs  : const DataSet
 Outputs :
 */
-void BaggingModel::predict(const DataSet &data) {
+std::vector<float> BaggingModel::predict(const DataSet &data) {
   std::shared_ptr test_DataSet = std::make_shared<DataSet>(data);
   this->forest.predict_Results(test_DataSet);
+  return this->forest.get_results();
 }
 
 /*
@@ -99,7 +100,7 @@ Inputs  :
 Outputs : vector<float>
 */
 std::vector<float> BaggingModel::get_Prediction() {
-  return this->forest.get_results();
+    return this->forest.get_results();
 }
 
 /*

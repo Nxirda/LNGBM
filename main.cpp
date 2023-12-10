@@ -1,5 +1,7 @@
-#include "BaggingModel.hpp"
+//#include "BaggingModel.hpp"
 #include "DataSet.hpp"
+#include "RandomForest.hpp"
+#include "EnumOperator.hpp"
 
 #include <stdio.h>
 
@@ -23,18 +25,22 @@ int main(int argc, char **argv) {
     std::cout << "Usage is : " << argv[0] << " [Split Metric] [Depth]\n";
     std::cout << "\n";
     std::cout << "== Split Metrics Available are ==\n";
-    BaggingModel m{};
-    m.print_Available_Operators();
+   /*  BaggingModel m{};
+    m.print_Available_Operators(); */
     return 1;
   }
 
-
-  //DataSet DS{"../data/datasets/d1.csv"};
+  DataSet DS{"../data/datasets/d1.csv"};
 
   std::string metric = argv[1];
   int depth = std::stoi(argv[2]);
 
-  BaggingModel model2{metric, depth};
+  IOperator* split_Man = new MAE();
+  RandomForest rf(DS, split_Man, 1, depth);
+  rf.generate_Forest(25);
+  
+
+  /*BaggingModel model2{metric, depth};
 
   //For testing on a cutted dataset
   DataSet DS2{"../data/datasets/d1_Test.csv"};
@@ -50,7 +56,7 @@ int main(int argc, char **argv) {
   for (auto idx : result) {
     std::cout << "[" << idx << "]";
   }
-  std::cout << "\n";
+  std::cout << "\n"; */
 
   return 0;
 }

@@ -34,7 +34,7 @@ public:
 
   // void fit(const DataSet &data);
   void train(const DataSet &data, int n);
-  void predict(const DataSet &datas);
+  std::vector<float> predict(const DataSet &datas);
   void print_Available_Operators();
 
   //std::vector<int> bootstrap_DataSet();

@@ -309,7 +309,7 @@ split, which is based on the criteria on a row at the col position
 Inputs : int, float
 Ouputs : vector<vector<int>>
 */
-std::vector<std::vector<int>>
+std::tuple<std::vector<int>, std::vector<int>>
 DataSet::split(int position, float criteria,
                const std::vector<int> &idx) const {
 
@@ -323,8 +323,7 @@ DataSet::split(int position, float criteria,
       sub_Index_Right.push_back(row);
     }
   }
-  std::vector<std::vector<int>> res{sub_Index_Left, sub_Index_Right};
-  return res;
+  return std::make_tuple(sub_Index_Left, sub_Index_Right);
 }
 
 /*

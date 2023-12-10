@@ -1,4 +1,4 @@
-
+#include <tuple>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -51,8 +51,8 @@ public:
   float column_Variance(const std::vector<int> &idx) const;
   float column_Mean(int position, const std::vector<int> &idx) const;
 
-  std::vector<std::vector<int>> split(int position, float criteria,
-                                      const std::vector<int> &idx) const;
+  std::tuple<std::vector<int>, std::vector<int>>
+  split(int position, float criteria, const std::vector<int> &idx) const;
 };
 
 #endif

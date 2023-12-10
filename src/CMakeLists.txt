@@ -4,7 +4,14 @@ project(Source_Lib)
 file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 # Make a lib containing all our .cpp
-add_library(Source_Lib  ${SOURCE_FILES})   
+#add_library(Source_Lib  ${SOURCE_FILES})   
+add_library(Source_Lib
+            Dataset/DataSet.cpp
+            Tree/TreeNode.cpp
+            Tree/DecisionTree.cpp
+            Operators/MAE.cpp
+            PredictionModel/TrainingElement.cpp
+            PredictionModel/RandomForest.cpp)   
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 

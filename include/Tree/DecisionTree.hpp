@@ -15,20 +15,14 @@ class DecisionTree {
 protected:
   // Parameters
 
-  DecisionTree *parent;
-  std::unique_ptr<DecisionTree> left;
-  std::unique_ptr<DecisionTree> right;
-  std::shared_ptr<TreeNode> curr_Node;
-
-  IOperator *split_Operator = nullptr;
+  std::unique_ptr<TreeNode> root;
   std::shared_ptr<std::vector<float>> predicted_Labels = nullptr;
 
 public:
   // Constructor
 
   DecisionTree();
-  DecisionTree(const DataSet &data);
-  DecisionTree(std::shared_ptr<TreeNode> tree_Node, std::vector<int> idx);
+  DecisionTree &operator=(const DecisionTree &tree);
 
   // Destructor
 
@@ -36,22 +30,13 @@ public:
 
   // Getters
 
-  DecisionTree *get_Left_Tree();
-  DecisionTree *get_Right_Tree();
-  DecisionTree *get_Parent_Tree();
-  std::shared_ptr<TreeNode> get_Current_Node();
+  TreeNode *get_Root();
   std::shared_ptr<std::vector<float>> get_Predicted_Labels();
 
   // Setters
-
-  void add_Parent(DecisionTree *dt);
-  void add_Operator(IOperator *wanted_Operator);
-  void add_Left(std::unique_ptr<DecisionTree> dt);
-  void add_Right(std::unique_ptr<DecisionTree> dt);
+  void set_Root(std::unique_ptr<TreeNode> node);
   void
   add_Predicted_Labels(std::shared_ptr<std::vector<float>> predicted_Labels);
-
-  void set_Test_DataSet(std::shared_ptr<DataSet> data);
 
   // Methods
 
@@ -60,7 +45,8 @@ public:
   void parse_Test_DataSet();
   void predict_Test_Labels();
 
-  void build_Splitted_Tree(int depth);
+  void train_Tree(const DataSet &data, IOperator* splitting_Operator, int max_Depth);
+
 };
 
 #endif

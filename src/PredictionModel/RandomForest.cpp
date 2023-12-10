@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <stack>
 
 #include "RandomForest.hpp"
+#include "TrainingElement.hpp"
 
 /**************************/
 /*                        */
@@ -12,19 +14,19 @@
 RandomForest::RandomForest() {
   this->size = 0;
   this->max_Depth = 0;
-  this->dataset = nullptr;
+  this->dataset = DataSet{};
   this->results = std::vector<float>();
-  this->trees = std::map<int, std::shared_ptr<DecisionTree>>();
+  this->trees = std::map<int, DecisionTree>();
 }
 
 /**/
-RandomForest::RandomForest(std::shared_ptr<DataSet> dataset,
-                           IOperator *split_Operator, int n, int depth) {
+RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
+                           int n, int depth) {
   this->size = n;
   this->max_Depth = depth;
   this->dataset = dataset;
   this->splitting_Operator = split_Operator;
-  this->trees = std::map<int, std::shared_ptr<DecisionTree>>();
+  this->trees = std::map<int, DecisionTree>();
 }
 
 /**/
@@ -37,37 +39,47 @@ std::vector<float> RandomForest::get_results() { return this->results; }
 int RandomForest::get_size() { return this->size; }
 
 /**/
-std::shared_ptr<DataSet> RandomForest::get_Dataset() { return this->dataset; }
+//std::shared_ptr<DataSet> RandomForest::get_Dataset() { return this->dataset; }
 
 /**/
 void RandomForest::generate_Forest(int size) {
 
   for (int i = 0; i < size; ++i) {
+    std::cout << "===Iteration ["<< i << "]===\n";
+    DecisionTree tree{};
+    TrainingElement elem{};
+    elem.set_Root(this->dataset.labels_Number(), tree.get_Root());
+
+    elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
+
+    tree.set_Root(std::make_unique<TreeNode>(*elem.node));
+    tree.get_Root()->node_Print_Criterion();
 
     //  Creating a Node
-    std::shared_ptr<TreeNode> base_Node =
-        make_shared<TreeNode>(this->get_Dataset());
+    /* std::shared_ptr<TreeNode> base_Node =
+        make_shared<TreeNode>(this->get_Dataset()); */
 
     // Create a bootstrap sample
-    std::vector<int> bootstrap_Index = base_Node->bootstrap_DataSet();
+    // std::vector<int> bootstrap_Index = base_Node->bootstrap_DataSet();
 
     // Decision Tree Initialisation wtith bootstrapped index
-    std::shared_ptr<DecisionTree> dt =
-        std::make_shared<DecisionTree>(base_Node, bootstrap_Index);
+    /* std::shared_ptr<DecisionTree> dt =
+        std::make_shared<DecisionTree>(base_Node, bootstrap_Index); */
 
     // Handle random forest
-    this->splitting_Operator->set_Node(dt->get_Current_Node());
 
-    dt->add_Operator(this->splitting_Operator);
+    // this->splitting_Operator->set_Node(dt->get_Current_Node());
 
-    dt->build_Splitted_Tree(this->max_Depth);
+    // dt->add_Operator(this->splitting_Operator);
 
-    this->trees[i] = dt;
+    // dt->build_Splitted_Tree(this->max_Depth);
+
+    this->trees[i] = tree;
   }
 }
 
 /**/
-void RandomForest::predict_Results(std::shared_ptr<DataSet> test_DataSet) {
+/* void RandomForest::predict_Results(std::shared_ptr<DataSet> test_DataSet) {
 
   std::vector<float> accumulator;
   for (auto it = this->trees.begin(); it != this->trees.end(); ++it) {
@@ -102,4 +114,4 @@ void RandomForest::predict_Results(std::shared_ptr<DataSet> test_DataSet) {
   }
 
   this->results = accumulator;
-}
+} */
