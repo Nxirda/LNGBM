@@ -10,9 +10,9 @@ class DataSet {
 protected:
   // Parameters
 
+  std::vector<float> labels;
   std::vector<std::string> features;
   std::vector<std::vector<float>> samples;
-  std::vector<float> labels;
 
 public:
   // Constructor
@@ -23,31 +23,33 @@ public:
           std::vector<std::vector<float>> values, std::vector<float> labels);
 
   void load(std::string file_Path);
+
   // Destructor
 
   ~DataSet();
 
   // Getters
-  std::vector<float> get_Labels(const std::vector<int> &idx) const;
+
   std::vector<std::string> get_Features() const;
+  std::vector<std::vector<float>> get_Samples() const;
+  std::vector<float> get_Labels(const std::vector<int> &idx) const;
   std::vector<float> get_Column(int position,
                                 const std::vector<int> &idx) const;
-  std::vector<std::vector<float>> get_Samples() const;
 
   // Methods
 
   void print() const;
   bool empty() const;
-  void print_With_Index(std::vector<int> idx) const;
-  void initialize_Labels(std::vector<float> column);
-  void update_Label_Value(int position, float value);
 
-  int features_Length() const;
+  void print_With_Index(std::vector<int> idx) const;
+
+  int labels_Number() const;
   int samples_Number() const;
+  int features_Length() const;
 
   float labels_Mean(const std::vector<int> &idx) const;
-  float column_Mean(int position, const std::vector<int> &idx) const;
   float column_Variance(const std::vector<int> &idx) const;
+  float column_Mean(int position, const std::vector<int> &idx) const;
 
   std::vector<std::vector<int>> split(int position, float criteria,
                                       const std::vector<int> &idx) const;

@@ -3,17 +3,30 @@
 #include "MAPE.hpp"
 #include "TreeNode.hpp"
 
+/********************/
+/*                  */
+/*    MAPE CLASS    */
+/*                  */
+/********************/
+
 /*
 Constructor
-Input  : DecisionTree*
-Output :
+Inputs  : DecisionTree*
+Outputs :
+*/
+MAPE::MAPE() { this->tree_Node = nullptr; }
+
+/*
+Constructor
+Inputs  : DecisionTree*
+Outputs :
 */
 MAPE::MAPE(std::shared_ptr<TreeNode> tree_Node) { this->tree_Node = tree_Node; }
 
 /*
 Setter for the tree pointer
-Input  : DecisionTree*
-Output : bool
+Inputs  : DecisionTree*
+Outputs : bool
 */
 bool MAPE::set_Node(std::shared_ptr<TreeNode> tree_Node) {
   this->tree_Node = tree_Node;
@@ -26,16 +39,16 @@ bool MAPE::set_Node(std::shared_ptr<TreeNode> tree_Node) {
 
 /*
 Destructor
-Input  :
-Output :
+Inputs  :
+Outputs :
 */
 MAPE::~MAPE() {}
 
 /*
 Print function to see the name of the operator
 (For debugging mainly)
-Input  :
-Output :
+Inputs  :
+Outputs :
 */
 void MAPE::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
@@ -43,19 +56,23 @@ void MAPE::print() {
 
 /*
 Returns the best splitting criteria for RIV algorithm
-Input  :
-Output : float
+Inputs  :
+Outputs : float
 */
 float MAPE::get_Best_Split_Criteria() { return this->split_Criteria; }
 
 /*
 Sets the split criteria as the value given
-Input  : float
-Output :
+Inputs  : float
+Outputs :
 */
 void MAPE::set_Split_Criteria(float value) { this->split_Criteria = value; }
 
-/**/
+/*
+Computes the Mean Absolute Percentage Error of a split on a given column
+Inputs  : int
+Outputs : float
+*/
 float MAPE::splitting_MAE(int position) {
 
   // Computes the split criteria, needs to be not hardcoded in the future
@@ -76,14 +93,14 @@ float MAPE::splitting_MAE(int position) {
   // Get the labels
   std::vector<float> labels =
       this->tree_Node->get_DataSet()->get_Labels(this->tree_Node->get_Index());
-      
+
   int size = (int)labels.size();
 
   // Computes the Mean Absolute Error for left child
   float left_Prediction = left_Child.compute_Predicted_Value();
   float left_MAPE = 0;
   for (int idx : child_Indexes[0]) {
-    if(idx < size)
+    if (idx < size)
       left_MAPE += (abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
 
@@ -91,7 +108,7 @@ float MAPE::splitting_MAE(int position) {
   float right_Prediction = right_Child.compute_Predicted_Value();
   float right_MAPE = 0;
   for (int idx : child_Indexes[1]) {
-    if(idx < size)
+    if (idx < size)
       right_MAPE += (abs(labels[idx] - right_Prediction)) / right_Prediction;
   }
 
@@ -116,7 +133,7 @@ int MAPE::find_Best_Split_Feature() {
   std::vector<std::string> features =
       this->tree_Node->get_DataSet()->get_Features();
 
-  for (unsigned long int i = 0; i < features.size() ; ++i) {
+  for (unsigned long int i = 0; i < features.size(); ++i) {
     float tmp_var = splitting_MAE(i);
     if (tmp_var < min_MAPE) {
       min_MAPE = tmp_var;

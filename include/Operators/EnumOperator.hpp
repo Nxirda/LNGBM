@@ -25,7 +25,6 @@ std::map<std::string, OperatorType> operator_Dictionnary = {
     {"MAE", OperatorType::MAE},
     {"MAPE", OperatorType::MAPE},
     {"RMSE", OperatorType::RMSE},
-    {"RIV", OperatorType::ReductionInVar}
-};
+    {"RIV", OperatorType::ReductionInVar}};
 
 #endif

@@ -8,13 +8,19 @@
 
 #include "DataSet.hpp"
 
+/********************/
+/*                  */
+/*  DATASET CLASS   */
+/*                  */
+/********************/
+
 // https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
 
 /*
 Take the path of the file to read
 Instanciates an object of type DataSet from the given CSV
 Inputs : String
-Ouputs : Object of DataSet Cass
+Ouputs : Object of DataSet Class
 */
 DataSet::DataSet(std::string file_Path) {
   // input filestream
@@ -80,7 +86,7 @@ DataSet::DataSet(std::string file_Path) {
 Take the path of the file to read
 Instanciates an object of type DataSet from the given CSV
 Inputs : String
-Ouputs : Object of DataSet Cass
+Ouputs : Object of DataSet Class
 */
 void DataSet::load(std::string file_Path) {
   // input filestream
@@ -108,7 +114,7 @@ void DataSet::load(std::string file_Path) {
       // Skip last column because it's the target name and it's not really
       // usefull
       if (!ss.eof()) {
-        // Initialize DataSet Labels
+        // Initialize DataSet features
         this->features.push_back(colname);
       }
     }
@@ -123,6 +129,8 @@ void DataSet::load(std::string file_Path) {
     // tmp vector : represent a row in the matrix
     std::vector<float> tmp;
     while (ss >> val) {
+      // Ignore label column
+      if (!ss.eof())
         tmp.push_back(val);
 
       if (ss.peek() == ',') {
@@ -146,7 +154,8 @@ Inputs : vector<string>, vector<vector<float>>
 Ouputs : Object of DataSet Class
 */
 DataSet::DataSet(std::vector<std::string> features,
-                 std::vector<std::vector<float>> samples, std::vector<float> labels) {
+                 std::vector<std::vector<float>> samples,
+                 std::vector<float> labels) {
   this->features = features;
   this->samples = samples;
   this->labels = labels;
@@ -157,7 +166,11 @@ Default Constructor
 Inputs :
 Ouputs : Object of DataSet Class
 */
-DataSet::DataSet() {}
+DataSet::DataSet() {
+  this->labels = std::vector<float>();
+  this->features = std::vector<std::string>();
+  this->samples = std::vector<std::vector<float>>();
+}
 
 /* Default Destructor */
 /* Inputs :           */
@@ -232,7 +245,8 @@ std::vector<std::vector<float>> DataSet::get_Samples() const {
 std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
   std::vector<float> Col(0);
   for (int row : idx) {
-    Col.push_back(this->labels[row]);
+    if (row <= this->labels_Number())
+      Col.push_back(this->labels[row]);
   }
   return Col;
 }
@@ -259,40 +273,34 @@ Ouputs : int
 int DataSet::samples_Number() const { return this->samples.size(); }
 
 /*
+Return the quantity of the DataSet's labels
+Inputs :
+Ouputs : int
+*/
+int DataSet::labels_Number() const { return this->labels.size(); }
+
+/*
 Returns the specified column of the dataset
 Inputs : int
 Ouputs : vector<float>
 */
 std::vector<float> DataSet::get_Column(int position,
                                        const std::vector<int> &idx) const {
-  
+
   std::vector<float> Col(0);
 
-  if(idx.empty()){//(position > len) {//|| position < 0){
+  if (idx.empty()) { //(position > len) {//|| position < 0){
     return Col;
   }
 
   long unsigned int len = idx.size();
 
-  //if(position < this->features_Length()){
-  //  return Col;
-  //}
-  //float len = idx.size();
- 
-  for(long unsigned int i = 0; i < len ; ++i){
-    Col.push_back(this->samples[idx[i]][position]);
+  for (long unsigned int i = 0; i < len; ++i) {
+    if ((int)i < this->samples_Number())
+      Col.push_back(this->samples[idx[i]][position]);
   }
 
   return Col;
-}
-
-/**/
-void DataSet::initialize_Labels(std::vector<float> column) {
-  this->labels = column;
-}
-
-void DataSet::update_Label_Value(int position, float value){
-  this->labels[position] = value;
 }
 
 /*
@@ -328,28 +336,36 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
 
   float mean = 0;
 
-  if(idx.empty()){
-    return mean;
-  }
-
-  int len = idx.size();
-  
-  if (len < 0 ){ 
+  if (idx.empty()) {
     return mean;
   }
 
   std::vector<float> current_Column = this->get_Column(position, idx);
-  mean = std::reduce(current_Column.begin(), current_Column.end(), 0l);
+  int len = current_Column.size();
+
+  mean = std::reduce(current_Column.begin(), current_Column.end(), 0.0);
   mean /= len;
   return mean;
 }
 
-/**/
-float DataSet::labels_Mean(const std::vector<int> &idx) const{
-  std::vector<float> current_Labels = this->get_Labels(idx);
+/*
+Computes the Mean of the values of the DataSet's labels
+Inputs  : const vector<int>
+Outputs : float
+*/
+float DataSet::labels_Mean(const std::vector<int> &idx) const {
+  float mean = 0;
 
-  float mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0l);
-  return (mean / current_Labels.size());
+  if (idx.empty()) {
+    return mean;
+  }
+
+  std::vector<float> current_Labels = this->get_Labels(idx);
+  int len = current_Labels.size();
+
+  mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0.0);
+  mean /= len;
+  return (mean);
 }
 
 /*
@@ -359,14 +375,13 @@ Inputs  : std:vector<int>
 Outputs : float
 */
 float DataSet::column_Variance(const std::vector<int> &idx) const {
-  int len = idx.size();
   //  check if there are values in the current Column
-  if (len <= 0) {
+  if (idx.size() <= 0) {
     return 0.0;
   }
 
   std::vector<float> current_Labels = this->get_Labels(idx);
-
+  int len = current_Labels.size();
   float mean = this->labels_Mean(idx);
   float variance = 0.0;
 
