@@ -78,7 +78,7 @@ TreeNode &TreeNode::operator=(const TreeNode &tn) {
   }
 
   return *this;
-}
+} 
 
 /*
 Sets the column of the DataSet which this node should split

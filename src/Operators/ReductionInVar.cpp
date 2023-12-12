@@ -17,29 +17,6 @@ Outputs :
 ReductionInVar::ReductionInVar() {}
 
 /*
-Constructor
-Inputs  : DecisionTree*
-Outputs :
-*/
-/* ReductionInVar::ReductionInVar(std::shared_ptr<TreeNode> tree_Node) {
-  this->tree_Node = tree_Node;
-} */
-
-/*
-Setter for the tree pointer
-Inputs  : DecisionTree*
-Outputs : bool
-*/
-/* bool ReductionInVar::set_Node(std::shared_ptr<TreeNode> tree_Node) {
-  this->tree_Node = tree_Node;
-  this->split_Criteria = 0.0;
-  if (this->tree_Node) {
-    return true;
-  }
-  return false;
-} */
-
-/*
 Destructor
 Inputs  :
 Outputs :
@@ -55,22 +32,6 @@ Outputs :
 void ReductionInVar::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
 }
-
-/*
-Returns the best splitting criteria for RIV algorithm
-Inputs  :
-Outputs : float
-*/
-/* float ReductionInVar::get_Best_Split_Criteria() { return this->split_Criteria; }
- */
-/*
-Sets the split criteria as the value given
-Inputs  : float
-Outputs :
-*/
-/* void ReductionInVar::set_Split_Criteria(float value) {
-  this->split_Criteria = value;
-} */
 
 /*
 Returns the variance of a split as the weighted average

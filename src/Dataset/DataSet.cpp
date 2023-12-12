@@ -310,14 +310,14 @@ Inputs : int, float
 Ouputs : vector<vector<int>>
 */
 std::tuple<std::vector<int>, std::vector<int>>
-DataSet::split(int position, float criteria,
+DataSet::split(int position, float criterion,
                const std::vector<int> &idx) const {
 
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
 
   for (int row : idx) {
-    if (this->samples[row][position] < criteria) {
+    if (this->samples[row][position] < criterion) {
       sub_Index_Left.push_back(row);
     } else {
       sub_Index_Right.push_back(row);

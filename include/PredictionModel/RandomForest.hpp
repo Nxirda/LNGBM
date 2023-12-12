@@ -11,12 +11,13 @@
 class RandomForest {
 
 private:
+  // Parameters
+
   int size;
   int max_Depth;
   IOperator *splitting_Operator;
   std::map<int, DecisionTree> trees;
   DataSet dataset;
-  std::vector<float> results;
 
 public:
   // Constructor
@@ -32,13 +33,13 @@ public:
 
   int get_size();
   std::vector<float> get_results();
-  // DataSet> get_Dataset();
-
-  // Setters
 
   // Methods
   void generate_Forest(int size);
-  void predict_Results(const DataSet &dataset);
+  std::vector<float> predict_Results(const DataSet &dataset);
+  void tree_Prediction(const DataSet &data,
+                       std::shared_ptr<std::vector<float>> result,
+                       std::vector<int> index, TreeNode *node);
 };
 
 #endif

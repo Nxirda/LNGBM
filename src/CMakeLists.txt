@@ -9,8 +9,10 @@ add_library(Source_Lib
             Operators/MAPE.cpp
             Operators/ReductionInVar.cpp
             Operators/RMSE.cpp
+            PredictionModel/RandomForest.cpp
+            PredictionModel/BaggingModel.cpp
             PredictionModel/TrainingElement.cpp
-            PredictionModel/RandomForest.cpp)   
+)   
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 

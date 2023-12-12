@@ -2,7 +2,6 @@
 #include <stack>
 
 #include "RandomForest.hpp"
-#include "TrainingElement.hpp"
 
 /**************************/
 /*                        */
@@ -15,7 +14,6 @@ RandomForest::RandomForest() {
   this->size = 0;
   this->max_Depth = 0;
   this->dataset = DataSet{};
-  this->results = std::vector<float>();
   this->trees = std::map<int, DecisionTree>();
 }
 
@@ -33,20 +31,12 @@ RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
 RandomForest::~RandomForest(){};
 
 /**/
-std::vector<float> RandomForest::get_results() { return this->results; }
-
-/**/
 int RandomForest::get_size() { return this->size; }
-
-/**/
-//std::shared_ptr<DataSet> RandomForest::get_Dataset() { return this->dataset; }
 
 /**/
 void RandomForest::generate_Forest(int size) {
 
   for (int i = 0; i < size; ++i) {
-    std::cout << "===Iteration ["<< i << "]===\n";
-
     DecisionTree tree{};
 
     TrainingElement elem{};
@@ -54,46 +44,63 @@ void RandomForest::generate_Forest(int size) {
     elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
-    tree.get_Root()->node_Print_Criterion();
 
+    //tree.get_Root()->node_Print_Criterion();
     this->trees[i] = tree;
   }
 }
 
 /**/
-/* void RandomForest::predict_Results(std::shared_ptr<DataSet> test_DataSet) {
+std::vector<float> RandomForest::predict_Results(const DataSet &data) {
+  int size = data.samples_Number();
+  std::vector<float> result(size);
 
-  std::vector<float> accumulator;
-  for (auto it = this->trees.begin(); it != this->trees.end(); ++it) {
-
-    it->second->set_Test_DataSet(test_DataSet);
-
-    it->second->parse_Test_DataSet();
-
-    it->second->predict_Test_Labels();
-
-    // Checks if we can add
-    if (accumulator.size() <= 0) {
-      accumulator = *it->second->get_Predicted_Labels();
-    } else {
-      if (accumulator.size() == it->second->get_Predicted_Labels()->size()) {
-
-        // Adding up predictions at every index so we can compute the mean of
-        // each prediction aftewards
-        std::transform(accumulator.begin(), accumulator.end(),
-                       it->second->get_Predicted_Labels()->begin(),
-                       accumulator.begin(), std::plus<float>());
-      } else {
-        perror("Random Forest : one tree didnt predict on all the values");
-        return;
-      }
-    }
-  }
-  if (size != 0) {
-    for (unsigned long int i = 0; i < accumulator.size(); ++i) {
-      accumulator[i] /= this->get_size();
-    }
+  // Computes the index
+  std::vector<int> index(size);
+  for (int i = 0; i < size; ++i) {
+    index[i] = i;
   }
 
-  this->results = accumulator;
-} */
+  // Iterate through the Forest
+  for (unsigned long int i = 0; i < this->trees.size(); ++i) {
+
+    std::shared_ptr<std::vector<float>> tree_Result =
+        std::make_shared<std::vector<float>>(size);
+
+    // Computes the prediction for the current tree
+    tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
+
+    // Adds two vectors
+    std::transform(result.begin(), result.end(), tree_Result->begin(),
+                   result.begin(), std::plus<float>());
+  }
+
+  // Divides to have the mean of the answers
+  for (unsigned long int j = 0; j < result.size(); ++j) {
+    result.at(j) /= this->trees.size();
+  }
+
+  return result;
+}
+
+/**/
+void RandomForest::tree_Prediction(const DataSet &data,
+                                   std::shared_ptr<std::vector<float>> result,
+                                   std::vector<int> index, TreeNode *node) {
+  // Update the values of the result
+  for (auto idx : index) {
+    result.get()->at(idx) = node->get_Predicted_Value();
+  }
+
+  // Put the correct indexes
+  auto [left_Index, right_Index] =
+      data.split(node->get_Split_Column(), node->get_Split_Criterion(), index);
+
+  if (node->get_Left_Node() != NULL) {
+    tree_Prediction(data, result, left_Index, node->get_Left_Node());
+  }
+
+  if (node->get_Right_Node() != NULL) {
+    tree_Prediction(data, result, right_Index, node->get_Right_Node());
+  }
+}

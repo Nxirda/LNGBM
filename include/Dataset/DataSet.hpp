@@ -52,7 +52,7 @@ public:
   float column_Mean(int position, const std::vector<int> &idx) const;
 
   std::tuple<std::vector<int>, std::vector<int>>
-  split(int position, float criteria, const std::vector<int> &idx) const;
+  split(int position, float criterion, const std::vector<int> &idx) const;
 };
 
 #endif

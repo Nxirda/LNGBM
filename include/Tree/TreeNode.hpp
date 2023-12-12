@@ -23,6 +23,7 @@ public:
 
   TreeNode();
   TreeNode(int split_Column, float split_Criterion, float predicted_Value);
+  
   TreeNode(const TreeNode &node);
   TreeNode &operator=(const TreeNode &tn); // copy assignment
 
@@ -35,6 +36,7 @@ public:
   void set_Split_Column(int col);
   void set_Predicted_Value(float value);
   void set_Split_Criterion(float criterion);
+  
   void add_Left(std::unique_ptr<TreeNode> Node);
   void add_Right(std::unique_ptr<TreeNode> Node);
 
