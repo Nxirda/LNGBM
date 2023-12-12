@@ -1,15 +1,14 @@
 project(Source_Lib)
 
-# Get every .cpp file in subdirectories
-file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-
-# Make a lib containing all our .cpp
-#add_library(Source_Lib  ${SOURCE_FILES})   
+# Make a lib containing all the .cpp
 add_library(Source_Lib
             Dataset/DataSet.cpp
             Tree/TreeNode.cpp
             Tree/DecisionTree.cpp
             Operators/MAE.cpp
+            Operators/MAPE.cpp
+            Operators/ReductionInVar.cpp
+            Operators/RMSE.cpp
             PredictionModel/TrainingElement.cpp
             PredictionModel/RandomForest.cpp)   
 
@@ -22,5 +21,4 @@ target_include_directories(Source_Lib
     ${CMAKE_SOURCE_DIR}/include/Operators
     ${CMAKE_SOURCE_DIR}/include/PredictionModel
     ${CMAKE_SOURCE_DIR}/include/Tree
-
 )

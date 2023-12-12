@@ -46,33 +46,15 @@ void RandomForest::generate_Forest(int size) {
 
   for (int i = 0; i < size; ++i) {
     std::cout << "===Iteration ["<< i << "]===\n";
-    DecisionTree tree{};
-    TrainingElement elem{};
-    elem.set_Root(this->dataset.labels_Number(), tree.get_Root());
 
+    DecisionTree tree{};
+
+    TrainingElement elem{};
+    elem.set_Node(tree.get_Root());
     elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
     tree.get_Root()->node_Print_Criterion();
-
-    //  Creating a Node
-    /* std::shared_ptr<TreeNode> base_Node =
-        make_shared<TreeNode>(this->get_Dataset()); */
-
-    // Create a bootstrap sample
-    // std::vector<int> bootstrap_Index = base_Node->bootstrap_DataSet();
-
-    // Decision Tree Initialisation wtith bootstrapped index
-    /* std::shared_ptr<DecisionTree> dt =
-        std::make_shared<DecisionTree>(base_Node, bootstrap_Index); */
-
-    // Handle random forest
-
-    // this->splitting_Operator->set_Node(dt->get_Current_Node());
-
-    // dt->add_Operator(this->splitting_Operator);
-
-    // dt->build_Splitted_Tree(this->max_Depth);
 
     this->trees[i] = tree;
   }

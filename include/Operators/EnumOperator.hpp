@@ -6,9 +6,9 @@
 #include "IOperator.hpp"
 
 #include "MAE.hpp"
-//#include "MAPE.hpp"
-//#include "RMSE.hpp"
-//#include "ReductionInVar.hpp"
+#include "MAPE.hpp"
+#include "RMSE.hpp"
+#include "ReductionInVar.hpp"
 
 /**/
 enum class OperatorType {

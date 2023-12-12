@@ -38,15 +38,14 @@ Computes the Mean Absolute Error of a split on a given column
 Inputs  : int
 Outputs : float
 */
-float MAE::splitting_MAE (int position, const DataSet &data,
-                         std::vector<int> index) const{
+float MAE::splitting_MAE(int position, const DataSet &data,
+                         std::vector<int> index) const {
 
   // Computes the split criteria, needs to be not hardcoded in the future
   float split_Criteria = data.column_Mean(position, index);
 
   // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] =
-      data.split(position, split_Criteria, index);
+  auto [left_index, right_index] = data.split(position, split_Criteria, index);
 
   float base_Population = index.size();
 
@@ -57,8 +56,7 @@ float MAE::splitting_MAE (int position, const DataSet &data,
   TreeNode right_Child{};
 
   // Get the labels
-  std::vector<float> labels =
-      data.get_Labels(index);
+  std::vector<float> labels = data.get_Labels(index);
   int size = (int)labels.size();
 
   // Computes the Mean Absolute Error for left child

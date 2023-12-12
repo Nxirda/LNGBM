@@ -1,7 +1,11 @@
 #include "TrainingElement.hpp"
 #include <stack>
 
-/**/
+/*
+Default Constructor
+Inputs  :
+Outputs :
+*/
 TrainingElement::TrainingElement() {
   this->depth = 0;
   this->index = std::vector<int>();
@@ -35,6 +39,7 @@ void TrainingElement::set_depth(int depth) { this->depth = depth; }
 void TrainingElement::set_Root(int dataset_Size, TreeNode *node) {
   this->depth = 0;
 
+  //Computes the index for the given DataSet (Bootstrap directly here)
   std::vector<int> idx(dataset_Size);
   for (int i = 0; i < dataset_Size; ++i) {
     idx[i] = i;
@@ -42,6 +47,15 @@ void TrainingElement::set_Root(int dataset_Size, TreeNode *node) {
 
   this->set_Index(idx);
   this->node = node;
+}
+
+/**/
+void TrainingElement::bootstrap_Index(int dataset_Size){
+  std::vector<int> idx(dataset_Size);
+  for (int i = 0; i < dataset_Size; ++i) {
+    idx[i] = rand() % dataset_Size;
+  }
+  this->set_Index(idx);
 }
 
 /**/
@@ -64,7 +78,11 @@ TrainingElement::split_Index(const DataSet &data, int criterion, int position,
   }
 }
 
-/**/
+/*
+Splits the Node according to the specified operator
+Inputs  : DataSet, TrainingElement, IOperator*, int
+Outputs : tuple<optional<TrainingElement>, <optional<TrainingElement>>
+*/
 std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
 TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
                             const IOperator *splitting_Operator,
@@ -79,6 +97,8 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   elem->node->set_Split_Column(column);
   elem->node->set_Split_Criterion(criterion);
   elem->node->set_Predicted_Value(data.labels_Mean(elem->get_Index()));
+
+  // Just so we dont have nodes with predicted value beeing -1 (default value)
   if (new_Depth < max_Depth) {
 
     // Left node
@@ -106,6 +126,7 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
 
   // Initialize the current Node
   this->set_Root(data.labels_Number(), this->node);
+  this->bootstrap_Index(data.labels_Number());
   remaining.push(*this);
 
   // Build iteratively the tree frame

@@ -24,19 +24,21 @@ public:
 
   // Getter
 
-  float get_Best_Split_Criterion() const override;
+  //  float get_Best_Split_Criterion() const override;
 
   // Setter
 
-  void set_Split_Criterion(float value) override;
-  bool set_Node(std::shared_ptr<TreeNode> tree_Node);
+  // void set_Split_Criterion(float value) override;
+  // bool set_Node(std::shared_ptr<TreeNode> tree_Node);
 
   // Methods
 
   void print() override;
 
-  int find_Best_Split_Feature() const override;
-  float splitting_Variance(int position);
+  std::tuple<int, float> find_Best_Split(const DataSet &data,
+                                         std::vector<int> index) const override;
+  float splitting_RIV(int position, const DataSet &data,
+                      std::vector<int> index) const;
 };
 
 #endif

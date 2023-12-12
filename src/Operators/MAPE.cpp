@@ -21,7 +21,8 @@ Constructor
 Inputs  : DecisionTree*
 Outputs :
 */
-/* MAPE::MAPE(std::shared_ptr<TreeNode> tree_Node) { this->tree_Node = tree_Node; }
+/* MAPE::MAPE(std::shared_ptr<TreeNode> tree_Node) { this->tree_Node =
+ * tree_Node; }
  */
 /*
 Setter for the tree pointer
@@ -59,55 +60,55 @@ Returns the best splitting criteria for RIV algorithm
 Inputs  :
 Outputs : float
 */
-float MAPE::get_Best_Split_Criterion() const { return this->split_Criterion; }
+// float MAPE::get_Best_Split_Criterion() const { return this->split_Criterion;
+// }
 
 /*
 Sets the split criteria as the value given
 Inputs  : float
 Outputs :
 */
-void MAPE::set_Split_Criterion(float value) { this->split_Criterion = value; }
+// void MAPE::set_Split_Criterion(float value) { this->split_Criterion = value;
+// }
 
 /*
 Computes the Mean Absolute Percentage Error of a split on a given column
 Inputs  : int
 Outputs : float
 */
-float MAPE::splitting_MAE(int position) {
+float MAPE::splitting_MAPE(int position, const DataSet &data,
+                           std::vector<int> index) const {
 
   // Computes the split criteria, needs to be not hardcoded in the future
-  float split_Criteria = this->tree_Node->node_Column_Mean(position);
+  float split_Criteria = data.column_Mean(position, index);
 
   // Computes the DataSet Row Indexes that child nodes can access
-  std::vector<std::vector<int>> child_Indexes =
-      this->tree_Node->node_Split(position, split_Criteria);
+  auto [left_index, right_index] = data.split(position, split_Criteria, index);
 
-  float base_Population = this->tree_Node->get_Index().size();
+  float base_Population = index.size();
 
   // Creating a left child
-  TreeNode left_Child{this->tree_Node->get_DataSet(), child_Indexes[0]};
+  TreeNode left_Child{};
 
   // Creating a right child
-  TreeNode right_Child{this->tree_Node->get_DataSet(), child_Indexes[1]};
+  TreeNode right_Child{};
 
   // Get the labels
-  std::vector<float> labels =
-      this->tree_Node->get_DataSet()->get_Labels(this->tree_Node->get_Index());
-
+  std::vector<float> labels = data.get_Labels(index);
   int size = (int)labels.size();
 
-  // Computes the Mean Absolute Error for left child
-  float left_Prediction = left_Child.compute_Predicted_Value();
+  // Computes the Mean Absolute Percentage Error for left child
+  float left_Prediction = data.labels_Mean(left_index);
   float left_MAPE = 0;
-  for (int idx : child_Indexes[0]) {
+  for (int idx : left_index) {
     if (idx < size)
       left_MAPE += (abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
 
-  // Computes the Mean Absolute Error for left child
-  float right_Prediction = right_Child.compute_Predicted_Value();
+  // Computes the Mean Absolute Percentage Error for left child
+  float right_Prediction = data.labels_Mean(right_index);
   float right_MAPE = 0;
-  for (int idx : child_Indexes[1]) {
+  for (int idx : right_index) {
     if (idx < size)
       right_MAPE += (abs(labels[idx] - right_Prediction)) / right_Prediction;
   }
@@ -125,22 +126,22 @@ Search for the best feature to split the dataset on at a given Node
 Inputs :
 Ouputs : int
 */
-int MAPE::find_Best_Split_Feature() {
+std::tuple<int, float> MAPE::find_Best_Split(const DataSet &data,
+                                             std::vector<int> index) const {
   int best_Feature = 0;
   // We try to minimize the mean absolute error for a split
   float min_MAPE = INT_MAX;
 
-  std::vector<std::string> features =
-      this->tree_Node->get_DataSet()->get_Features();
+  std::vector<std::string> features = data.get_Features();
 
   for (unsigned long int i = 0; i < features.size(); ++i) {
-    float tmp_var = splitting_MAE(i);
+    float tmp_var = splitting_MAPE(i, data, index);
     if (tmp_var < min_MAPE) {
       min_MAPE = tmp_var;
       best_Feature = i;
     }
   }
-  this->set_Split_Criteria(this->tree_Node->node_Column_Mean(best_Feature));
-
-  return best_Feature;
+  //this->set_Split_Criteria(this->tree_Node->node_Column_Mean(best_Feature));
+  float criterion = data.column_Mean(best_Feature, index);
+  return std::make_tuple(best_Feature, criterion);
 }

@@ -30,17 +30,17 @@ TreeNode::TreeNode(const TreeNode &node) {
   this->split_Criterion = node.split_Criterion;
   this->predicted_Value = node.predicted_Value;
 
-  if(node.left){
+  if (node.left) {
     this->left = std::make_unique<TreeNode>(*node.get_Left_Node());
-  }else{
+  } else {
     this->left.reset();
   }
 
-  if(node.right){
+  if (node.right) {
     this->right = std::make_unique<TreeNode>(*node.get_Right_Node());
-  }else{
+  } else {
     this->right.reset();
-  } 
+  }
 }
 
 /*
@@ -60,22 +60,22 @@ Inputs  : Object of TreeNode Class
 Outputs : Object of TreeNode Class
 */
 TreeNode &TreeNode::operator=(const TreeNode &tn) {
-  
+
   this->predicted_Value = tn.get_Predicted_Value();
   this->split_Column = tn.get_Split_Column();
   this->split_Criterion = tn.get_Split_Criterion();
 
-  if(tn.left){
+  if (tn.left) {
     this->left = std::make_unique<TreeNode>(*tn.get_Left_Node());
-  }else{
+  } else {
     this->left.reset();
   }
 
-  if(tn.right){
+  if (tn.right) {
     this->right = std::make_unique<TreeNode>(*tn.get_Right_Node());
-  }else{
+  } else {
     this->right.reset();
-  } 
+  }
 
   return *this;
 }
@@ -150,12 +150,12 @@ Outputs :
 */
 void TreeNode::node_Print_Criterion() {
   // std::cout << "-> Split Column is : " << this->split_Column << "\n";
-  //std::cout << "-> Split Criterion is : " << this->split_Criterion << "\n";
+  // std::cout << "-> Split Criterion is : " << this->split_Criterion << "\n";
   std::cout << "-> Split Prediction is : " << this->predicted_Value << "\n";
-  if(this->left){
+  if (this->left) {
     this->left->node_Print_Criterion();
   }
-  if(this->right){
+  if (this->right) {
     this->right->node_Print_Criterion();
   }
 }
