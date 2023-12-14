@@ -38,7 +38,7 @@ Computes the Mean Absolute Percentage Error of a split on a given column
 Inputs  : int
 Outputs : float
 */
-float MAPE::splitting_MAPE(int position, const DataSet &data,
+float MAPE::compute(int position, const DataSet &data,
                            std::vector<int> index) const {
 
   // Computes the split criteria, needs to be not hardcoded in the future
@@ -78,29 +78,4 @@ float MAPE::splitting_MAPE(int position, const DataSet &data,
   // Compute the result of MAE for the split at position
   float res = (left_MAPE + right_MAPE) / base_Population;
   return res;
-}
-
-/*
-Search for the best feature to split the dataset on at a given Node
-Inputs :
-Ouputs : int
-*/
-std::tuple<int, float> MAPE::find_Best_Split(const DataSet &data,
-                                             std::vector<int> index) const {
-  int best_Feature = 0;
-  // We try to minimize the mean absolute error for a split
-  float min_MAPE = INT_MAX;
-
-  std::vector<std::string> features = data.get_Features();
-
-  for (unsigned long int i = 0; i < features.size(); ++i) {
-    float tmp_var = splitting_MAPE(i, data, index);
-    if (tmp_var < min_MAPE) {
-      min_MAPE = tmp_var;
-      best_Feature = i;
-    }
-  }
-  // this->set_Split_Criteria(this->tree_Node->node_Column_Mean(best_Feature));
-  float criterion = data.column_Mean(best_Feature, index);
-  return std::make_tuple(best_Feature, criterion);
 }

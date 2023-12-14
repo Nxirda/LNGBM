@@ -62,12 +62,32 @@ void TrainingElement::bootstrap_Index(int dataset_Size) {
   this->set_Index(idx);
 }
 
-/**/
+/*
+Search for the best feature to split the dataset on at a given Node
+Gives the split criterion at the same time
+Inputs : Dataset, TrainingElem, IOperator
+Ouputs : tuple<int, float>
+*/
 std::tuple<int, float>
 TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
                                  const IOperator *splitting_Operator) {
 
-  return splitting_Operator->find_Best_Split(data, elem->index);
+  /* return splitting_Operator->find_Best_Split(data, elem->index); */
+  int best_Feature = 0;
+  // We try to minimize the mean absolute error for a split
+  float min = INT_MAX;
+
+  std::vector<std::string> features = data.get_Features();
+
+  for (unsigned long int i = 0; i < features.size(); ++i) {
+    float tmp_var = splitting_Operator->compute(i, data, elem->index);
+    if (tmp_var < min) {
+      min = tmp_var;
+      best_Feature = i;
+    }
+  }
+  float criterion = data.column_Mean(best_Feature, elem->index);
+  return std::make_tuple(best_Feature, criterion);
 }
 
 /**/

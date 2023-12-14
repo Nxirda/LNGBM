@@ -39,7 +39,7 @@ variance of child nodes
 Inputs  : int
 Outputs : float
 */
-float ReductionInVar::splitting_RIV(int position, const DataSet &data,
+float ReductionInVar::compute(int position, const DataSet &data,
                                     std::vector<int> index) const {
 
   // Computes the split criteria, needs to be not hardcoded in the future
@@ -69,29 +69,4 @@ float ReductionInVar::splitting_RIV(int position, const DataSet &data,
                                 right_Weighted_Average * right_Variance);
 
   return weighted_Average_Var;
-}
-
-/*
-Search for the best feature to split the dataset on at a given Node
-Inputs :
-Ouputs : int
-*/
-std::tuple<int, float>
-ReductionInVar::find_Best_Split(const DataSet &data,
-                                std::vector<int> index) const {
-  int best_Feature = 0;
-  float max_Reduction_In_Var = INT_MAX;
-
-  std::vector<std::string> features = data.get_Features();
-
-  for (unsigned long int i = 0; i < features.size(); ++i) {
-    float tmp_var = splitting_RIV(i, data, index);
-    if (tmp_var < max_Reduction_In_Var) {
-      max_Reduction_In_Var = tmp_var;
-      best_Feature = i;
-    }
-  }
-  // this->set_Split_Criteria(this->tree_Node->node_Column_Mean(best_Feature));
-  float criterion = data.column_Mean(best_Feature, index);
-  return std::make_tuple(best_Feature, criterion);
 }

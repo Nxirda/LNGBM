@@ -38,7 +38,7 @@ Computes the Mean Absolute Error of a split on a given column
 Inputs  : int
 Outputs : float
 */
-float MAE::splitting_MAE(int position, const DataSet &data,
+float MAE::compute(int position, const DataSet &data,
                          std::vector<int> index) const {
 
   // Computes the split criteria, needs to be not hardcoded in the future
@@ -75,28 +75,4 @@ float MAE::splitting_MAE(int position, const DataSet &data,
   // Compute the result of MAE for the split at position
   float res = (left_MAE + right_MAE) / base_Population;
   return res;
-}
-
-/*
-Search for the best feature to split the dataset on at a given Node
-Inputs :
-Ouputs : int
-*/
-std::tuple<int, float> MAE::find_Best_Split(const DataSet &data,
-                                            std::vector<int> index) const {
-  int best_Feature = 0;
-  // We try to minimize the mean absolute error for a split
-  float min_MAE = INT_MAX;
-
-  std::vector<std::string> features = data.get_Features();
-
-  for (unsigned long int i = 0; i < features.size(); ++i) {
-    float tmp_var = splitting_MAE(i, data, index);
-    if (tmp_var < min_MAE) {
-      min_MAE = tmp_var;
-      best_Feature = i;
-    }
-  }
-  float criterion = data.column_Mean(best_Feature, index);
-  return std::make_tuple(best_Feature, criterion);
 }

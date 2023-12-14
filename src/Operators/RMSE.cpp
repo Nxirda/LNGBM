@@ -38,7 +38,7 @@ Computes the Root Mean Square Error of a split on a given column
 Inputs  : int
 Outputs : float
 */
-float RMSE::splitting_RMSE(int position, const DataSet &data,
+float RMSE::compute(int position, const DataSet &data,
                            std::vector<int> index) const {
 
   // Computes the split criteria, needs to be not hardcoded in the future
@@ -84,7 +84,7 @@ Search for the best feature to split the dataset on at a given Node
 Inputs :
 Ouputs : int
 */
-std::tuple<int, float> RMSE::find_Best_Split(const DataSet &data,
+/* std::tuple<int, float> RMSE::find_Best_Split(const DataSet &data,
                                              std::vector<int> index) const {
   int best_Feature = 0;
   float tmp_var = 0;
@@ -102,4 +102,4 @@ std::tuple<int, float> RMSE::find_Best_Split(const DataSet &data,
   }
   float criterion = data.column_Mean(best_Feature, index);
   return std::make_tuple(best_Feature, criterion);
-}
+} */
