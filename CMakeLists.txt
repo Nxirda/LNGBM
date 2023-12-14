@@ -45,3 +45,13 @@ target_link_libraries(Tests PUBLIC GTest::GTest GTest::Main)
 target_link_libraries(Tests PUBLIC Source_Lib)
 
 gtest_discover_tests(Tests)
+
+# ===== Benchmark Part =====
+
+add_executable(Benchmarks Benchmark/Benchmark.cpp)
+
+add_subdirectory(Benchmark)
+
+target_link_libraries(Benchmarks PUBLIC Source_Lib)
+
+

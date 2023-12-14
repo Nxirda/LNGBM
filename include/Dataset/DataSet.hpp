@@ -1,10 +1,11 @@
-
-#include <iostream>
-#include <string>
-#include <vector>
-
 #ifndef DATASET_H_
 #define DATASET_H_
+
+#include <iostream>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <vector>
 
 class DataSet {
 protected:
@@ -48,11 +49,11 @@ public:
   int features_Length() const;
 
   float labels_Mean(const std::vector<int> &idx) const;
-  float column_Variance(const std::vector<int> &idx) const;
+  float labels_Variance(const std::vector<int> &idx) const;
   float column_Mean(int position, const std::vector<int> &idx) const;
 
-  std::vector<std::vector<int>> split(int position, float criteria,
-                                      const std::vector<int> &idx) const;
+  std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
+  split(int position, float criterion, const std::vector<int> &idx) const;
 };
 
 #endif

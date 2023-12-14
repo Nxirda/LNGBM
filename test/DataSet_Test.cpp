@@ -108,16 +108,16 @@ TEST(Computation, ColumnMean) {
   ASSERT_EQ(d.column_Mean(4, idx), mean);
 }
 
-TEST(Computation, ColumnVariance) {
+TEST(Computation, LabelsVariance) {
   DataSet d;
   std::vector<int> idx(0);
   float mean = 0;
   float variance = 0.0;
 
-  ASSERT_EQ(d.column_Variance(idx), 0);
+  ASSERT_EQ(d.labels_Variance(idx), 0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.column_Variance(idx), 0);
+  ASSERT_EQ(d.labels_Variance(idx), 0);
 
   for (unsigned long int i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
@@ -130,11 +130,11 @@ TEST(Computation, ColumnVariance) {
   }
   variance /= d.get_Labels(idx).size();
 
-  ASSERT_EQ(d.column_Variance(idx), variance);
+  ASSERT_EQ(d.labels_Variance(idx), variance);
 
   // Try inserting out of range elem in index
   idx.push_back(44);
-  ASSERT_EQ(d.column_Variance(idx), variance);
+  ASSERT_EQ(d.labels_Variance(idx), variance);
 }
 
 TEST(Computation, Split) {

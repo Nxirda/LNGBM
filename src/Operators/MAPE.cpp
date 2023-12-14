@@ -14,28 +14,7 @@ Constructor
 Inputs  : DecisionTree*
 Outputs :
 */
-MAPE::MAPE() { this->tree_Node = nullptr; }
-
-/*
-Constructor
-Inputs  : DecisionTree*
-Outputs :
-*/
-MAPE::MAPE(std::shared_ptr<TreeNode> tree_Node) { this->tree_Node = tree_Node; }
-
-/*
-Setter for the tree pointer
-Inputs  : DecisionTree*
-Outputs : bool
-*/
-bool MAPE::set_Node(std::shared_ptr<TreeNode> tree_Node) {
-  this->tree_Node = tree_Node;
-  this->split_Criteria = 0.0;
-  if (this->tree_Node) {
-    return true;
-  }
-  return false;
-}
+MAPE::MAPE() {}
 
 /*
 Destructor
@@ -55,61 +34,42 @@ void MAPE::print() {
 }
 
 /*
-Returns the best splitting criteria for RIV algorithm
-Inputs  :
-Outputs : float
-*/
-float MAPE::get_Best_Split_Criteria() { return this->split_Criteria; }
-
-/*
-Sets the split criteria as the value given
-Inputs  : float
-Outputs :
-*/
-void MAPE::set_Split_Criteria(float value) { this->split_Criteria = value; }
-
-/*
 Computes the Mean Absolute Percentage Error of a split on a given column
 Inputs  : int
 Outputs : float
 */
-float MAPE::splitting_MAE(int position) {
+float MAPE::compute(int position, const DataSet &data,
+                           std::vector<int> index) const {
 
   // Computes the split criteria, needs to be not hardcoded in the future
-  float split_Criteria = this->tree_Node->node_Column_Mean(position);
+  float split_Criteria = data.column_Mean(position, index);
 
   // Computes the DataSet Row Indexes that child nodes can access
-  std::vector<std::vector<int>> child_Indexes =
-      this->tree_Node->node_Split(position, split_Criteria);
+  auto [left_index, right_index] = data.split(position, split_Criteria, index);
 
-  float base_Population = this->tree_Node->get_Index().size();
+  float base_Population = index.size();
 
   // Creating a left child
-  TreeNode left_Child{this->tree_Node->get_DataSet(), child_Indexes[0]};
+  TreeNode left_Child{};
 
   // Creating a right child
-  TreeNode right_Child{this->tree_Node->get_DataSet(), child_Indexes[1]};
+  TreeNode right_Child{};
 
   // Get the labels
-  std::vector<float> labels =
-      this->tree_Node->get_DataSet()->get_Labels(this->tree_Node->get_Index());
+  std::vector<float> labels = data.get_Labels(index);
 
-  int size = (int)labels.size();
-
-  // Computes the Mean Absolute Error for left child
-  float left_Prediction = left_Child.compute_Predicted_Value();
+  // Computes the Mean Absolute Percentage Error for left child
+  float left_Prediction = data.labels_Mean(*left_index);
   float left_MAPE = 0;
-  for (int idx : child_Indexes[0]) {
-    if (idx < size)
-      left_MAPE += (abs(labels[idx] - left_Prediction)) / left_Prediction;
+  for (int idx : *left_index) {
+    left_MAPE += (abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
 
-  // Computes the Mean Absolute Error for left child
-  float right_Prediction = right_Child.compute_Predicted_Value();
+  // Computes the Mean Absolute Percentage Error for left child
+  float right_Prediction = data.labels_Mean(*right_index);
   float right_MAPE = 0;
-  for (int idx : child_Indexes[1]) {
-    if (idx < size)
-      right_MAPE += (abs(labels[idx] - right_Prediction)) / right_Prediction;
+  for (int idx : *right_index) {
+    right_MAPE += (abs(labels[idx] - right_Prediction)) / right_Prediction;
   }
 
   left_MAPE *= 100;
@@ -118,29 +78,4 @@ float MAPE::splitting_MAE(int position) {
   // Compute the result of MAE for the split at position
   float res = (left_MAPE + right_MAPE) / base_Population;
   return res;
-}
-
-/*
-Search for the best feature to split the dataset on at a given Node
-Inputs :
-Ouputs : int
-*/
-int MAPE::find_Best_Split_Feature() {
-  int best_Feature = 0;
-  // We try to minimize the mean absolute error for a split
-  float min_MAPE = INT_MAX;
-
-  std::vector<std::string> features =
-      this->tree_Node->get_DataSet()->get_Features();
-
-  for (unsigned long int i = 0; i < features.size(); ++i) {
-    float tmp_var = splitting_MAE(i);
-    if (tmp_var < min_MAPE) {
-      min_MAPE = tmp_var;
-      best_Feature = i;
-    }
-  }
-  this->set_Split_Criteria(this->tree_Node->node_Column_Mean(best_Feature));
-
-  return best_Feature;
 }

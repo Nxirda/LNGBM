@@ -1,11 +1,10 @@
 project(Test_Lib)
 
-# Get every .cpp file in subdirectories
-file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-
-# Make a lib containing all our .cpp
-add_library(Test_Lib  ${SOURCE_FILES})   
-
+# Make a lib containing all the .cpp
+add_library(Test_Lib 
+            DataSet_Test.cpp
+            DecisionTree_Test.cpp
+            TreeNode_Test.cpp)   
 # Dont forget to include headers so cpp can compile
 include_directories(${CMAKE_SOURCE_DIR}/include)
 

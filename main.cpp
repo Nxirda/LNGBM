@@ -11,12 +11,6 @@ using namespace std;
 /*                   */
 /*********************/
 
-/* uint64_t rdtsc() {
-  unsigned int lo, hi;
-  __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
-  return ((uint64_t)hi << 32) | lo;
-} */
-
 int main(int argc, char **argv) {
 
   if (argc < 3) {
@@ -24,33 +18,42 @@ int main(int argc, char **argv) {
     std::cout << "\n";
     std::cout << "== Split Metrics Available are ==\n";
     BaggingModel m{};
-    m.print_Available_Operators();
+    m.print_Available_Operators(); 
     return 1;
   }
-
-
-  //DataSet DS{"../data/datasets/d1.csv"};
 
   std::string metric = argv[1];
   int depth = std::stoi(argv[2]);
 
-  BaggingModel model2{metric, depth};
+  BaggingModel model{metric, depth};
 
-  //For testing on a cutted dataset
+  // For testing on a cutted dataset
   DataSet DS2{"../data/datasets/d1_Test.csv"};
-  
+
   DataSet test_DS2{};
   test_DS2.load("../data/datasets/d1_Test.csv");
 
-  model2.train(DS2, 25);
-  
-  model2.predict(test_DS2);
+  model.train(DS2, 1);
 
-  std::vector<float> result = model2.get_Prediction();
+  auto result = model.predict(test_DS2);
+  std::cout << "\n ===== MAIN RESULTS ===== \n";
   for (auto idx : result) {
     std::cout << "[" << idx << "]";
   }
-  std::cout << "\n";
+  std::cout << "\n"; 
+
+  /* DataSet DS{"../data/datasets/d1.csv"};
+
+  DataSet test_DS{};
+  test_DS.load("../data/datasets/d1_Test.csv");
+
+  model.train(DS, 75);
+
+  std::vector<float> result = model.predict(test_DS);
+  for (auto idx : result) {
+    std::cout << "[" << idx << "]";
+  }
+  std::cout << "\n"; */
 
   return 0;
 }

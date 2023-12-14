@@ -9,34 +9,24 @@ class ReductionInVar : public IOperator {
 private:
   // Parameters
 
-  float split_Criteria;
+  float split_Criterion;
   const std::string name = "RIV";
-  std::shared_ptr<TreeNode> tree_Node;
 
 public:
   // Constructor
+
   ReductionInVar();
-  ReductionInVar(std::shared_ptr<TreeNode> tree_Node);
 
   // Destructor
 
   ~ReductionInVar() override;
 
-  // Getter
-
-  float get_Best_Split_Criteria() override;
-
-  // Setter
-
-  void set_Split_Criteria(float value) override;
-  bool set_Node(std::shared_ptr<TreeNode> tree_Node);
-
   // Methods
 
   void print() override;
 
-  int find_Best_Split_Feature() override;
-  float splitting_Variance(int position);
+  float compute(int position, const DataSet &data,
+                std::vector<int> index) const override;
 };
 
 #endif
