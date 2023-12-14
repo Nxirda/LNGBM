@@ -42,11 +42,14 @@ void RandomForest::generate_Forest(int size) {
     TrainingElement elem{};
     elem.set_Node(tree.get_Root());
     elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
+    
+    std::cout << "=== Tree number [" << i << "] ===\n";
+    elem.node->node_Print_Criterion();
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
-
-    //tree.get_Root()->node_Print_Criterion();
     this->trees[i] = tree;
+    std::cout << "=== Returned tree number [" << i << "] ===\n";
+    this->trees[i].get_Root()->node_Print_Criterion();
   }
 }
 
@@ -63,18 +66,21 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
 
   // Iterate through the Forest
   for (unsigned long int i = 0; i < this->trees.size(); ++i) {
-
+    std::cout << "=== Iteration [" << i << "] ===\n";
     std::shared_ptr<std::vector<float>> tree_Result =
         std::make_shared<std::vector<float>>(size);
 
     // Computes the prediction for the current tree
     tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
+    for (unsigned long int i = 0; i < tree_Result.get()->size(); ++i) {
+      std::cout << "[" << tree_Result.get()->at(i) << "]";
+    }
+    std::cout << "\n";
 
     // Adds two vectors
     std::transform(result.begin(), result.end(), tree_Result->begin(),
                    result.begin(), std::plus<float>());
   }
-
   // Divides to have the mean of the answers
   for (unsigned long int j = 0; j < result.size(); ++j) {
     result.at(j) /= this->trees.size();
@@ -87,7 +93,11 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
 void RandomForest::tree_Prediction(const DataSet &data,
                                    std::shared_ptr<std::vector<float>> result,
                                    std::vector<int> index, TreeNode *node) {
-  // Update the values of the result
+  //  Update the values of the result
+  //std::cout << "\n Node value is " << node->get_Predicted_Value() << "\n";
+  /* if(node->get_Predicted_Value() == 0){
+    return;
+  } */
   for (auto idx : index) {
     result.get()->at(idx) = node->get_Predicted_Value();
   }
@@ -96,11 +106,18 @@ void RandomForest::tree_Prediction(const DataSet &data,
   auto [left_Index, right_Index] =
       data.split(node->get_Split_Column(), node->get_Split_Criterion(), index);
 
-  if (node->get_Left_Node() != NULL) {
-    tree_Prediction(data, result, left_Index, node->get_Left_Node());
+  // check for left side
+  if (!left_Index) {
+    return;
+  } else if (node->get_Left_Node() != NULL) {
+    tree_Prediction(data, result, *left_Index, node->get_Left_Node());
   }
 
-  if (node->get_Right_Node() != NULL) {
-    tree_Prediction(data, result, right_Index, node->get_Right_Node());
+  // Check for right side
+  if (!right_Index) {
+    return;
+  } else if (node->get_Right_Node() != NULL) {
+    tree_Prediction(data, result, *right_Index, node->get_Right_Node());
   }
+  //}
 }

@@ -12,6 +12,9 @@ Inputs  :
 Outputs : Object of TreeNode Class
 */
 TreeNode::TreeNode() {
+  this->split_Column = -1;
+  this->split_Criterion = -1;
+  this->predicted_Value = -1;
   this->left = nullptr;
   this->right = nullptr;
 }

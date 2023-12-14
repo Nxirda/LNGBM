@@ -43,7 +43,7 @@ struct TrainingElement {
                                          TrainingElement *elem,
                                          const IOperator *splitting_Operator);
 
-  std::tuple<std::vector<int>, std::vector<int>>
+  std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
   split_Index(const DataSet &data, int criterion, int position,
               TrainingElement *elem);
 

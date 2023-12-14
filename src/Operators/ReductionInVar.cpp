@@ -57,14 +57,12 @@ float ReductionInVar::splitting_RIV(int position, const DataSet &data,
   TreeNode right_Child{};
 
   // Computes Weighted Variance for left child
-  float left_Variance = data.column_Variance(left_index);
-  // float left_Variance = left_Child.node_Variance();
-  float left_Weighted_Average = left_index.size() / base_Population;
+  float left_Variance = data.labels_Variance(*left_index);
+  float left_Weighted_Average = left_index.value().size() / base_Population;
 
   // Computes Weighted Variance for right child
-  float right_Variance = data.column_Variance(right_index);
-  // float right_Variance = right_Child.node_Variance();
-  float right_Weighted_Average = right_index.size() / base_Population;
+  float right_Variance = data.labels_Variance(*right_index);
+  float right_Weighted_Average = right_index.value().size() / base_Population;
 
   // Computes weighted Average Variance for the two Nodes
   float weighted_Average_Var = (left_Weighted_Average * left_Variance +
@@ -80,12 +78,11 @@ Ouputs : int
 */
 std::tuple<int, float>
 ReductionInVar::find_Best_Split(const DataSet &data,
-                                        std::vector<int> index) const {
+                                std::vector<int> index) const {
   int best_Feature = 0;
   float max_Reduction_In_Var = INT_MAX;
 
-  std::vector<std::string> features =
-      data.get_Features();
+  std::vector<std::string> features = data.get_Features();
 
   for (unsigned long int i = 0; i < features.size(); ++i) {
     float tmp_var = splitting_RIV(i, data, index);
@@ -94,7 +91,7 @@ ReductionInVar::find_Best_Split(const DataSet &data,
       best_Feature = i;
     }
   }
-  //this->set_Split_Criteria(this->tree_Node->node_Column_Mean(best_Feature));
+  // this->set_Split_Criteria(this->tree_Node->node_Column_Mean(best_Feature));
   float criterion = data.column_Mean(best_Feature, index);
   return std::make_tuple(best_Feature, criterion);
 }

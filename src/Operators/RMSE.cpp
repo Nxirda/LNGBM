@@ -61,16 +61,16 @@ float RMSE::splitting_RMSE(int position, const DataSet &data,
   std::vector<float> labels = data.get_Labels(index);
 
   // Computes the Mean Absolute Error for left child
-  float left_Prediction = data.labels_Mean(left_index);
+  float left_Prediction = data.labels_Mean(*left_index);
 
-  for (int idx : left_index) {
+  for (int idx : *left_index) {
     left_RMSE += pow((abs(labels[idx] - left_Prediction)), 2);
   }
 
   // Computes the Mean Absolute Error for left child
-  float right_Prediction = data.labels_Mean(right_index);
+  float right_Prediction = data.labels_Mean(*right_index);
 
-  for (int idx : right_index) {
+  for (int idx : *right_index) {
     right_RMSE += pow((abs(labels[idx] - right_Prediction)), 2);
   }
 

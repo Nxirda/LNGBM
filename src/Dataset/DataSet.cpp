@@ -3,7 +3,6 @@
 #include <numeric>
 #include <sstream>   // std::stringstream
 #include <stdexcept> // std::runtime_error
-#include <string>
 #include <vector>
 
 #include "DataSet.hpp"
@@ -244,8 +243,13 @@ std::vector<std::vector<float>> DataSet::get_Samples() const {
 /**/
 std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
   std::vector<float> Col(0);
+
+  if (idx.empty()) {
+    return Col;
+  }
+
   for (int row : idx) {
-    if (row <= this->labels_Number())
+    if (row < this->labels_Number())
       Col.push_back(this->labels[row]);
   }
   return Col;
@@ -309,7 +313,7 @@ split, which is based on the criteria on a row at the col position
 Inputs : int, float
 Ouputs : vector<vector<int>>
 */
-std::tuple<std::vector<int>, std::vector<int>>
+std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
 DataSet::split(int position, float criterion,
                const std::vector<int> &idx) const {
 
@@ -317,12 +321,15 @@ DataSet::split(int position, float criterion,
   std::vector<int> sub_Index_Left;
 
   for (int row : idx) {
-    if (this->samples[row][position] < criterion) {
-      sub_Index_Left.push_back(row);
-    } else {
-      sub_Index_Right.push_back(row);
-    }
+    //if (row < idx.size()) {
+      if (this->samples[row][position] < criterion) {
+        sub_Index_Left.push_back(row);
+      } else {
+        sub_Index_Right.push_back(row);
+      }
+    //}
   }
+  // if(sub_Index_Left)
   return std::make_tuple(sub_Index_Left, sub_Index_Right);
 }
 
@@ -353,7 +360,7 @@ Inputs  : const vector<int>
 Outputs : float
 */
 float DataSet::labels_Mean(const std::vector<int> &idx) const {
-  float mean = 0;
+  float mean = -1;
 
   if (idx.empty()) {
     return mean;
@@ -373,9 +380,9 @@ idx represents the index that the object above can use
 Inputs  : std:vector<int>
 Outputs : float
 */
-float DataSet::column_Variance(const std::vector<int> &idx) const {
+float DataSet::labels_Variance(const std::vector<int> &idx) const {
   //  check if there are values in the current Column
-  if (idx.size() <= 0) {
+  if (idx.empty()) {
     return 0.0;
   }
 

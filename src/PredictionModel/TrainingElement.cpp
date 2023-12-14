@@ -39,7 +39,7 @@ void TrainingElement::set_depth(int depth) { this->depth = depth; }
 void TrainingElement::set_Root(int dataset_Size, TreeNode *node) {
   this->depth = 0;
 
-  //Computes the index for the given DataSet (Bootstrap directly here)
+  // Computes the index for the given DataSet (Bootstrap directly here)
   std::vector<int> idx(dataset_Size);
   for (int i = 0; i < dataset_Size; ++i) {
     idx[i] = i;
@@ -47,13 +47,17 @@ void TrainingElement::set_Root(int dataset_Size, TreeNode *node) {
 
   this->set_Index(idx);
   this->node = node;
+
+  // elem->node->set_Split_Column(column);
+  // elem->node->set_Split_Criterion(criterion);
+  // elem->node->set_Predicted_Value(data.labels_Mean(elem->get_Index()));
 }
 
 /**/
-void TrainingElement::bootstrap_Index(int dataset_Size){
+void TrainingElement::bootstrap_Index(int dataset_Size) {
   std::vector<int> idx(dataset_Size);
   for (int i = 0; i < dataset_Size; ++i) {
-    idx[i] = rand() % dataset_Size;
+    idx[i] = rand() % (dataset_Size - 1);
   }
   this->set_Index(idx);
 }
@@ -67,7 +71,7 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
 }
 
 /**/
-std::tuple<std::vector<int>, std::vector<int>>
+std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
 TrainingElement::split_Index(const DataSet &data, int criterion, int position,
                              TrainingElement *elem) {
 
@@ -91,30 +95,61 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   auto [column, criterion] = find_Best_Split(data, elem, splitting_Operator);
   auto [left_index, right_index] = split_Index(data, criterion, column, elem);
 
-  int new_Depth = elem->depth + 1;
+  int next_Depth = elem->depth + 1;
+  max_Depth++;
 
   // Set the datas for the current node
   elem->node->set_Split_Column(column);
   elem->node->set_Split_Criterion(criterion);
   elem->node->set_Predicted_Value(data.labels_Mean(elem->get_Index()));
 
-  // Just so we dont have nodes with predicted value beeing -1 (default value)
-  if (new_Depth < max_Depth) {
+  float predic_Left = data.labels_Mean(*left_index);
+  float predic_Right = data.labels_Mean(*right_index);
 
+  std::cout << "Predics are : left :" << predic_Left
+            << " right :" << predic_Right << "\n";
+
+  // SET PRED VAL DIRECTLY HERE
+  if (predic_Left > 0 || predic_Right > 0) {
     // Left node
     TreeNode left{};
-    elem->node->add_Left(std::make_unique<TreeNode>(left));
-    TrainingElement train_Left(elem->node->get_Left_Node(), left_index,
-                               new_Depth);
+
     // Right node
     TreeNode right{};
-    elem->node->add_Right(std::make_unique<TreeNode>(right));
-    TrainingElement train_Right(elem->node->get_Right_Node(), right_index,
-                                new_Depth);
-    return std::make_tuple(train_Left, train_Right);
-  }
 
-  return {};
+    if (predic_Left < 0) {
+      elem->node->add_Right(std::make_unique<TreeNode>(right));
+      elem->node->get_Right_Node()->set_Predicted_Value(predic_Right);
+      TrainingElement train_Right(elem->node->get_Right_Node(), *right_index,
+                                  next_Depth);
+
+      return {std::nullopt, train_Right};
+    }
+
+    else if (predic_Right < 0) {
+      elem->node->add_Left(std::make_unique<TreeNode>(left));
+      elem->node->get_Left_Node()->set_Predicted_Value(predic_Left);
+      TrainingElement train_Left(elem->node->get_Left_Node(), *left_index,
+                                 next_Depth);
+
+      return {train_Left, std::nullopt};
+
+    } else {
+
+      elem->node->add_Left(std::make_unique<TreeNode>(left));
+      elem->node->get_Left_Node()->set_Predicted_Value(predic_Left);
+      TrainingElement train_Left(elem->node->get_Left_Node(), *left_index,
+                                 next_Depth);
+
+      elem->node->add_Right(std::make_unique<TreeNode>(right));
+      elem->node->get_Right_Node()->set_Predicted_Value(predic_Right);
+      TrainingElement train_Right(elem->node->get_Right_Node(), *right_index,
+                                  next_Depth);
+
+      return std::make_tuple(train_Left, train_Right);
+    }
+  }
+  return {std::nullopt, std::nullopt};
 }
 
 /**/
@@ -122,11 +157,11 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
                             int max_Depth) {
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
-  TreeNode root{};
+  //TreeNode root{};
 
   // Initialize the current Node
   this->set_Root(data.labels_Number(), this->node);
-  this->bootstrap_Index(data.labels_Number());
+  // this->bootstrap_Index(data.labels_Number());
   remaining.push(*this);
 
   // Build iteratively the tree frame

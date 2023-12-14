@@ -59,16 +59,16 @@ float MAE::splitting_MAE(int position, const DataSet &data,
   std::vector<float> labels = data.get_Labels(index);
 
   // Computes the Mean Absolute Error for left child
-  float left_Prediction = data.labels_Mean(left_index);
+  float left_Prediction = data.labels_Mean(left_index.value());
   float left_MAE = 0;
-  for (int idx : left_index) {
+  for (int idx : left_index.value()) {
     left_MAE += abs(labels[idx] - left_Prediction);
   }
 
   // Computes the Mean Absolute Error for left child
-  float right_Prediction = data.labels_Mean(right_index);
+  float right_Prediction = data.labels_Mean(right_index.value());
   float right_MAE = 0;
-  for (int idx : right_index) {
+  for (int idx : right_index.value()) {
     right_MAE += abs(labels[idx] - right_Prediction);
   }
 
