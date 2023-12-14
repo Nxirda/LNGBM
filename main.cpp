@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     std::cout << "\n";
     std::cout << "== Split Metrics Available are ==\n";
     BaggingModel m{};
-     m.print_Available_Operators(); 
+    m.print_Available_Operators(); 
     return 1;
   }
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 
   model.train(DS2, 1);
 
-  std::vector<float> result = model.predict(test_DS2);
+  auto result = model.predict(test_DS2);
   std::cout << "\n ===== MAIN RESULTS ===== \n";
   for (auto idx : result) {
     std::cout << "[" << idx << "]";

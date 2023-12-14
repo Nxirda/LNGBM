@@ -97,7 +97,6 @@ std::tuple<int, float> MAE::find_Best_Split(const DataSet &data,
       best_Feature = i;
     }
   }
-  // this->set_Split_Criterion(this->tree_Node->node_Column_Mean(best_Feature));
   float criterion = data.column_Mean(best_Feature, index);
   return std::make_tuple(best_Feature, criterion);
 }

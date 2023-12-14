@@ -42,14 +42,9 @@ void RandomForest::generate_Forest(int size) {
     TrainingElement elem{};
     elem.set_Node(tree.get_Root());
     elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
-    
-    std::cout << "=== Tree number [" << i << "] ===\n";
-    elem.node->node_Print_Criterion();
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
     this->trees[i] = tree;
-    std::cout << "=== Returned tree number [" << i << "] ===\n";
-    this->trees[i].get_Root()->node_Print_Criterion();
   }
 }
 
@@ -93,31 +88,19 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
 void RandomForest::tree_Prediction(const DataSet &data,
                                    std::shared_ptr<std::vector<float>> result,
                                    std::vector<int> index, TreeNode *node) {
-  //  Update the values of the result
-  //std::cout << "\n Node value is " << node->get_Predicted_Value() << "\n";
-  /* if(node->get_Predicted_Value() == 0){
-    return;
-  } */
-  for (auto idx : index) {
-    result.get()->at(idx) = node->get_Predicted_Value();
-  }
-
   // Put the correct indexes
   auto [left_Index, right_Index] =
       data.split(node->get_Split_Column(), node->get_Split_Criterion(), index);
 
-  // check for left side
-  if (!left_Index) {
-    return;
-  } else if (node->get_Left_Node() != NULL) {
+  for (auto idx : index) {
+    result.get()->at(idx) = node->get_Predicted_Value();
+  }
+
+  if (node->get_Left_Node()) {
     tree_Prediction(data, result, *left_Index, node->get_Left_Node());
   }
 
-  // Check for right side
-  if (!right_Index) {
-    return;
-  } else if (node->get_Right_Node() != NULL) {
+  if (node->get_Right_Node()) {
     tree_Prediction(data, result, *right_Index, node->get_Right_Node());
   }
-  //}
 }

@@ -101,13 +101,12 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   // Set the datas for the current node
   elem->node->set_Split_Column(column);
   elem->node->set_Split_Criterion(criterion);
+
+  //Needs to be fixed, for base node compute it in "set root" maybe
   elem->node->set_Predicted_Value(data.labels_Mean(elem->get_Index()));
 
   float predic_Left = data.labels_Mean(*left_index);
   float predic_Right = data.labels_Mean(*right_index);
-
-  std::cout << "Predics are : left :" << predic_Left
-            << " right :" << predic_Right << "\n";
 
   // SET PRED VAL DIRECTLY HERE
   if (predic_Left > 0 || predic_Right > 0) {
@@ -161,7 +160,7 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
 
   // Initialize the current Node
   this->set_Root(data.labels_Number(), this->node);
-  // this->bootstrap_Index(data.labels_Number());
+  //this->bootstrap_Index(data.labels_Number());
   remaining.push(*this);
 
   // Build iteratively the tree frame
