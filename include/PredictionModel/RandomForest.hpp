@@ -6,23 +6,24 @@
 
 #include "DecisionTree.hpp"
 #include "IOperator.hpp"
+#include "TrainingElement.hpp"
 
 class RandomForest {
 
 private:
+  // Parameters
+
   int size;
   int max_Depth;
   IOperator *splitting_Operator;
-  std::map<int, std::shared_ptr<DecisionTree>> trees;
-  std::shared_ptr<DataSet> dataset;
-  std::vector<float> results;
+  std::map<int, DecisionTree> trees;
+  DataSet dataset;
 
 public:
   // Constructor
 
   RandomForest();
-  RandomForest(std::shared_ptr<DataSet> dataset, IOperator *op, int n,
-               int depth);
+  RandomForest(const DataSet &dataset, IOperator *op, int n, int depth);
 
   // Destructor
 
@@ -32,13 +33,13 @@ public:
 
   int get_size();
   std::vector<float> get_results();
-  std::shared_ptr<DataSet> get_Dataset();
-
-  // Setters
 
   // Methods
   void generate_Forest(int size);
-  void predict_Results(std::shared_ptr<DataSet> dataset);
+  std::vector<float> predict_Results(const DataSet &dataset);
+  void tree_Prediction(const DataSet &data,
+                       std::shared_ptr<std::vector<float>> result,
+                       std::vector<int> index, TreeNode *node);
 };
 
 #endif

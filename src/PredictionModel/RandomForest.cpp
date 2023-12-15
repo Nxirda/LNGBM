@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <stack>
 
 #include "RandomForest.hpp"
 
@@ -12,94 +13,94 @@
 RandomForest::RandomForest() {
   this->size = 0;
   this->max_Depth = 0;
-  this->dataset = nullptr;
-  this->results = std::vector<float>();
-  this->trees = std::map<int, std::shared_ptr<DecisionTree>>();
+  this->dataset = DataSet{};
+  this->trees = std::map<int, DecisionTree>();
 }
 
 /**/
-RandomForest::RandomForest(std::shared_ptr<DataSet> dataset,
-                           IOperator *split_Operator, int n, int depth) {
+RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
+                           int n, int depth) {
   this->size = n;
   this->max_Depth = depth;
   this->dataset = dataset;
   this->splitting_Operator = split_Operator;
-  this->trees = std::map<int, std::shared_ptr<DecisionTree>>();
+  this->trees = std::map<int, DecisionTree>();
 }
 
 /**/
 RandomForest::~RandomForest(){};
 
 /**/
-std::vector<float> RandomForest::get_results() { return this->results; }
-
-/**/
 int RandomForest::get_size() { return this->size; }
-
-/**/
-std::shared_ptr<DataSet> RandomForest::get_Dataset() { return this->dataset; }
 
 /**/
 void RandomForest::generate_Forest(int size) {
 
   for (int i = 0; i < size; ++i) {
+    DecisionTree tree{};
 
-    //  Creating a Node
-    std::shared_ptr<TreeNode> base_Node =
-        make_shared<TreeNode>(this->get_Dataset());
+    TrainingElement elem{};
+    elem.set_Node(tree.get_Root());
+    elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
 
-    // Create a bootstrap sample
-    std::vector<int> bootstrap_Index = base_Node->bootstrap_DataSet();
-
-    // Decision Tree Initialisation wtith bootstrapped index
-    std::shared_ptr<DecisionTree> dt =
-        std::make_shared<DecisionTree>(base_Node, bootstrap_Index);
-
-    // Handle random forest
-    this->splitting_Operator->set_Node(dt->get_Current_Node());
-
-    dt->add_Operator(this->splitting_Operator);
-
-    dt->build_Splitted_Tree(this->max_Depth);
-
-    this->trees[i] = dt;
+    tree.set_Root(std::make_unique<TreeNode>(*elem.node));
+    this->trees[i] = tree;
   }
 }
 
 /**/
-void RandomForest::predict_Results(std::shared_ptr<DataSet> test_DataSet) {
+std::vector<float> RandomForest::predict_Results(const DataSet &data) {
+  int size = data.samples_Number();
+  std::vector<float> result(size);
 
-  std::vector<float> accumulator;
-  for (auto it = this->trees.begin(); it != this->trees.end(); ++it) {
-
-    it->second->set_Test_DataSet(test_DataSet);
-
-    it->second->parse_Test_DataSet();
-
-    it->second->predict_Test_Labels();
-
-    // Checks if we can add
-    if (accumulator.size() <= 0) {
-      accumulator = *it->second->get_Predicted_Labels();
-    } else {
-      if (accumulator.size() == it->second->get_Predicted_Labels()->size()) {
-
-        // Adding up predictions at every index so we can compute the mean of
-        // each prediction aftewards
-        std::transform(accumulator.begin(), accumulator.end(),
-                       it->second->get_Predicted_Labels()->begin(),
-                       accumulator.begin(), std::plus<float>());
-      } else {
-        perror("Random Forest : one tree didnt predict on all the values");
-        return;
-      }
-    }
-  }
-  if (size != 0) {
-    for (unsigned long int i = 0; i < accumulator.size(); ++i) {
-      accumulator[i] /= this->get_size();
-    }
+  // Computes the index
+  std::vector<int> index(size);
+  for (int i = 0; i < size; ++i) {
+    index[i] = i;
   }
 
-  this->results = accumulator;
+  // Iterate through the Forest
+  for (unsigned long int i = 0; i < this->trees.size(); ++i) {
+    std::cout << "=== Iteration [" << i << "] ===\n";
+    std::shared_ptr<std::vector<float>> tree_Result =
+        std::make_shared<std::vector<float>>(size);
+
+    // Computes the prediction for the current tree
+    tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
+    for (unsigned long int i = 0; i < tree_Result.get()->size(); ++i) {
+      std::cout << "[" << tree_Result.get()->at(i) << "]";
+    }
+    std::cout << "\n";
+
+    // Adds two vectors
+    std::transform(result.begin(), result.end(), tree_Result->begin(),
+                   result.begin(), std::plus<float>());
+  }
+  // Divides to have the mean of the answers
+  for (unsigned long int j = 0; j < result.size(); ++j) {
+    result.at(j) /= this->trees.size();
+  }
+
+  return result;
+}
+
+/**/
+void RandomForest::tree_Prediction(const DataSet &data,
+                                   std::shared_ptr<std::vector<float>> result,
+                                   std::vector<int> index, TreeNode *node) {
+  // Put the correct indexes
+  auto [left_Index, right_Index] =
+      data.split(node->get_Split_Column(), node->get_Split_Criterion(), index);
+
+  for (auto idx : index) {
+    result.get()->at(idx) = node->get_Predicted_Value();
+  }
+
+  if (node->get_Left_Node()) {
+    tree_Prediction(data, result, *left_Index, node->get_Left_Node());
+  }
+
+  if (node->get_Right_Node()) {
+    tree_Prediction(data, result, *right_Index, node->get_Right_Node());
+  }
 }

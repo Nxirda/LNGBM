@@ -3,7 +3,6 @@
 #include <numeric>
 #include <sstream>   // std::stringstream
 #include <stdexcept> // std::runtime_error
-#include <string>
 #include <vector>
 
 #include "DataSet.hpp"
@@ -244,8 +243,14 @@ std::vector<std::vector<float>> DataSet::get_Samples() const {
 /**/
 std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
   std::vector<float> Col(0);
+  // No idx
+  if (idx.empty()) {
+    return Col;
+  }
+
   for (int row : idx) {
-    if (row <= this->labels_Number())
+    // Check row in bounds
+    if (row < this->labels_Number() && row >= 0)
       Col.push_back(this->labels[row]);
   }
   return Col;
@@ -289,15 +294,19 @@ std::vector<float> DataSet::get_Column(int position,
 
   std::vector<float> Col(0);
 
-  if (idx.empty()) { //(position > len) {//|| position < 0){
+  // Check olumn in bounds
+  if (position >= this->features_Length() || position < 0) {
+    return Col;
+  }
+  // No index
+  if (idx.empty()) {
     return Col;
   }
 
-  long unsigned int len = idx.size();
-
-  for (long unsigned int i = 0; i < len; ++i) {
-    if ((int)i < this->samples_Number())
-      Col.push_back(this->samples[idx[i]][position]);
+  for (int row : idx) {
+    // Check row in bounds
+    if (row < this->samples_Number() && row >= 0)
+      Col.push_back(this->samples[row][position]);
   }
 
   return Col;
@@ -309,22 +318,31 @@ split, which is based on the criteria on a row at the col position
 Inputs : int, float
 Ouputs : vector<vector<int>>
 */
-std::vector<std::vector<int>>
-DataSet::split(int position, float criteria,
+std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
+DataSet::split(int position, float criterion,
                const std::vector<int> &idx) const {
-
+  // Check column in bounds
+  if (position >= this->features_Length() || position < 0) {
+    return {};
+  }
+  // No index
+  if (idx.empty()) {
+    return {};
+  }
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
 
   for (int row : idx) {
-    if (this->samples[row][position] < criteria) {
-      sub_Index_Left.push_back(row);
-    } else {
-      sub_Index_Right.push_back(row);
+    // Row in bounds
+    if (row < this->samples_Number() && row >= 0) {
+      if (this->samples[row][position] < criterion) {
+        sub_Index_Left.push_back(row);
+      } else {
+        sub_Index_Right.push_back(row);
+      }
     }
   }
-  std::vector<std::vector<int>> res{sub_Index_Left, sub_Index_Right};
-  return res;
+  return std::make_tuple(sub_Index_Left, sub_Index_Right);
 }
 
 /*
@@ -335,13 +353,22 @@ Outputs : float
 float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
 
   float mean = 0;
-
+  // CHeck column in bounds
+  if (position >= this->features_Length() || position < 0) {
+    return mean;
+  }
+  // No index
   if (idx.empty()) {
     return mean;
   }
 
   std::vector<float> current_Column = this->get_Column(position, idx);
   int len = current_Column.size();
+
+  // To prevent dividing by 0
+  if (len == 0) {
+    return mean;
+  }
 
   mean = std::reduce(current_Column.begin(), current_Column.end(), 0.0);
   mean /= len;
@@ -354,14 +381,19 @@ Inputs  : const vector<int>
 Outputs : float
 */
 float DataSet::labels_Mean(const std::vector<int> &idx) const {
-  float mean = 0;
-
+  float mean = -1;
+  // No index
   if (idx.empty()) {
     return mean;
   }
 
   std::vector<float> current_Labels = this->get_Labels(idx);
   int len = current_Labels.size();
+
+  // To prevent dividing by 0
+  if (len == 0) {
+    return mean;
+  }
 
   mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0.0);
   mean /= len;
@@ -374,14 +406,21 @@ idx represents the index that the object above can use
 Inputs  : std:vector<int>
 Outputs : float
 */
-float DataSet::column_Variance(const std::vector<int> &idx) const {
-  //  check if there are values in the current Column
-  if (idx.size() <= 0) {
+float DataSet::labels_Variance(const std::vector<int> &idx) const {
+  // No index
+  if (idx.empty()) {
     return 0.0;
   }
 
   std::vector<float> current_Labels = this->get_Labels(idx);
+
   int len = current_Labels.size();
+
+  // To prevent dividing by 0
+  if (len == 0) {
+    return 0.0;
+  }
+
   float mean = this->labels_Mean(idx);
   float variance = 0.0;
 
