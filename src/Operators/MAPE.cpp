@@ -39,7 +39,10 @@ Inputs  : int
 Outputs : float
 */
 float MAPE::compute(int position, const DataSet &data,
-                           std::vector<int> index) const {
+                    std::vector<int> index) const {
+
+  float left_MAPE = 0;
+  float right_MAPE = 0;
 
   // Computes the split criteria, needs to be not hardcoded in the future
   float split_Criteria = data.column_Mean(position, index);
@@ -56,19 +59,17 @@ float MAPE::compute(int position, const DataSet &data,
   TreeNode right_Child{};
 
   // Get the labels
-  std::vector<float> labels = data.get_Labels(index);
+  std::vector<float> labels = data.get_Labels();
 
   // Computes the Mean Absolute Percentage Error for left child
-  float left_Prediction = data.labels_Mean(*left_index);
-  float left_MAPE = 0;
-  for (int idx : *left_index) {
+  float left_Prediction = data.labels_Mean(left_index.value());
+  for (int idx : left_index.value()) {
     left_MAPE += (abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
 
   // Computes the Mean Absolute Percentage Error for left child
-  float right_Prediction = data.labels_Mean(*right_index);
-  float right_MAPE = 0;
-  for (int idx : *right_index) {
+  float right_Prediction = data.labels_Mean(right_index.value());
+  for (int idx : right_index.value()) {
     right_MAPE += (abs(labels[idx] - right_Prediction)) / right_Prediction;
   }
 

@@ -33,6 +33,7 @@ public:
 
   std::vector<std::string> get_Features() const;
   std::vector<std::vector<float>> get_Samples() const;
+  std::vector<float> get_Labels() const;
   std::vector<float> get_Labels(const std::vector<int> &idx) const;
   std::vector<float> get_Column(int position,
                                 const std::vector<int> &idx) const;

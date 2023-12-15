@@ -241,6 +241,12 @@ std::vector<std::vector<float>> DataSet::get_Samples() const {
 }
 
 /**/
+std::vector<float> DataSet::get_Labels() const{
+  return this->labels;
+}
+
+
+/**/
 std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
   std::vector<float> Col(0);
   // No idx

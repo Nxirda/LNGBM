@@ -17,7 +17,7 @@ struct TrainingElement {
   // Constructor
 
   TrainingElement();
-  TrainingElement(TreeNode *node, std::vector<int> index, int depth);
+  TrainingElement(TreeNode *node, std::vector<int> const index, int depth);
 
   // Destructor
 
@@ -37,7 +37,7 @@ struct TrainingElement {
 
   std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
   split_Node(const DataSet &data, TrainingElement *elem,
-             const IOperator *splitting_Operator, int max_Depth);
+             const IOperator *splitting_Operator);
 
   std::tuple<int, float> find_Best_Split(const DataSet &data,
                                          TrainingElement *elem,

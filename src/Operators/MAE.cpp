@@ -39,7 +39,10 @@ Inputs  : int
 Outputs : float
 */
 float MAE::compute(int position, const DataSet &data,
-                         std::vector<int> index) const {
+                   std::vector<int> index) const {
+
+  float left_MAE = 0;
+  float right_MAE = 0;
 
   // Computes the split criteria, needs to be not hardcoded in the future
   float split_Criteria = data.column_Mean(position, index);
@@ -56,23 +59,22 @@ float MAE::compute(int position, const DataSet &data,
   TreeNode right_Child{};
 
   // Get the labels
-  std::vector<float> labels = data.get_Labels(index);
+  std::vector<float> labels = data.get_Labels();
 
   // Computes the Mean Absolute Error for left child
   float left_Prediction = data.labels_Mean(left_index.value());
-  float left_MAE = 0;
   for (int idx : left_index.value()) {
     left_MAE += abs(labels[idx] - left_Prediction);
   }
 
-  // Computes the Mean Absolute Error for left child
+  // Computes the Mean Absolute Error for right child
   float right_Prediction = data.labels_Mean(right_index.value());
-  float right_MAE = 0;
   for (int idx : right_index.value()) {
     right_MAE += abs(labels[idx] - right_Prediction);
   }
 
   // Compute the result of MAE for the split at position
   float res = (left_MAE + right_MAE) / base_Population;
+
   return res;
 }

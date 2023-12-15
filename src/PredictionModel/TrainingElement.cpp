@@ -13,10 +13,10 @@ TrainingElement::TrainingElement() {
 }
 
 /**/
-TrainingElement::TrainingElement(TreeNode *node, std::vector<int> index,
+TrainingElement::TrainingElement(TreeNode *node, std::vector<int> const index,
                                  int depth) {
   this->node = node;
-  this->index = index;
+  this->index = std::move(index);
   this->depth = depth;
 }
 
@@ -72,7 +72,6 @@ std::tuple<int, float>
 TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
                                  const IOperator *splitting_Operator) {
 
-  /* return splitting_Operator->find_Best_Split(data, elem->index); */
   int best_Feature = 0;
   // We try to minimize the mean absolute error for a split
   float min = INT_MAX;
@@ -81,6 +80,7 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
 
   for (unsigned long int i = 0; i < features.size(); ++i) {
     float tmp_var = splitting_Operator->compute(i, data, elem->index);
+
     if (tmp_var < min) {
       min = tmp_var;
       best_Feature = i;
@@ -109,20 +109,18 @@ Outputs : tuple<optional<TrainingElement>, <optional<TrainingElement>>
 */
 std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
 TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
-                            const IOperator *splitting_Operator,
-                            int max_Depth) {
+                            const IOperator *splitting_Operator) {
 
   auto [column, criterion] = find_Best_Split(data, elem, splitting_Operator);
   auto [left_index, right_index] = split_Index(data, criterion, column, elem);
 
   int next_Depth = elem->depth + 1;
-  max_Depth++;
 
   // Set the datas for the current node
   elem->node->set_Split_Column(column);
   elem->node->set_Split_Criterion(criterion);
 
-  //Needs to be fixed, for base node compute it in "set root" maybe
+  // Needs to be fixed, for base node compute it in "set root" maybe
   elem->node->set_Predicted_Value(data.labels_Mean(elem->get_Index()));
 
   float predic_Left = data.labels_Mean(*left_index);
@@ -176,11 +174,11 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
                             int max_Depth) {
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
-  //TreeNode root{};
+  // TreeNode root{};
 
   // Initialize the current Node
   this->set_Root(data.labels_Number(), this->node);
-  //this->bootstrap_Index(data.labels_Number());
+  // this->bootstrap_Index(data.labels_Number());
   remaining.push(*this);
 
   // Build iteratively the tree frame
@@ -191,12 +189,13 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
     if (elem.depth >= max_Depth) {
       continue;
     }
-    auto [left, right] = split_Node(data, &elem, splitting_Operator, max_Depth);
+    auto [left, right] = split_Node(data, &elem, splitting_Operator);
+
     if (left) {
       remaining.push(*left);
     }
     if (right) {
       remaining.push(*right);
-    }
+    } 
   }
 }

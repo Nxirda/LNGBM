@@ -27,33 +27,22 @@ int main(int argc, char **argv) {
 
   BaggingModel model{metric, depth};
 
-  // For testing on a cutted dataset
-  DataSet DS2{"../data/datasets/d1_Test.csv"};
-
-  DataSet test_DS2{};
-  test_DS2.load("../data/datasets/d1_Test.csv");
-
-  model.train(DS2, 1);
-
-  auto result = model.predict(test_DS2);
-  std::cout << "\n ===== MAIN RESULTS ===== \n";
-  for (auto idx : result) {
-    std::cout << "[" << idx << "]";
-  }
-  std::cout << "\n"; 
-
-  /* DataSet DS{"../data/datasets/d1.csv"};
+  DataSet DS{"../data/datasets/d1.csv"};
 
   DataSet test_DS{};
   test_DS.load("../data/datasets/d1_Test.csv");
 
-  model.train(DS, 75);
+  model.train(DS, 10);
 
-  std::vector<float> result = model.predict(test_DS);
+  auto result = model.predict(test_DS);
+
+  
+  std::cout << "\n ===== MAIN RESULTS ===== \n";
+  //std::vector<float> result = model.predict(test_DS);
   for (auto idx : result) {
     std::cout << "[" << idx << "]";
   }
-  std::cout << "\n"; */
+  std::cout << "\n"; 
 
   return 0;
 }
