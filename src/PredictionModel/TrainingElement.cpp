@@ -36,10 +36,10 @@ void TrainingElement::set_Index(std::vector<int> index) { this->index = index; }
 void TrainingElement::set_depth(int depth) { this->depth = depth; }
 
 /**/
-void TrainingElement::set_Root(int dataset_Size, TreeNode *node) {
+void TrainingElement::set_Root(int dataset_Size, TreeNode *node, float value) {
   this->depth = 0;
 
-  // Computes the index for the given DataSet (Bootstrap directly here)
+  // Computes the index for the given DataSet 
   std::vector<int> idx(dataset_Size);
   for (int i = 0; i < dataset_Size; ++i) {
     idx[i] = i;
@@ -47,10 +47,7 @@ void TrainingElement::set_Root(int dataset_Size, TreeNode *node) {
 
   this->set_Index(idx);
   this->node = node;
-
-  // elem->node->set_Split_Column(column);
-  // elem->node->set_Split_Criterion(criterion);
-  // elem->node->set_Predicted_Value(data.labels_Mean(elem->get_Index()));
+  this->node->set_Predicted_Value(value);
 }
 
 /**/
@@ -120,13 +117,9 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   elem->node->set_Split_Column(column);
   elem->node->set_Split_Criterion(criterion);
 
-  // Needs to be fixed, for base node compute it in "set root" maybe
-  elem->node->set_Predicted_Value(data.labels_Mean(elem->get_Index()));
-
   float predic_Left = data.labels_Mean(*left_index);
   float predic_Right = data.labels_Mean(*right_index);
 
-  // SET PRED VAL DIRECTLY HERE
   if (predic_Left > 0 || predic_Right > 0) {
     // Left node
     TreeNode left{};
@@ -174,10 +167,9 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
                             int max_Depth) {
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
-  // TreeNode root{};
 
   // Initialize the current Node
-  this->set_Root(data.labels_Number(), this->node);
+  this->set_Root(data.labels_Number(), this->node, data.whole_Labels_Mean());
   this->bootstrap_Index(data.labels_Number());
   remaining.push(*this);
 

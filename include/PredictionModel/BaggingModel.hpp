@@ -22,16 +22,21 @@ public:
   BaggingModel();
   BaggingModel(std::string split_Metric, int max_Depth);
 
+  //Getter
+
+  std::string get_Metric();
+
   // Destructor
 
   ~BaggingModel();
 
   // Methods
 
+  void train(const DataSet &data);
   void train(const DataSet &data, int n);
+  //void reset_Forest();
   std::vector<float> predict(const DataSet &datas);
   void print_Available_Operators();
-
 };
 
 #endif

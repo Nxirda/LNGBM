@@ -87,7 +87,7 @@ float MAPE::apply(const std::vector<float> &exact,
 
   float res = 0;
   float size = prediction.size();
-  for (unsigned long int i = 0; i < exact.size(); ++i) {
+  for (unsigned long int i = 0; i < size; ++i) {
     res += std::abs(exact[i] - prediction[i])/exact[i];
   }
 

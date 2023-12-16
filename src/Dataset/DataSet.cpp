@@ -87,10 +87,11 @@ Instanciates an object of type DataSet from the given CSV
 Inputs : String
 Ouputs : Object of DataSet Class
 */
-void DataSet::load(std::string file_Path) {
+DataSet DataSet::load(std::string file_Path) {
   // input filestream
   std::ifstream file;
   file.open(file_Path);
+  DataSet ds{};
 
   // Make sure the file is open
   if (!file.is_open()) {
@@ -114,7 +115,7 @@ void DataSet::load(std::string file_Path) {
       // usefull
       if (!ss.eof()) {
         // Initialize DataSet features
-        this->features.push_back(colname);
+        ds.features.push_back(colname);
       }
     }
   }
@@ -130,7 +131,7 @@ void DataSet::load(std::string file_Path) {
     while (ss >> val) {
       // Ignore label column
       if (ss.eof()) {
-        this->labels.push_back(val);
+        ds.labels.push_back(val);
       } else {
         tmp.push_back(val);
       }
@@ -139,14 +140,15 @@ void DataSet::load(std::string file_Path) {
       }
     }
     // Place the row in the 2D Matrix
-    this->samples.push_back(tmp);
+    ds.samples.push_back(tmp);
   }
 
-  //std::cout << "DONT FORGET TO DELETE THIS IN LOAD FUNCTION\n";
-  //this->labels = std::vector<float>(this->samples.size(), 0);
+  // std::cout << "DONT FORGET TO DELETE THIS IN LOAD FUNCTION\n";
+  // this->labels = std::vector<float>(this->samples.size(), 0);
 
   // Close file
   file.close();
+  return ds;
 }
 
 /*
@@ -160,6 +162,13 @@ DataSet::DataSet(std::vector<std::string> features,
   this->features = features;
   this->samples = samples;
   this->labels = labels;
+}
+
+/**/
+DataSet::DataSet(const DataSet &data, std::vector<int> idx) {
+  this->features = data.get_Features();
+  this->samples = data.get_Samples(idx);
+  this->labels = data.get_Labels(idx);
 }
 
 /*
@@ -243,10 +252,24 @@ std::vector<std::vector<float>> DataSet::get_Samples() const {
 }
 
 /**/
-std::vector<float> DataSet::get_Labels() const{
-  return this->labels;
+std::vector<std::vector<float>>
+DataSet::get_Samples(const std::vector<int> &idx) const {
+  std::vector<std::vector<float>> res;
+  // No idx
+  if (idx.empty()) {
+    return {};
+  }
+
+  for (int i : idx) {
+    if (i < this->samples_Number())
+      res.push_back(this->samples[i]);
+  }
+
+  return res;
 }
 
+/**/
+std::vector<float> DataSet::get_Labels() const { return this->labels; }
 
 /**/
 std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
@@ -396,6 +419,23 @@ float DataSet::labels_Mean(const std::vector<int> &idx) const {
   }
 
   std::vector<float> current_Labels = this->get_Labels(idx);
+  int len = current_Labels.size();
+
+  // To prevent dividing by 0
+  if (len == 0) {
+    return mean;
+  }
+
+  mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0.0);
+  mean /= len;
+  return (mean);
+}
+
+/**/
+float DataSet::whole_Labels_Mean() const {
+  float mean = -1;
+
+  std::vector<float> current_Labels = this->get_Labels();
   int len = current_Labels.size();
 
   // To prevent dividing by 0

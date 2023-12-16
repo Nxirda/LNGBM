@@ -61,16 +61,15 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
 
   // Iterate through the Forest
   for (unsigned long int i = 0; i < this->trees.size(); ++i) {
-    std::cout << "=== Iteration [" << i << "] ===\n";
     std::shared_ptr<std::vector<float>> tree_Result =
         std::make_shared<std::vector<float>>(size);
 
     // Computes the prediction for the current tree
     tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
-    for (unsigned long int i = 0; i < tree_Result.get()->size(); ++i) {
+    /* for (unsigned long int i = 0; i < tree_Result.get()->size(); ++i) {
       std::cout << "[" << tree_Result.get()->at(i) << "]";
     }
-    std::cout << "\n";
+    std::cout << "\n"; */
 
     // Adds two vectors
     std::transform(result.begin(), result.end(), tree_Result->begin(),

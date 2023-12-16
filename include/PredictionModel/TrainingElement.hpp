@@ -49,7 +49,7 @@ struct TrainingElement {
 
   void train(const DataSet &data, IOperator *splitting_Operator, int max_Depth);
 
-  void set_Root(int dataset_Size, TreeNode *node);
+  void set_Root(int dataset_Size, TreeNode *node, float value);
   void bootstrap_Index(int dataset_Size);
 };
 

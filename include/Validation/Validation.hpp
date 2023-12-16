@@ -14,10 +14,10 @@ double compute_accuracy(BaggingModel &model, const DataSet &data) {
   
   std::cout << "\n===== PREDICTED RESULTS ===== \n";
   //std::vector<float> result = model.predict(test_DS);
-  for (auto idx : prediction) {
+  /* for (auto idx : prediction) {
     std::cout << "[" << idx << "]";
   }
-  std::cout << "\n"; 
+  std::cout << "\n";  */
 
   auto error = MAE::apply(exact, prediction);
   auto percentage_Error = MAPE::apply(exact, prediction);
