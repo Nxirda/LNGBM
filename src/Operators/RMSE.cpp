@@ -43,6 +43,7 @@ float RMSE::compute(int position, const DataSet &data,
 
   float right_RMSE = 0;
   float left_RMSE = 0;
+
   // Computes the split criteria, needs to be not hardcoded in the future
   float split_Criteria = data.column_Mean(position, index);
 

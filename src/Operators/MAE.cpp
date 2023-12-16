@@ -78,3 +78,19 @@ float MAE::compute(int position, const DataSet &data,
 
   return res;
 }
+
+/**/
+float MAE::apply(const std::vector<float> &exact,
+                 const std::vector<float> &prediction) {
+
+  float res = 0;
+  float size = prediction.size();
+  for (unsigned long int i = 0; i < exact.size(); ++i) {
+    res += std::abs(exact[i] - prediction[i]);
+  }
+
+  // Compute the MAE 
+  res = res /size;
+
+  return res;
+}

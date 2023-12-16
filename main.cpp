@@ -1,5 +1,6 @@
 #include "BaggingModel.hpp"
 #include "DataSet.hpp"
+#include "Validation.hpp"
 
 #include <stdio.h>
 
@@ -32,17 +33,20 @@ int main(int argc, char **argv) {
   DataSet test_DS{};
   test_DS.load("../data/datasets/d1_Test.csv");
 
-  model.train(DS, 10);
+  model.train(DS, 25);
 
-  auto result = model.predict(test_DS);
+  /* auto result = model.predict(test_DS);
 
-  
   std::cout << "\n ===== MAIN RESULTS ===== \n";
   //std::vector<float> result = model.predict(test_DS);
   for (auto idx : result) {
     std::cout << "[" << idx << "]";
   }
-  std::cout << "\n"; 
+  std::cout << "\n";  */
+
+  metric::compute_accuracy(model, test_DS);
+ /*  std::cout << "\n ===== ERROR ===== \n";
+  std::cout << " Mean Asbolute Error : " << error << "\n"; */
 
   return 0;
 }

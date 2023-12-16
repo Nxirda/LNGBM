@@ -76,7 +76,23 @@ float MAPE::compute(int position, const DataSet &data,
   left_MAPE *= 100;
   right_MAPE *= 100;
 
-  // Compute the result of MAE for the split at position
+  // Compute the result of MAPE for the split at position
   float res = (left_MAPE + right_MAPE) / base_Population;
+  return res;
+}
+
+/**/
+float MAPE::apply(const std::vector<float> &exact,
+                   const std::vector<float> &prediction) {
+
+  float res = 0;
+  float size = prediction.size();
+  for (unsigned long int i = 0; i < exact.size(); ++i) {
+    res += std::abs(exact[i] - prediction[i])/exact[i];
+  }
+
+  // Compute the MAPE
+  res = (res*100) / size;
+
   return res;
 }
