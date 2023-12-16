@@ -129,9 +129,11 @@ void DataSet::load(std::string file_Path) {
     std::vector<float> tmp;
     while (ss >> val) {
       // Ignore label column
-      if (!ss.eof())
+      if (ss.eof()) {
+        this->labels.push_back(val);
+      } else {
         tmp.push_back(val);
-
+      }
       if (ss.peek() == ',') {
         ss.ignore();
       }
@@ -140,8 +142,8 @@ void DataSet::load(std::string file_Path) {
     this->samples.push_back(tmp);
   }
 
-  std::cout << "DONT FORGET TO DELETE THIS IN LOAD FUNCTION\n";
-  this->labels = std::vector<float>(this->samples.size(), 0);
+  //std::cout << "DONT FORGET TO DELETE THIS IN LOAD FUNCTION\n";
+  //this->labels = std::vector<float>(this->samples.size(), 0);
 
   // Close file
   file.close();
@@ -239,6 +241,12 @@ Ouputs : vector<vector<float>>
 std::vector<std::vector<float>> DataSet::get_Samples() const {
   return this->samples;
 }
+
+/**/
+std::vector<float> DataSet::get_Labels() const{
+  return this->labels;
+}
+
 
 /**/
 std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
