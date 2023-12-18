@@ -1,5 +1,7 @@
 #include "BaggingModel.hpp"
 #include "DataSet.hpp"
+#include "Validation.hpp"
+#include "CrossValidation.hpp"
 
 #include <stdio.h>
 
@@ -27,33 +29,16 @@ int main(int argc, char **argv) {
 
   BaggingModel model{metric, depth};
 
-  // For testing on a cutted dataset
-  DataSet DS2{"../data/datasets/d1_Test.csv"};
+  DataSet DS{"../data/datasets/d1.csv"};
 
-  DataSet test_DS2{};
-  test_DS2.load("../data/datasets/d1_Test.csv");
+  //DataSet test_DS{};
+  //test_DS.load("../data/datasets/d1_Test.csv");
+  DataSet test_DS = DataSet::load("../data/datasets/d1_Test.csv");
+  
+  model.train(DS, 25);
+  
+  //metric::compute_accuracy(model, test_DS);
 
-  model.train(DS2, 1);
-
-  auto result = model.predict(test_DS2);
-  std::cout << "\n ===== MAIN RESULTS ===== \n";
-  for (auto idx : result) {
-    std::cout << "[" << idx << "]";
-  }
-  std::cout << "\n"; 
-
-  /* DataSet DS{"../data/datasets/d1.csv"};
-
-  DataSet test_DS{};
-  test_DS.load("../data/datasets/d1_Test.csv");
-
-  model.train(DS, 75);
-
-  std::vector<float> result = model.predict(test_DS);
-  for (auto idx : result) {
-    std::cout << "[" << idx << "]";
-  }
-  std::cout << "\n"; */
-
+  CrossValidation::K_Folds(model, DS, 5);
   return 0;
 }

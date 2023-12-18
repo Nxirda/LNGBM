@@ -23,4 +23,5 @@ target_include_directories(Source_Lib
     ${CMAKE_SOURCE_DIR}/include/Operators
     ${CMAKE_SOURCE_DIR}/include/PredictionModel
     ${CMAKE_SOURCE_DIR}/include/Tree
+    ${CMAKE_SOURCE_DIR}/include/Validation
 )

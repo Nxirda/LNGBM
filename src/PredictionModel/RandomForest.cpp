@@ -51,7 +51,7 @@ void RandomForest::generate_Forest(int size) {
 /**/
 std::vector<float> RandomForest::predict_Results(const DataSet &data) {
   int size = data.samples_Number();
-  std::vector<float> result(size);
+  std::vector<float> result(size, 0);
 
   // Computes the index
   std::vector<int> index(size);
@@ -61,16 +61,15 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
 
   // Iterate through the Forest
   for (unsigned long int i = 0; i < this->trees.size(); ++i) {
-    std::cout << "=== Iteration [" << i << "] ===\n";
     std::shared_ptr<std::vector<float>> tree_Result =
         std::make_shared<std::vector<float>>(size);
 
     // Computes the prediction for the current tree
     tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
-    for (unsigned long int i = 0; i < tree_Result.get()->size(); ++i) {
+    /* for (unsigned long int i = 0; i < tree_Result.get()->size(); ++i) {
       std::cout << "[" << tree_Result.get()->at(i) << "]";
     }
-    std::cout << "\n";
+    std::cout << "\n"; */
 
     // Adds two vectors
     std::transform(result.begin(), result.end(), tree_Result->begin(),
@@ -96,11 +95,11 @@ void RandomForest::tree_Prediction(const DataSet &data,
     result.get()->at(idx) = node->get_Predicted_Value();
   }
 
-  if (node->get_Left_Node()) {
+  if (node->get_Left_Node() && left_Index) {
     tree_Prediction(data, result, *left_Index, node->get_Left_Node());
   }
 
-  if (node->get_Right_Node()) {
+  if (node->get_Right_Node() && right_Index) {
     tree_Prediction(data, result, *right_Index, node->get_Right_Node());
   }
 }

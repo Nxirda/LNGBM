@@ -22,8 +22,9 @@ public:
   DataSet(std::string file_Path);
   DataSet(std::vector<std::string> features,
           std::vector<std::vector<float>> values, std::vector<float> labels);
+  DataSet(const DataSet &data, std::vector<int> idx);
 
-  void load(std::string file_Path);
+  static DataSet load(std::string file_Path);
 
   // Destructor
 
@@ -32,8 +33,14 @@ public:
   // Getters
 
   std::vector<std::string> get_Features() const;
+
   std::vector<std::vector<float>> get_Samples() const;
+  std::vector<std::vector<float>>
+  get_Samples(const std::vector<int> &idx) const;
+
+  std::vector<float> get_Labels() const;
   std::vector<float> get_Labels(const std::vector<int> &idx) const;
+  
   std::vector<float> get_Column(int position,
                                 const std::vector<int> &idx) const;
 
@@ -48,6 +55,7 @@ public:
   int samples_Number() const;
   int features_Length() const;
 
+  float whole_Labels_Mean() const;
   float labels_Mean(const std::vector<int> &idx) const;
   float labels_Variance(const std::vector<int> &idx) const;
   float column_Mean(int position, const std::vector<int> &idx) const;

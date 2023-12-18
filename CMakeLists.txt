@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #Add compilation options 
-add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3)
+add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
 
 #Add the subdirectory for the source files
 add_subdirectory(src)

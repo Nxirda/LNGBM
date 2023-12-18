@@ -48,8 +48,7 @@ BaggingModel::BaggingModel(std::string split_Metric, int max_Depth) {
     this->split_Metric = new RMSE();
     break;
   case (OperatorType::ReductionInVar):
-    this->split_Metric =
-        new ReductionInVar();
+    this->split_Metric = new ReductionInVar();
     break;
   default:
     std::cout << "Chosen metric is invalid \n" << std::endl;
@@ -64,14 +63,20 @@ Outputs :
 */
 BaggingModel::~BaggingModel() { delete (this->split_Metric); };
 
+/**/
+std::string BaggingModel::get_Metric(){
+  return this->metric;
+}
+
+/**/
+void BaggingModel::train(const DataSet &data) { train(data, this->max_Depth); }
+
 /*
 train the model on the DataSet with the operator and depth fixed
 Inputs  : const DataSet, int
 Outputs :
 */
 void BaggingModel::train(const DataSet &data, int n) {
-  std::cout << "=== " << this->metric << " ===\n";
-
   this->forest = RandomForest(data, this->split_Metric, n, this->max_Depth);
 
   this->forest.generate_Forest(n);
@@ -83,7 +88,7 @@ Inputs  : const DataSet
 Outputs :
 */
 std::vector<float> BaggingModel::predict(const DataSet &data) {
-  return this->forest.predict_Results(data); 
+  return this->forest.predict_Results(data);
 }
 
 /*

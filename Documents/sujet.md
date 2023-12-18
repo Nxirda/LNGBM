@@ -25,4 +25,4 @@ implémenter un ou plusieurs de ces algorithmes. Le projet se composera en deux 
     * (optionnel) Choix du format de stockage (float, double, short, int, long) et impact
     sur la performance et la précision
     Une attention particulière sera portée sur la qualité logicielle. Les données d'entraînement
-    seront mises à disposition par l'encadrant pendant le premier semestre.
+    seront mises à disposition par l'encadrant pendant le premier semestre. 
