@@ -63,17 +63,25 @@ float RMSE::compute(int position, const DataSet &data,
 
   // Computes the Mean Absolute Error for left child
   float left_Prediction = data.labels_Mean(left_index.value());
+  float left_Population = left_index.value().size();
   for (int idx : left_index.value()) {
-    left_RMSE += pow((abs(labels[idx] - left_Prediction)), 2);
+    left_RMSE += pow((std::abs(labels[idx] - left_Prediction)), 2);
   }
+  left_RMSE /= left_Population;
+  left_RMSE = sqrt(left_RMSE);
 
   // Computes the Mean Absolute Error for left child
   float right_Prediction = data.labels_Mean(right_index.value());
+  float right_Population = left_index.value().size();
   for (int idx : right_index.value()) {
-    right_RMSE += pow((abs(labels[idx] - right_Prediction)), 2);
+    right_RMSE += pow((std::abs(labels[idx] - right_Prediction)), 2);
   }
+  right_RMSE /= right_Population;
+  right_RMSE = sqrt(right_RMSE);
 
   // Compute the result of MAE for the split at position
-  float res = sqrt((left_RMSE + right_RMSE) / base_Population);
+  float res =
+      ((left_RMSE * left_Population) + (right_RMSE * right_Population)) /
+      base_Population;
   return res;
 }

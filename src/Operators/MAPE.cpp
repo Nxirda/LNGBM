@@ -63,36 +63,41 @@ float MAPE::compute(int position, const DataSet &data,
 
   // Computes the Mean Absolute Percentage Error for left child
   float left_Prediction = data.labels_Mean(left_index.value());
+  float left_Population = left_index.value().size();
   for (int idx : left_index.value()) {
-    left_MAPE += (abs(labels[idx] - left_Prediction)) / left_Prediction;
+    left_MAPE += (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
+  left_MAPE *= 100;
+  left_MAPE /= left_Population;
 
   // Computes the Mean Absolute Percentage Error for left child
   float right_Prediction = data.labels_Mean(right_index.value());
+  float right_Population = right_index.value().size();
   for (int idx : right_index.value()) {
-    right_MAPE += (abs(labels[idx] - right_Prediction)) / right_Prediction;
+    right_MAPE += (std::abs(labels[idx] - right_Prediction)) / right_Prediction;
   }
-
-  left_MAPE *= 100;
   right_MAPE *= 100;
+  right_MAPE /= right_Population;
 
   // Compute the result of MAPE for the split at position
-  float res = (left_MAPE + right_MAPE) / base_Population;
+  float res =
+      ((left_MAPE * left_Population) + (right_MAPE * right_Population)) /
+      base_Population;
   return res;
 }
 
 /**/
 float MAPE::apply(const std::vector<float> &exact,
-                   const std::vector<float> &prediction) {
+                  const std::vector<float> &prediction) {
 
   float res = 0;
   float size = prediction.size();
   for (unsigned long int i = 0; i < size; ++i) {
-    res += std::abs(exact[i] - prediction[i])/exact[i];
+    res += std::abs(exact[i] - prediction[i]) / exact[i];
   }
 
   // Compute the MAPE
-  res = (res*100) / size;
+  res = (res * 100) / size;
 
   return res;
 }

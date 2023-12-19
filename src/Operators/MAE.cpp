@@ -63,18 +63,23 @@ float MAE::compute(int position, const DataSet &data,
 
   // Computes the Mean Absolute Error for left child
   float left_Prediction = data.labels_Mean(left_index.value());
+  float left_Population = left_index.value().size();
   for (int idx : left_index.value()) {
-    left_MAE += abs(labels[idx] - left_Prediction);
+    left_MAE += std::abs(labels[idx] - left_Prediction);
   }
+  left_MAE /= left_Population;
 
   // Computes the Mean Absolute Error for right child
   float right_Prediction = data.labels_Mean(right_index.value());
+  float right_Population = right_index.value().size();
   for (int idx : right_index.value()) {
-    right_MAE += abs(labels[idx] - right_Prediction);
+    right_MAE += std::abs(labels[idx] - right_Prediction);
   }
+  right_MAE /= right_Population;
 
   // Compute the result of MAE for the split at position
-  float res = (left_MAE + right_MAE) / base_Population;
+  float res = ((left_MAE * left_Population) + (right_MAE * right_Population)) /
+              base_Population;
 
   return res;
 }
@@ -89,8 +94,8 @@ float MAE::apply(const std::vector<float> &exact,
     res += std::abs(exact[i] - prediction[i]);
   }
 
-  // Compute the MAE 
-  res = res /size;
+  // Compute the MAE
+  res = res / size;
 
   return res;
 }

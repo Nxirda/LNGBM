@@ -7,25 +7,26 @@
 #include <numeric>
 
 namespace metric {
-double compute_accuracy(BaggingModel &model, const DataSet &data) {
+/*
+Computes the accuracy of the given model
+Parameters : Prediction Model, DataSet
+Inputs     : BaggingModel, const DataSet
+Outputs    : double
+*/
+std::tuple<double, double> compute_accuracy(BaggingModel &model, const DataSet &data) {
 
   auto prediction = model.predict(data);
   auto exact = data.get_Labels();
   
   std::cout << "\n===== PREDICTED RESULTS ===== \n";
-  //std::vector<float> result = model.predict(test_DS);
-  /* for (auto idx : prediction) {
-    std::cout << "[" << idx << "]";
-  }
-  std::cout << "\n";  */
 
   auto error = MAE::apply(exact, prediction);
   auto percentage_Error = MAPE::apply(exact, prediction);
 
   std::cout << "===== ERROR =====\n";
-  std::cout << "MAE  : " << error << "\n";
-  std::cout << "MAPE : " << percentage_Error << "%\n";
-  return error;
+  std::cout << "Mean Absolute Error            : " << error << "\n";
+  std::cout << "Mean Absolute Percentage Error : " << percentage_Error << "%\n";
+  return std::make_tuple(error, percentage_Error);
 }
 
 }; // namespace metric
