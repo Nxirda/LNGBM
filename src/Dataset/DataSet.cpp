@@ -18,8 +18,9 @@
 /*
 Take the path of the file to read
 Instanciates an object of type DataSet from the given CSV
-Inputs : String
-Ouputs : Object of DataSet Class
+Parameters : file path
+Inputs     : String
+Ouputs     : Object of DataSet Class
 */
 DataSet::DataSet(std::string file_Path) {
   // input filestream
@@ -84,8 +85,9 @@ DataSet::DataSet(std::string file_Path) {
 /*
 Take the path of the file to read
 Instanciates an object of type DataSet from the given CSV
-Inputs : String
-Ouputs : Object of DataSet Class
+Parameters : file path
+Inputs     : String
+Ouputs     : Object of DataSet Class
 */
 DataSet DataSet::load(std::string file_Path) {
   // input filestream
@@ -143,9 +145,6 @@ DataSet DataSet::load(std::string file_Path) {
     ds.samples.push_back(tmp);
   }
 
-  // std::cout << "DONT FORGET TO DELETE THIS IN LOAD FUNCTION\n";
-  // this->labels = std::vector<float>(this->samples.size(), 0);
-
   // Close file
   file.close();
   return ds;
@@ -153,8 +152,9 @@ DataSet DataSet::load(std::string file_Path) {
 
 /*
 Explicit Constructor, takes two vectors and builds a DataSet Object
-Inputs : vector<string>, vector<vector<float>>
-Ouputs : Object of DataSet Class
+Parameters : features, samples, labels
+Inputs     : vector<string>, vector<vector<float>>
+Ouputs     : Object of DataSet Class
 */
 DataSet::DataSet(std::vector<std::string> features,
                  std::vector<std::vector<float>> samples,
@@ -164,7 +164,11 @@ DataSet::DataSet(std::vector<std::string> features,
   this->labels = labels;
 }
 
-/**/
+/*
+Constructor to copy partially a DataSet at the given indexes
+Parameters : Dataset, index
+Inputs     : const DataSet,  vector<int>
+*/
 DataSet::DataSet(const DataSet &data, std::vector<int> idx) {
   this->features = data.get_Features();
   this->samples = data.get_Samples(idx);
@@ -173,8 +177,9 @@ DataSet::DataSet(const DataSet &data, std::vector<int> idx) {
 
 /*
 Default Constructor
-Inputs :
-Ouputs : Object of DataSet Class
+Parameters :
+Inputs     :
+Ouputs     : Object of DataSet Class
 */
 DataSet::DataSet() {
   this->labels = std::vector<float>();
@@ -182,15 +187,19 @@ DataSet::DataSet() {
   this->samples = std::vector<std::vector<float>>();
 }
 
-/* Default Destructor */
-/* Inputs :           */
-/* Ouputs :           */
+/*
+Default Destructor
+Parameters :
+Inputs     :
+Ouputs     :
+*/
 DataSet::~DataSet() {}
 
 /*
 Naive print function of the DataSet
-Inputs :
-Ouputs :
+Parameters :
+Inputs     :
+Ouputs     :
 */
 void DataSet::print() const {
   // Logical but prints the features
@@ -213,8 +222,9 @@ void DataSet::print() const {
 /*
 Print function of the DataSet with Index
 Used by TreeNode Class
-Inputs : vector<int>
-Ouputs :
+Parameters : index
+Inputs     : vector<int>
+Ouputs     :
 */
 void DataSet::print_With_Index(std::vector<int> idx) const {
   // Logical but prints the features
@@ -235,8 +245,9 @@ void DataSet::print_With_Index(std::vector<int> idx) const {
 
 /*
 Returns the features of the DataSet
-Inputs :
-Ouputs : vector<string>
+Parameters :
+Inputs     :
+Ouputs     : vector<string>
 */
 std::vector<std::string> DataSet::get_Features() const {
   return this->features;
@@ -244,14 +255,20 @@ std::vector<std::string> DataSet::get_Features() const {
 
 /*
 Returns the Values of the DataSet
-Inputs :
-Ouputs : vector<vector<float>>
+Parameters :
+Inputs     :
+Ouputs     : vector<vector<float>>
 */
 std::vector<std::vector<float>> DataSet::get_Samples() const {
   return this->samples;
 }
 
-/**/
+/*
+Returns the Samples of the DataSet at a given index
+Parameters : index
+Inputs     : const vector<int>
+Outputs    : vector<vector<float>>
+*/
 std::vector<std::vector<float>>
 DataSet::get_Samples(const std::vector<int> &idx) const {
   std::vector<std::vector<float>> res;
@@ -268,10 +285,20 @@ DataSet::get_Samples(const std::vector<int> &idx) const {
   return res;
 }
 
-/**/
+/*
+Returns all the labels of the DataSet
+Parameters :
+Inputs     :
+Outputs    : vector<float>
+*/
 std::vector<float> DataSet::get_Labels() const { return this->labels; }
 
-/**/
+/*
+Return the labels of the DataSet at a given index
+Parameters : index
+Inputs     : const vector<int>
+Outputs    : vector<float>
+*/
 std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
   std::vector<float> Col(0);
   // No idx
@@ -289,36 +316,41 @@ std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
 
 /*
 Return True if there are no values in the DataSet
-Inputs
-Ouputs : boolean
+Parameters :
+Inputs     :
+Ouputs     : boolean
 */
 bool DataSet::empty() const { return this->samples.empty(); }
 
 /*
 Return the length (= number of features) of the DataSet
-Inputs :
-Ouputs : int
+Parameters :
+Inputs     :
+Ouputs     : int
 */
 int DataSet::features_Length() const { return this->features.size(); }
 
 /*
 Return the height (= number of samples) of the DataSet
-Inputs :
-Ouputs : int
+Parameters :
+Inputs     :
+Ouputs     : int
 */
 int DataSet::samples_Number() const { return this->samples.size(); }
 
 /*
 Return the quantity of the DataSet's labels
-Inputs :
-Ouputs : int
+Parameters :
+Inputs     :
+Ouputs     : int
 */
 int DataSet::labels_Number() const { return this->labels.size(); }
 
 /*
 Returns the specified column of the dataset
-Inputs : int
-Ouputs : vector<float>
+Parameters : column, index
+Inputs     : int, const vector<int>
+Ouputs     : vector<float>
 */
 std::vector<float> DataSet::get_Column(int position,
                                        const std::vector<int> &idx) const {
@@ -344,10 +376,11 @@ std::vector<float> DataSet::get_Column(int position,
 }
 
 /*
-Return 2 vector which contains the index of each subtree datasets after
-split, which is based on the criteria on a row at the col position
-Inputs : int, float
-Ouputs : vector<vector<int>>
+Return 2 vector which contains the index of each subtree datasets after split
+Split is based on the criteria on a row at the column specified by position
+Parameters : position, criterion, index
+Inputs     : int, float, constvector<int>
+Ouputs     : tuple<optional<vector<int>, optional<vector<int>>
 */
 std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
 DataSet::split(int position, float criterion,
@@ -378,8 +411,9 @@ DataSet::split(int position, float criterion,
 
 /*
 Computes the Mean of a given Column of the DataSet
-Inputs  : int
-Outputs : float
+Parameters : position, index
+Inputs     : int, const vector<int>
+Outputs    : float
 */
 float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
 
@@ -408,8 +442,9 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
 
 /*
 Computes the Mean of the values of the DataSet's labels
-Inputs  : const vector<int>
-Outputs : float
+Parameters : index
+Inputs     : const vector<int>
+Outputs    : float
 */
 float DataSet::labels_Mean(const std::vector<int> &idx) const {
   float mean = -1;
@@ -431,7 +466,12 @@ float DataSet::labels_Mean(const std::vector<int> &idx) const {
   return (mean);
 }
 
-/**/
+/*
+Computes the mean of all the labels of the DataSet
+Parameters : 
+Inputs     :
+Outputs    : float
+*/
 float DataSet::whole_Labels_Mean() const {
   float mean = -1;
 
@@ -451,8 +491,9 @@ float DataSet::whole_Labels_Mean() const {
 /*
 Computes the Variance of the  DataSet on the labels
 idx represents the index that the object above can use
-Inputs  : std:vector<int>
-Outputs : float
+Parameters : index
+Inputs     : const vector<int>
+Outputs    : float
 */
 float DataSet::labels_Variance(const std::vector<int> &idx) const {
   // No index
