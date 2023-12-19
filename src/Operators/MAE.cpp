@@ -11,23 +11,26 @@
 
 /*
 Constructor
-Inputs  : DecisionTree*
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 MAE::MAE() {}
 
 /*
 Destructor
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 MAE::~MAE() {}
 
 /*
 Print function to see the name of the operator
 (For debugging mainly)
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 void MAE::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
@@ -35,8 +38,10 @@ void MAE::print() {
 
 /*
 Computes the Mean Absolute Error of a split on a given column
-Inputs  : int
-Outputs : float
+Index is used to get the column of the dataset that can be accessed
+Parameters : position, DataSet, index
+Inputs     : int, DataSet, vector<int>
+Outputs    : float
 */
 float MAE::compute(int position, const DataSet &data,
                    std::vector<int> index) const {
@@ -84,7 +89,12 @@ float MAE::compute(int position, const DataSet &data,
   return res;
 }
 
-/**/
+/*
+Computes the MAE of two vectors
+Parameters : exact results, prediction results
+Inputs     : const vector<float>, const vector<float>
+Outputs    : float
+*/
 float MAE::apply(const std::vector<float> &exact,
                  const std::vector<float> &prediction) {
 

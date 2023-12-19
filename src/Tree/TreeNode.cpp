@@ -8,8 +8,9 @@
 
 /*
 Default Constructor
-Inputs  :
-Outputs : Object of TreeNode Class
+Parameters :
+Inputs     :
+Outputs    : 
 */
 TreeNode::TreeNode() {
   this->split_Column = -1;
@@ -19,7 +20,12 @@ TreeNode::TreeNode() {
   this->right = nullptr;
 }
 
-/**/
+/*
+Constructor of Tree Node with parameters
+Parameters : column, criterion, predicted value
+Inputs     : int, floatt, float
+Outputs    : 
+ */
 TreeNode::TreeNode(int split_Column, float split_Criterion,
                    float predicted_Value) {
   this->split_Column = split_Column;
@@ -27,7 +33,12 @@ TreeNode::TreeNode(int split_Column, float split_Criterion,
   this->predicted_Value = predicted_Value;
 }
 
-/**/
+/*
+COnstructor that copies a Node
+Parameters : Tree Node
+Inputs     : const TreeNode
+Outputs    : 
+*/
 TreeNode::TreeNode(const TreeNode &node) {
   this->split_Column = node.split_Column;
   this->split_Criterion = node.split_Criterion;
@@ -48,19 +59,17 @@ TreeNode::TreeNode(const TreeNode &node) {
 
 /*
 Default Destructor
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 TreeNode::~TreeNode() {}
 
-/* void TreeNode::node_Print(){
-  std::cout << this.sp
-} */
-
 /*
 Override "=" operator
-Inputs  : Object of TreeNode Class
-Outputs : Object of TreeNode Class
+Parameters : TreeNode
+Inputs     : const TreeNode
+Outputs    :
 */
 TreeNode &TreeNode::operator=(const TreeNode &tn) {
 
@@ -85,16 +94,18 @@ TreeNode &TreeNode::operator=(const TreeNode &tn) {
 
 /*
 Sets the column of the DataSet which this node should split
-Inputs  : int
-Outputs :
+Parameters : column
+Inputs     : int
+Outputs    :
 */
 void TreeNode::set_Split_Column(int col) { this->split_Column = col; }
 
 /*
 Sets the value in the split column that is used to split at
 this Node
-Inputs  : float
-Outputs :
+Parameters : criterion
+Inputs     : float
+Outputs    :
 */
 void TreeNode::set_Split_Criterion(float criterion) {
   this->split_Criterion = criterion;
@@ -102,54 +113,78 @@ void TreeNode::set_Split_Criterion(float criterion) {
 
 /*
 Sets the value we predicted for this Node with the split
-Inputs  : float
-Outputs :
+Parameters : predicted value
+Inputs     : float
+Outputs    :
 */
 void TreeNode::set_Predicted_Value(float value) {
   this->predicted_Value = value;
 }
 
-/**/
+/*
+Adds a left node to the left pointer
+Parameters : Tree Node
+Inputs     : unique_ptr<TreeNode>
+Outputs    :
+*/
 void TreeNode::add_Left(std::unique_ptr<TreeNode> Node) {
   this->left = std::move(Node);
 }
 
-/**/
+/*
+Adds a right node to the right pointer
+Parameters : Tree Node
+Inputs     : unique_ptr<TreeNode>
+Outputs    :
+*/
 void TreeNode::add_Right(std::unique_ptr<TreeNode> Node) {
   this->right = std::move(Node);
 }
 
 /*
 Get the split criteria to split on at this node
-Inputs  :
-Outputs : float
+Parameters : 
+Inputs     :
+Outputs    : float
 */
 float TreeNode::get_Split_Criterion() const { return this->split_Criterion; }
 
 /*
 Get the column to split on at this node
-Inputs  :
-Outputs : int
+Parameters : Tree Node
+Inputs     :
+Outputs    : int
 */
 int TreeNode::get_Split_Column() const { return this->split_Column; }
 
 /*
 Get the value we expect of the split at this node
-Inputs  :
-Outputs : float
+Parameters : 
+Inputs     :
+Outputs    : float
 */
 float TreeNode::get_Predicted_Value() const { return this->predicted_Value; }
 
-/**/
+/*
+Returns a pointer to the left node of the current node
+Parameters : 
+Inputs     :
+Outputs    : TreeNode*
+*/
 TreeNode *TreeNode::get_Left_Node() const { return this->left.get(); }
 
-/**/
+/*
+Returns a pointer to the right node of the current node
+Parameters : 
+Inputs     :
+Outputs    : TreeNode**/
 TreeNode *TreeNode::get_Right_Node() const { return this->right.get(); }
 
 /*
 Print for debugging mainly
-Inputs  :
-Outputs :
+Parameters : 
+Inputs     :
+Outputs    :
 */
 void TreeNode::node_Print_Criterion() {
   // std::cout << "-> Split Column is : " << this->split_Column << "\n";

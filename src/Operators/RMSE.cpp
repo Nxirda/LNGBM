@@ -11,23 +11,26 @@
 
 /*
 Constructor
-Input  : DecisionTree*
-Output :
+Parameters :
+Input      :
+Output     :
 */
 RMSE::RMSE() {}
 
 /*
 Destructor
-Input  :
-Output :
+Parameters :
+Input      :
+Output     :
 */
 RMSE::~RMSE() {}
 
 /*
 Print function to see the name of the operator
 (For debugging mainly)
-Input  :
-Output :
+Parameters :
+Input      :
+Output     :
 */
 void RMSE::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
@@ -35,8 +38,10 @@ void RMSE::print() {
 
 /*
 Computes the Root Mean Square Error of a split on a given column
-Inputs  : int
-Outputs : float
+Index is used to get the column of the dataset that can be accessed
+Parameters : position, DataSet, index
+Inputs     : int, DataSet, vector<int>
+Outputs    : float
 */
 float RMSE::compute(int position, const DataSet &data,
                     std::vector<int> index) const {

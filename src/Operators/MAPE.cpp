@@ -11,23 +11,26 @@
 
 /*
 Constructor
-Inputs  : DecisionTree*
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 MAPE::MAPE() {}
 
 /*
 Destructor
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 MAPE::~MAPE() {}
 
 /*
 Print function to see the name of the operator
 (For debugging mainly)
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 void MAPE::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
@@ -35,8 +38,10 @@ void MAPE::print() {
 
 /*
 Computes the Mean Absolute Percentage Error of a split on a given column
-Inputs  : int
-Outputs : float
+Index is used to get the column of the dataset that can be accessed
+Parameters : position, DataSet, index
+Inputs     : int, DataSet, vector<int>
+Outputs    : float
 */
 float MAPE::compute(int position, const DataSet &data,
                     std::vector<int> index) const {
@@ -86,7 +91,12 @@ float MAPE::compute(int position, const DataSet &data,
   return res;
 }
 
-/**/
+/*
+Computes the MAPE of two vectors
+Parameters : exact results, prediction results
+Inputs     : const vector<float>, const vector<float>
+Outputs    : float
+*/
 float MAPE::apply(const std::vector<float> &exact,
                   const std::vector<float> &prediction) {
 
