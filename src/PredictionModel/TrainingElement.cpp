@@ -3,8 +3,9 @@
 
 /*
 Default Constructor
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 TrainingElement::TrainingElement() {
   this->depth = 0;
@@ -12,7 +13,12 @@ TrainingElement::TrainingElement() {
   this->node = nullptr;
 }
 
-/**/
+/*
+Constructor to set up the node of the training element
+Parameters : Node, index, depth
+Inputs     : TreeNode*, const vector<int>, int
+Outputs    :
+*/
 TrainingElement::TrainingElement(TreeNode *node, std::vector<int> const index,
                                  int depth) {
   this->node = node;
@@ -20,26 +26,56 @@ TrainingElement::TrainingElement(TreeNode *node, std::vector<int> const index,
   this->depth = depth;
 }
 
-/**/
+/*
+Destructor
+Parameters :
+Inputs     :
+Outputs    :
+*/
 TrainingElement::~TrainingElement(){};
 
-/**/
+/*
+Returns the index the TrainingElement can access
+Parameters :
+Inputs     :
+Outputs    : vector<int>
+*/
 std::vector<int> TrainingElement::get_Index() { return this->index; }
 
-/**/
+/*
+Sets the node pointer to a given node
+Parameters : node
+Inputs     : TreeNode*
+Outputs    :
+*/
 void TrainingElement::set_Node(TreeNode *node) { this->node = node; }
 
-/**/
+/*
+Sets the index
+Parameters : index
+Inputs     : vector<int>
+Outputs    :
+*/
 void TrainingElement::set_Index(std::vector<int> index) { this->index = index; }
 
-/**/
+/*
+Sets the depth
+Parameters : depth
+Inputs     : int
+Outputs    :
+*/
 void TrainingElement::set_depth(int depth) { this->depth = depth; }
 
-/**/
+/*
+Sets the root element (First node of the tree)
+Parameters : DataSet size, TreeNode, predicted value
+Inputs     : int, TreeNode*, float
+Outputs    :
+*/
 void TrainingElement::set_Root(int dataset_Size, TreeNode *node, float value) {
   this->depth = 0;
 
-  // Computes the index for the given DataSet 
+  // Computes the index for the given DataSet
   std::vector<int> idx(dataset_Size);
   for (int i = 0; i < dataset_Size; ++i) {
     idx[i] = i;
@@ -50,7 +86,12 @@ void TrainingElement::set_Root(int dataset_Size, TreeNode *node, float value) {
   this->node->set_Predicted_Value(value);
 }
 
-/**/
+/*
+Bootstraps the index of a node by sort of shuffling it
+Parameters : DataSet size
+Inputs     : int
+Outputs    :
+*/
 void TrainingElement::bootstrap_Index(int dataset_Size) {
   std::vector<int> idx(dataset_Size);
   for (int i = 0; i < dataset_Size; ++i) {
@@ -62,8 +103,9 @@ void TrainingElement::bootstrap_Index(int dataset_Size) {
 /*
 Search for the best feature to split the dataset on at a given Node
 Gives the split criterion at the same time
-Inputs : Dataset, TrainingElem, IOperator
-Ouputs : tuple<int, float>
+Parameters : Dataset, Element, Splitting operator
+Inputs     : const DataSet, TrainingElem* , IOperator*
+Ouputs     : tuple<int, float>
 */
 std::tuple<int, float>
 TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
@@ -75,6 +117,7 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
 
   std::vector<std::string> features = data.get_Features();
 
+  // Minimize the error by trying multiple splits
   for (unsigned long int i = 0; i < features.size(); ++i) {
     float tmp_var = splitting_Operator->compute(i, data, elem->index);
 
@@ -83,11 +126,17 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
       best_Feature = i;
     }
   }
+
   float criterion = data.column_Mean(best_Feature, elem->index);
   return std::make_tuple(best_Feature, criterion);
 }
 
-/**/
+/*
+Returns two vectors containing the indexes of each sub dataset after splitting
+Parameters : Dataset, criterion, position, element
+Inputs     : const DataSet, int, int, TrainingElement*
+Outputs    : tuple<optional<vector<int>>, optional<vector<int>>>
+*/
 std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
 TrainingElement::split_Index(const DataSet &data, int criterion, int position,
                              TrainingElement *elem) {
@@ -100,9 +149,10 @@ TrainingElement::split_Index(const DataSet &data, int criterion, int position,
 }
 
 /*
-Splits the Node according to the specified operator
-Inputs  : DataSet, TrainingElement, IOperator*, int
-Outputs : tuple<optional<TrainingElement>, <optional<TrainingElement>>
+Splits the element according to the specified operator
+Parameters : Dataset, element, operator
+Inputs     : const DataSet, TrainingElement*, IOperator*, int
+Outputs    : tuple<optional<TrainingElement>, <optional<TrainingElement>>
 */
 std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
 TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
@@ -162,7 +212,13 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   return {std::nullopt, std::nullopt};
 }
 
-/**/
+/*
+Train the model by splitting nodes till they have reach max Depth or dont bring
+informations
+Parameters : Dataset, operator, max depth
+Inputs     : const DataSet, IOperator*, int
+Outputs    : 
+*/
 void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
                             int max_Depth) {
   // Initialize the stack of Node that will be splitted
@@ -188,6 +244,6 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
     }
     if (right) {
       remaining.push(*right);
-    } 
+    }
   }
 }

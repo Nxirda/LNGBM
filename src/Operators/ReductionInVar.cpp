@@ -11,36 +11,40 @@
 
 /*
 Constructor
-Inputs  : DecisionTree*
-Outputs :
+Parameters :
+Inputs     : 
+Outputs    :
 */
 ReductionInVar::ReductionInVar() {}
 
 /*
 Destructor
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 ReductionInVar::~ReductionInVar() {}
 
 /*
 Print function to see the name of the operator
 (For debugging mainly)
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 void ReductionInVar::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
 }
 
 /*
-Returns the variance of a split as the weighted average
-variance of child nodes
-Inputs  : int
-Outputs : float
+Computes the Variance of a split on a given column
+Index is used to get the column of the dataset that can be accessed
+Parameters : position, DataSet, index
+Inputs     : int, DataSet, vector<int>
+Outputs    : float
 */
 float ReductionInVar::compute(int position, const DataSet &data,
-                                    std::vector<int> index) const {
+                              std::vector<int> index) const {
 
   // Computes the split criteria, needs to be not hardcoded in the future
   float split_Criteria = data.column_Mean(position, index);
