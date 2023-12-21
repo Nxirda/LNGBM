@@ -45,5 +45,5 @@ cmake-build-*
 *.out
 *.app
 
-# Datafiles generated for quick benchmarks
+# Specific to the project
 *.dat

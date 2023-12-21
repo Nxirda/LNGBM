@@ -26,6 +26,20 @@ cd build
 # This is temporary till we have a stable version
 ```
 
+## Tests : 
+
+If you want to make sure everything has been done properly you
+can run the tests :
+
+- Refer to the Readme in the test directory
+
+## Benchmarks : 
+
+If you want to benchmark your model you can run the benchmarks :
+
+- Refer to the Readme in the Benchmark directory
+
+
 ## Authors :
 [Adrien Henrot](https://github.com/Nxirda) \
 [Valentin Denis](https://github.com/valde3003)  \
