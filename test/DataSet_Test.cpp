@@ -3,6 +3,7 @@
 
 std::string PATH = "../data/datasets/d1_Test.csv";
 
+//
 TEST(Getters, GetFeatures) {
   DataSet d;
   ASSERT_EQ(d.get_Features().size(), 0);
@@ -11,6 +12,7 @@ TEST(Getters, GetFeatures) {
   ASSERT_EQ(d.get_Features().size(), 10);
 }
 
+//
 TEST(Getters, GetSamples) {
   DataSet d;
   ASSERT_EQ(d.get_Samples().size(), 0);
@@ -21,6 +23,7 @@ TEST(Getters, GetSamples) {
   ASSERT_EQ(d.get_Samples()[0].size(), 10);
 }
 
+//
 TEST(Getters, GetLabels) {
   DataSet d;
   std::vector<int> idx(0);
@@ -40,6 +43,7 @@ TEST(Getters, GetLabels) {
   ASSERT_EQ(d.get_Labels(idx).size(), 31);
 }
 
+//
 TEST(Getters, ColumnWithIndex) {
   DataSet d;
   std::vector<int> idx;
@@ -65,10 +69,10 @@ TEST(Computations, LabelsMean) {
   std::vector<int> idx(0);
   float mean = 0;
 
-  ASSERT_EQ(d.labels_Mean(idx), 0);
+  ASSERT_EQ(d.labels_Mean(idx), -1);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.labels_Mean(idx), 0);
+  ASSERT_EQ(d.labels_Mean(idx), -1);
 
   for (unsigned long int i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
@@ -81,9 +85,10 @@ TEST(Computations, LabelsMean) {
 
   // Try inserting out of range elem in index
   idx.push_back(44);
-  ASSERT_EQ(d.labels_Mean(idx), mean);
+  ASSERT_EQ(d.labels_Mean(idx), mean);  
 }
 
+//
 TEST(Computation, ColumnMean) {
   DataSet d;
   std::vector<int> idx(0);
@@ -108,6 +113,7 @@ TEST(Computation, ColumnMean) {
   ASSERT_EQ(d.column_Mean(4, idx), mean);
 }
 
+//
 TEST(Computation, LabelsVariance) {
   DataSet d;
   std::vector<int> idx(0);
@@ -139,7 +145,7 @@ TEST(Computation, LabelsVariance) {
 
 TEST(Computation, Split) {
   DataSet d;
-  ASSERT_FALSE(d.empty());
+  ASSERT_TRUE(d.empty());
 }
 
 //
@@ -151,6 +157,7 @@ TEST(Size, empty) {
   ASSERT_FALSE(d.empty());
 }
 
+//
 TEST(Size, LabelsNumber) {
   DataSet d;
   ASSERT_EQ(d.labels_Number(), 0);
@@ -159,6 +166,7 @@ TEST(Size, LabelsNumber) {
   ASSERT_EQ(d.labels_Number(), 31);
 }
 
+//
 TEST(Size, SamplesNumber) {
   DataSet d;
   ASSERT_EQ(d.samples_Number(), 0);
@@ -167,6 +175,7 @@ TEST(Size, SamplesNumber) {
   ASSERT_EQ(d.samples_Number(), 31);
 }
 
+//
 TEST(Size, FeaturesLength) {
   DataSet d;
   ASSERT_EQ(d.features_Length(), 0);

@@ -29,7 +29,11 @@ find_package(GTest REQUIRED)
 #To be able to launch tests with ctest
 enable_testing()
 
-add_executable(Tests test/DataSet_Test.cpp src/)
+add_executable(Tests test/DataSet_Test.cpp 
+                    test/DecisionTree_Test.cpp 
+                    test/TreeNode_Test.cpp 
+                    src/
+)
 
 add_test(myTest Tests)
 

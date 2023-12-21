@@ -1,7 +1,7 @@
 #include "BaggingModel.hpp"
+#include "CrossValidation.hpp"
 #include "DataSet.hpp"
 #include "Validation.hpp"
-#include "CrossValidation.hpp"
 
 #include <stdio.h>
 
@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     std::cout << "\n";
     std::cout << "== Split Metrics Available are ==\n";
     BaggingModel m{};
-    m.print_Available_Operators(); 
+    m.print_Available_Operators();
     return 1;
   }
 
@@ -31,13 +31,13 @@ int main(int argc, char **argv) {
 
   DataSet DS{"../data/datasets/d1.csv"};
 
-  //DataSet test_DS{};
-  //test_DS.load("../data/datasets/d1_Test.csv");
-  //DataSet test_DS = DataSet::load("../data/datasets/d1_Test.csv");
-  
+  // DataSet test_DS{};
+  // test_DS.load("../data/datasets/d1_Test.csv");
+  // DataSet test_DS = DataSet::load("../data/datasets/d1_Test.csv");
+
   model.train(DS, 25);
-  
-  //metric::compute_accuracy(model, test_DS);
+
+  // metric::compute_accuracy(model, test_DS);
 
   CrossValidation::K_Folds(model, DS, 5);
   return 0;
