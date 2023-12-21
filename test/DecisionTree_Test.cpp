@@ -15,77 +15,73 @@ TEST_F(DecisionTreeTest, DefaultConstructor)
 
 TEST_F(DecisionTreeTest, CopyConstructor) 
 {
+    std::unique_ptr<TreeNode> node = std::make_unique<TreeNode>(1, 1.5, 2.0);
     DecisionTree tree1;
-    tree1.set_Root(new TreeNode(1, 1.5, 2.0));
+    tree1.set_Root(std::move(node));
     DecisionTree tree2(tree1);
     EXPECT_NE(tree2.get_Root(), nullptr);
-    EXPECT_EQ(tree2.get_Root()->getSplitColumn(), 1);
+    EXPECT_EQ(tree2.get_Root()->get_Split_Column(), 1);
 }
 
 TEST_F(DecisionTreeTest, AssignmentOperator) 
 {
+    std::unique_ptr<TreeNode> node = std::make_unique<TreeNode>(1, 1.5, 2.0);
     DecisionTree tree1;
-    tree1.set_Root(new TreeNode(1, 1.5, 2.0));
+    tree1.set_Root(std::move(node));
     DecisionTree tree2;
     tree2 = tree1;
     EXPECT_NE(tree2.get_Root(), nullptr);
-    EXPECT_EQ(tree2.get_Root()->getSplitColumn(), 1);
+    EXPECT_EQ(tree2.get_Root()->get_Split_Column(), 1);
 }
 
 TEST_F(DecisionTreeTest, Destructor) 
 {
     DecisionTree* tree = new DecisionTree();
-    tree->set_Root(new TreeNode());
+    tree->set_Root(std::make_unique<TreeNode>());
     delete tree;
-
 }
 
 TEST_F(DecisionTreeTest, GetRoot) 
 {
+    std::unique_ptr<TreeNode> node = std::make_unique<TreeNode>(1, 1.5, 2.0);
     DecisionTree tree;
-    tree.set_Root(new TreeNode(1, 1.5, 2.0));
+    tree.set_Root(std::move(node));
     EXPECT_NE(tree.get_Root(), nullptr);
 }
 
 TEST_F(DecisionTreeTest, SetRoot) 
 {
+    std::unique_ptr<TreeNode> node = std::make_unique<TreeNode>(2, 2.5, 3.0);
     DecisionTree tree;
-    tree.set_Root(new TreeNode(2, 2.5, 3.0));
+    tree.set_Root(std::move(node));
     EXPECT_NE(tree.get_Root(), nullptr);
-    EXPECT_EQ(tree.get_Root()->getSplitColumn(), 2);
+    EXPECT_EQ(tree.get_Root()->get_Split_Column(), 2);
 }
 
-TEST_F(DecisionTreeTest, InsertNode) 
+
+TEST_F(DecisionTreeTest, TreeNodeOperations) 
 {
+    std::unique_ptr<TreeNode> root = std::make_unique<TreeNode>(1, 1.5, 2.0);
+    std::unique_ptr<TreeNode> leftChild = std::make_unique<TreeNode>(2, 2.5, 3.0);
+    std::unique_ptr<TreeNode> rightChild = std::make_unique<TreeNode>(3, 3.5, 4.0);
+    
+    root->add_Left(std::move(leftChild));
+    root->add_Right(std::move(rightChild));
+
     DecisionTree tree;
-    tree.insert(3, 3.5, 4.0);
+    tree.set_Root(std::move(root));
+
     EXPECT_NE(tree.get_Root(), nullptr);
+    EXPECT_NE(tree.get_Root()->get_Left_Node(), nullptr);
+    EXPECT_NE(tree.get_Root()->get_Right_Node(), nullptr);
 }
 
-TEST_F(DecisionTreeTest, DeleteNode) 
+TEST_F(DecisionTreeTest, PrintTree) 
 {
     DecisionTree tree;
-    tree.insert(3, 3.5, 4.0);
-    tree.delete(3);
-
-}
-
-TEST_F(DecisionTreeTest, SearchNode) 
-{
-    DecisionTree tree;
-    tree.insert(4, 4.5, 5.0);
-    TreeNode* node = tree.search(4);
-    EXPECT_NE(node, nullptr);
-
-}
-
-TEST_F(DecisionTreeTest, TraverseTree) 
-{
-    DecisionTree tree;
-    tree.insert(5, 5.5, 6.0);
-    std::vector<TreeNode*> nodes = tree.inorder();
-    EXPECT_FALSE(nodes.empty());
-
+    std::unique_ptr<TreeNode> node = std::make_unique<TreeNode>(1, 1.5, 2.0);
+    tree.set_Root(std::move(node));
+    EXPECT_NO_THROW(tree.print_Tree());
 }
 
 
