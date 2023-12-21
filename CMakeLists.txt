@@ -18,9 +18,6 @@ add_subdirectory(src)
 #Add the executable
 add_executable(Projet_run main.cpp)
 
-#Add the headers
-#target_include_directories(Projet_run PUBLIC include/ )
-
 #Add the Libraries
 target_link_libraries(Projet_run PUBLIC Source_Lib)
 
@@ -48,10 +45,11 @@ gtest_discover_tests(Tests)
 
 # ===== Benchmark Part =====
 
-add_executable(Benchmarks Benchmark/Benchmark.cpp)
+add_executable(Benchmarks Benchmark/mainBenchmark.cpp)
 
 add_subdirectory(Benchmark)
 
-target_link_libraries(Benchmarks PUBLIC Source_Lib)
+target_link_libraries(Benchmarks PUBLIC Benchmark_Lib)
+
 
 

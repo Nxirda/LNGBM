@@ -31,31 +31,42 @@ std::vector<int> compute_Train(std::vector<int> global_Index,
 }
 
 /*
-Computes indexes for the DataSet folds for the validation metric
+Computes indexes for the folds on the DataSet
 Parameters : Global index, Total size of DataSet, K (nb of folds)
 Inputs     : const vector<int>, int, int
-Outputs    : vector<vector<int>>
+Outputs    : tuple<vector<vector<int>>, vector<vector<int>>>
 */
-std::vector<std::vector<int>>
+std::tuple<std::vector<std::vector<int>>, std::vector<std::vector<int>>>
 compute_Folds(const std::vector<int> &global_Index, int total_Size, int K) {
-
-  std::vector<std::vector<int>> folds(K);
-
   int foldSize = total_Size / K;
-  int extra = total_Size % K;
-  int dataIndex = 0;
+  // int extra = total_Size % K;
+  // int dataIndex = 0;
 
-  for (int i = 0; i < K; ++i) {
-    int foldCount = (i < extra) ? foldSize + 1 : foldSize;
-    std::vector<int> fold;
+  std::vector<std::vector<int>> test_Folds(K);
+  std::vector<std::vector<int>> train_Folds(K);
 
-    for (int j = 0; j < foldCount; ++j) {
-      fold.push_back(global_Index[dataIndex++]);
+  for (int j = 0; j < K; ++j) {
+    std::vector<int> test_Folds_Construct(foldSize);
+    int test_Curr_Index = 0;
+
+    std::vector<int> train_Folds_Construct(total_Size - foldSize);
+    int train_Curr_Index = 0;
+
+    int upper_Bound = (j + 1) * foldSize;
+    int lower_Bound = j * foldSize;
+
+    for (int i = 0; i < total_Size; ++i) {
+      if (i > lower_Bound && i < upper_Bound) {
+        test_Folds_Construct[test_Curr_Index] = global_Index[i];
+      } else {
+        train_Folds_Construct[train_Curr_Index] = global_Index[i];
+      }
     }
 
-    folds[i] = fold;
+    test_Folds[j] = test_Folds_Construct;
+    train_Folds[j] = train_Folds_Construct;
   }
-  return folds;
+  return std::make_tuple(test_Folds, train_Folds);
 }
 
 /*
@@ -64,8 +75,8 @@ Parameters : Prediction Model, DataSet, K
 Inputs     : BaggingModel, const DataSet, int
 Outputs    : double
 */
-std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data, int K) {
-  std::cout << "===== METRIC : " << model.get_Metric() << " =====\n";
+std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
+                                   int K) {
   if (K == 0) {
     return {};
   }
@@ -80,25 +91,22 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data, int
     global_Index[i] = i;
   }
 
-  // Computes the index of the folds
-  std::vector<std::vector<int>> folds =
-      compute_Folds(global_Index, total_Size, K);
+  // Computes the indexes of the folds
+  auto [test_Folds, train_Folds] = compute_Folds(global_Index, total_Size, K);
 
   for (int i = 0; i < K; ++i) {
 
     // Creating Test Dataset for this iteration
-    DataSet test(data, folds[i]);
+    DataSet test(data, test_Folds[i]);
 
     // Creating Training Dataset for this iteration
-    std::vector<int> train_Index = compute_Train(global_Index, folds[i]);
-    DataSet train(data, train_Index);
+    DataSet train(data, train_Folds[i]);
 
     // Train the model on the sub data set
     model.train(train);
 
     auto [fold_Mae, fold_Mape] = metric::compute_accuracy(model, test);
     // Add the result
-    // global_Result += metric::compute_accuracy(model, test);
     global_MAE += fold_Mae;
     global_MAPE += fold_Mape;
   }
@@ -107,9 +115,11 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data, int
   global_MAE /= K;
   global_MAPE /= K;
 
-  std::cout << "\n===== RESULT OF CROSS-VALIDATION =====\n";
-  std::cout << "Global Mean Absolute Error            : " << global_MAE << "\n";
-  std::cout << "Global Mean Absolute Percentage Error : " << global_MAPE << "\n";
+  std::cout << "\n=== RESULTS OF CROSS-VALIDATION ===\n";
+  std::cout << "\nGlobal Mean Absolute Error            : " << global_MAE
+            << " for " << K << " folds\n";
+  std::cout << "Global Mean Absolute Percentage Error : " << global_MAPE
+            << " for " << K << " folds\n";
   std::cout << std::endl;
 
   return std::make_tuple(global_MAE, global_MAPE);
