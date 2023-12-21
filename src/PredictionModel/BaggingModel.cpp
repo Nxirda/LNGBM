@@ -16,6 +16,7 @@ BaggingModel::BaggingModel() {
   this->forest = RandomForest();
   this->max_Depth = 0;
   this->metric = "NO METRIC";
+  this->split_Metric = nullptr;
 }
 
 /*
@@ -100,4 +101,5 @@ void BaggingModel::print_Available_Operators() {
   for (auto const &pair : operator_Dictionnary) {
     std::cout << "{" << pair.first << "}\n";
   }
+  return;
 }

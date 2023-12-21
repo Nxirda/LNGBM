@@ -22,8 +22,7 @@ make -j
 ```sh
 # Ensure the project has been built properly
 cd build
-./Projet_Run [metric] [number of trees]
-# This is temporary till we have a stable version
+./main [Path to DataSet] [Split Metric] [Depth] [Number of Trees]
 ```
 
 ## Tests : 
