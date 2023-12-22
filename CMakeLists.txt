@@ -16,10 +16,10 @@ add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=nativ
 add_subdirectory(src)
 
 #Add the executable
-add_executable(Projet_run main.cpp)
+add_executable(main main.cpp)
 
 #Add the Libraries
-target_link_libraries(Projet_run PUBLIC Source_Lib)
+target_link_libraries(main PUBLIC Source_Lib)
 
 # ===== Testing Part =====
 

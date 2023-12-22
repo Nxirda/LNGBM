@@ -56,13 +56,12 @@ compute_Folds(const std::vector<int> &global_Index, int total_Size, int K) {
     int lower_Bound = j * foldSize;
 
     for (int i = 0; i < total_Size; ++i) {
-      if (i > lower_Bound && i < upper_Bound) {
+      if ((i > lower_Bound) && (i < upper_Bound)) {
         test_Folds_Construct[test_Curr_Index] = global_Index[i];
       } else {
         train_Folds_Construct[train_Curr_Index] = global_Index[i];
       }
     }
-
     test_Folds[j] = test_Folds_Construct;
     train_Folds[j] = train_Folds_Construct;
   }
