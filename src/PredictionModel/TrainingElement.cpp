@@ -227,6 +227,7 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
   // Initialize the current Node
   this->set_Root(data.labels_Number(), this->node, data.whole_Labels_Mean());
   this->bootstrap_Index(data.labels_Number());
+  
   remaining.push(*this);
 
   // Build iteratively the tree frame

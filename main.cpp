@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   std::string dataset_Path = argv[1];
   std::string metric = argv[2];
   int depth = std::stoi(argv[3]);
-  int number_Of_Trees = std::atoi(argv[3]);
+  int number_Of_Trees = std::atoi(argv[4]);
 
   BaggingModel model{metric, depth};
 

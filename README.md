@@ -1,14 +1,48 @@
 # LAPACK DGTERF performance prediction via Machine Learning
 
-## Build : Dependencies
+## Build with docker :
+
+### Docker :
+
+You will need docker installed on your machine
+
+On Debian/Ubuntu with apt :
+
+```sh
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+#Make sure install went right :
+$ sudo docker run hello-world
+```
+Docker documentation is available [here](https://docs.docker.com/engine/install/)
+
+### Build the project :
+
+```sh
+#Clone this repository
+$ git clone https://github.com/Nxirda/PPN_Projet_MEM.git
+
+#First build the image, once in the project directory :
+$ docker build . -t project_mem 
+
+#Then start the container, the project will be built at the same time
+$ docker run --rm -it project_mem
+```
+
+Then you can skip to the Usage section below
+
+
+## Build : Standard way
+
+### Dependencies :
 
 You will need gtest 
 
 ```sh
-sudo apt-get install libgtest-dev
+sudo apt install libgtest-dev
 ```
 
-## Build :
+### Build :
 
 ```sh
 git clone https://github.com/Nxirda/PPN_Projet_MEM.git
