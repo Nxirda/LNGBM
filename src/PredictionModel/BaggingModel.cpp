@@ -68,14 +68,12 @@ Outputs    :
 BaggingModel::~BaggingModel() { delete (this->split_Metric); };
 
 /*
-Returns the actual metric used for splitting 
+Returns the actual metric used for splitting
 Parameters :
 Inputs     :
 Outputs    : string
 */
-std::string BaggingModel::get_Metric(){
-  return this->metric;
-}
+std::string BaggingModel::get_Metric() { return this->metric; }
 
 /*
 Train the trees on the given dataset on the configured max depth
@@ -83,7 +81,7 @@ Parameters : Dataset for training
 Inputs     : const DataSet
 Outputs    :
 */
-void BaggingModel::train(const DataSet &data) { train(data, this->max_Depth); }
+void BaggingModel::train(const DataSet &data) { train(data, this->forest.get_size()); }
 
 /*
 train the model on the DataSet with the operator and depth fixed

@@ -22,11 +22,11 @@ std::tuple<double, double> compute_accuracy(BaggingModel &model,
   auto error = MAE::apply(exact, prediction);
   auto percentage_Error = MAPE::apply(exact, prediction);
 
-  std::cout << "\n=== RESULTS OF VALIDATION ===\n";
+  /* std::cout << "\n=== RESULTS OF VALIDATION ===\n";
   std::cout << "\nGlobal Mean Absolute Error            : " << error << " \n";
   std::cout << "Global Mean Absolute Percentage Error : " << percentage_Error
             << " \n";
-  std::cout << std::endl;
+  std::cout << std::endl; */
 
   return std::make_tuple(error, percentage_Error);
 }

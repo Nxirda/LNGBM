@@ -29,7 +29,7 @@ void RIV_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
   t.print("Reduction in variance splitting took : ");
   
   t.start();
-  CrossValidation::K_Folds(RIV_Bench, ds, 5);
+  CrossValidation::K_Folds(RIV_Bench, ds, 10);
   t.stop();
   t.print("Reduction in variance validation on 5 folds took : ");
 }
@@ -48,7 +48,7 @@ void MAE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
   t.print("Mean absolute error splitting took : ");
   
   t.start();
-  CrossValidation::K_Folds(MAE_Bench, ds, 5);
+  CrossValidation::K_Folds(MAE_Bench, ds, 10);
   t.stop();
   t.print("Mean absolute error validation on 5 folds took : ");
 }
@@ -67,7 +67,7 @@ void MAPE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
   t.print("Mean absolute percentage error splitting took : ");
   
   t.start();
-  CrossValidation::K_Folds(MAPE_Bench, ds, 5);
+  CrossValidation::K_Folds(MAPE_Bench, ds, 10);
   t.stop();
   t.print("Mean absolute percentage error validation on 5 folds took : ");
 }
@@ -85,7 +85,7 @@ void RMSE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
   t.print("Mean absolute error splitting took : ");
   
   t.start();
-  CrossValidation::K_Folds(RMSE_Bench, ds, 5);
+  CrossValidation::K_Folds(RMSE_Bench, ds, 10);
   t.stop();
   t.print("Mean absolute error validation on 5 folds took : ");
 }
