@@ -20,14 +20,23 @@ void Timer::stop() {
 
 //
 void Timer::print(std::string func_name) {
+  //Timer in micro-seconds
   auto micro_s_duration = std::chrono::duration_cast<std::chrono::microseconds>(
       this->end_time - this->start_time);
+
+  //Time in mili-seconds
   auto ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
       this->end_time - this->start_time);
+
+  //Time in seconds
   auto s_duration = std::chrono::duration_cast<std::chrono::seconds>(
       this->end_time - this->start_time);
+
+  //Time in minutes
   auto min_duration = std::chrono::duration_cast<std::chrono::minutes>(
       this->end_time - this->start_time);
+
+  //
   std::cout << func_name << " : " << min_duration.count() << "min "
             << s_duration.count() - (min_duration.count() * 60) << "s "
             << (ms_duration.count()) - (s_duration.count() * 1000) << "ms "

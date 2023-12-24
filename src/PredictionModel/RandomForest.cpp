@@ -9,7 +9,12 @@
 /*                        */
 /**************************/
 
-/**/
+/*
+Default Constructor : Initialize empty Forest
+Parameters :
+Inputs     :
+Outputs    :
+*/
 RandomForest::RandomForest() {
   this->size = 0;
   this->max_Depth = 0;
@@ -17,7 +22,12 @@ RandomForest::RandomForest() {
   this->trees = std::map<int, DecisionTree>();
 }
 
-/**/
+/*
+Constructor with arguments
+Parameters : Dataset, splitting operator, forest size, depth for the trees
+Inputs     : const DataSet, IOperator*, int, int
+Outputs    :
+*/
 RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
                            int n, int depth) {
   this->size = n;
@@ -27,13 +37,28 @@ RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
   this->trees = std::map<int, DecisionTree>();
 }
 
-/**/
+/*
+Default Destructor
+Parameters :
+Inputs     :
+Outputs    :
+*/
 RandomForest::~RandomForest(){};
 
-/**/
+/*
+Returns the size of the the forest
+Parameters :
+Inputs     :
+Outputs    : int
+*/
 int RandomForest::get_size() { return this->size; }
 
-/**/
+/*
+Generate the forest by training a specified number of trees
+Parameters : Size (number of Trees)
+Inputs     : int
+Outputs    :
+*/
 void RandomForest::generate_Forest(int size) {
 
   for (int i = 0; i < size; ++i) {
@@ -48,7 +73,12 @@ void RandomForest::generate_Forest(int size) {
   }
 }
 
-/**/
+/*
+Returns the predictions for the current dataset
+Parameters : Dataset to predict on
+Inputs     : const DataSet
+Outputs    : vector<float>
+*/
 std::vector<float> RandomForest::predict_Results(const DataSet &data) {
   int size = data.samples_Number();
   std::vector<float> result(size, 0);
@@ -66,15 +96,12 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
 
     // Computes the prediction for the current tree
     tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
-    /* for (unsigned long int i = 0; i < tree_Result.get()->size(); ++i) {
-      std::cout << "[" << tree_Result.get()->at(i) << "]";
-    }
-    std::cout << "\n"; */
 
     // Adds two vectors
     std::transform(result.begin(), result.end(), tree_Result->begin(),
                    result.begin(), std::plus<float>());
   }
+
   // Divides to have the mean of the answers
   for (unsigned long int j = 0; j < result.size(); ++j) {
     result.at(j) /= this->trees.size();
@@ -83,7 +110,12 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
   return result;
 }
 
-/**/
+/*
+Predict the result for the current tree
+Parameters : Dataset, results, index for the current node, current node
+Inputs     : const DataSet, shared_ptr<vector<float>>, vector<int>, TreeNode*
+Outputs    :
+*/
 void RandomForest::tree_Prediction(const DataSet &data,
                                    std::shared_ptr<std::vector<float>> result,
                                    std::vector<int> index, TreeNode *node) {

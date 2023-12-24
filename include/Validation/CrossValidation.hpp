@@ -76,7 +76,7 @@ Outputs    : double
 */
 std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
                                    int K) {
-  if (K == 0) {
+  if (K <= 1) {
     return {};
   }
   double global_MAE = 0;
@@ -98,6 +98,9 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
     // Creating Test Dataset for this iteration
     DataSet test(data, test_Folds[i]);
 
+    std::cout << "Training for Fold ["<< i << "]\n";
+    std::cout << test_Folds[i].size() << "\n";
+    std::cout << train_Folds[i].size() << "\n";
     // Creating Training Dataset for this iteration
     DataSet train(data, train_Folds[i]);
 

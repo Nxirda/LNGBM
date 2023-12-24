@@ -9,8 +9,9 @@
 
 /*
 Default Constructor
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 BaggingModel::BaggingModel() {
   this->forest = RandomForest();
@@ -21,8 +22,9 @@ BaggingModel::BaggingModel() {
 
 /*
 Constructor with operator and depth fixed
-Inputs  : string, int
-Outputs :
+Parameters : split metric, max depth
+Inputs     : string, int
+Outputs    :
 */
 BaggingModel::BaggingModel(std::string split_Metric, int max_Depth) {
   // Here we just prepare the infos for the model
@@ -59,23 +61,33 @@ BaggingModel::BaggingModel(std::string split_Metric, int max_Depth) {
 
 /*
 Destructor
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 BaggingModel::~BaggingModel() { delete (this->split_Metric); };
 
-/**/
-std::string BaggingModel::get_Metric(){
-  return this->metric;
-}
+/*
+Returns the actual metric used for splitting
+Parameters :
+Inputs     :
+Outputs    : string
+*/
+std::string BaggingModel::get_Metric() { return this->metric; }
 
-/**/
-void BaggingModel::train(const DataSet &data) { train(data, this->max_Depth); }
+/*
+Train the trees on the given dataset on the configured max depth
+Parameters : Dataset for training
+Inputs     : const DataSet
+Outputs    :
+*/
+void BaggingModel::train(const DataSet &data) { train(data, this->forest.get_size()); }
 
 /*
 train the model on the DataSet with the operator and depth fixed
-Inputs  : const DataSet, int
-Outputs :
+Parameters : Dataset for training, number of trees to train
+Inputs     : const DataSet, int
+Outputs    :
 */
 void BaggingModel::train(const DataSet &data, int n) {
   this->forest = RandomForest(data, this->split_Metric, n, this->max_Depth);
@@ -85,8 +97,9 @@ void BaggingModel::train(const DataSet &data, int n) {
 
 /*
 predict the labels for the given dataset with the operator and depth fixed
-Inputs  : const DataSet
-Outputs :
+Parameters : Dataset for prediction
+Inputs     : const DataSet
+Outputs    : vector<float>
 */
 std::vector<float> BaggingModel::predict(const DataSet &data) {
   return this->forest.predict_Results(data);
@@ -94,8 +107,9 @@ std::vector<float> BaggingModel::predict(const DataSet &data) {
 
 /*
 Prints the available operator for this library
-Inputs  :
-Outputs :
+Parameters :
+Inputs     :
+Outputs    :
 */
 void BaggingModel::print_Available_Operators() {
   for (auto const &pair : operator_Dictionnary) {
