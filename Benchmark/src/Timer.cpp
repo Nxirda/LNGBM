@@ -36,7 +36,7 @@ void Timer::print(std::string func_name) {
   auto min_duration = std::chrono::duration_cast<std::chrono::minutes>(
       this->end_time - this->start_time);
 
-  //
+  //Printing out the results
   std::cout << func_name << " : " << min_duration.count() << "min "
             << s_duration.count() - (min_duration.count() * 60) << "s "
             << (ms_duration.count()) - (s_duration.count() * 1000) << "ms "

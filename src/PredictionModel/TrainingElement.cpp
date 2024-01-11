@@ -159,6 +159,7 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
                             const IOperator *splitting_Operator) {
 
   auto [column, criterion] = find_Best_Split(data, elem, splitting_Operator);
+
   auto [left_index, right_index] = split_Index(data, criterion, column, elem);
 
   int next_Depth = elem->depth + 1;
@@ -170,7 +171,8 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   float predic_Left = data.labels_Mean(*left_index);
   float predic_Right = data.labels_Mean(*right_index);
 
-  if (predic_Left > 0 || predic_Right > 0) {
+
+  if (predic_Left >= 0 || predic_Right >= 0) {
     // Left node
     TreeNode left{};
 
@@ -214,7 +216,7 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
 
 /*
 Train the model by splitting nodes till they have reach max Depth or dont bring
-informations
+anymore informations
 Parameters : Dataset, operator, max depth
 Inputs     : const DataSet, IOperator*, int
 Outputs    : 
@@ -223,7 +225,7 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
                             int max_Depth) {
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
-
+    
   // Initialize the current Node
   this->set_Root(data.labels_Number(), this->node, data.whole_Labels_Mean());
   this->bootstrap_Index(data.labels_Number());

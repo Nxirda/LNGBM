@@ -60,7 +60,6 @@ Inputs     : int
 Outputs    :
 */
 void RandomForest::generate_Forest(int size) {
-
   for (int i = 0; i < size; ++i) {
     DecisionTree tree{};
 
@@ -69,7 +68,8 @@ void RandomForest::generate_Forest(int size) {
     elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
-    this->trees[i] = tree;
+    //this->trees[i] = tree;
+    this->trees.insert({i, tree});
   }
 }
 
@@ -92,9 +92,13 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
   // Iterate through the Forest
   for (unsigned long int i = 0; i < this->trees.size(); ++i) {
     std::shared_ptr<std::vector<float>> tree_Result =
-        std::make_shared<std::vector<float>>(size);
+        std::make_shared<std::vector<float>>(size, 0);
 
     // Computes the prediction for the current tree
+    if (this->trees.find(i) == this->trees.end()) {
+      perror("Couldnt find wanted tree");
+    }
+
     tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
 
     // Adds two vectors
@@ -103,7 +107,7 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
   }
 
   // Divides to have the mean of the answers
-  for (unsigned long int j = 0; j < result.size(); ++j) {
+  for (int j = 0; j < size; ++j) {
     result.at(j) /= this->trees.size();
   }
 
@@ -119,13 +123,15 @@ Outputs    :
 void RandomForest::tree_Prediction(const DataSet &data,
                                    std::shared_ptr<std::vector<float>> result,
                                    std::vector<int> index, TreeNode *node) {
+
+  // Update the values of the result
+  for (int idx : index) {
+    result->at(idx) = node->get_Predicted_Value();
+  }
+
   // Put the correct indexes
   auto [left_Index, right_Index] =
       data.split(node->get_Split_Column(), node->get_Split_Criterion(), index);
-
-  for (auto idx : index) {
-    result.get()->at(idx) = node->get_Predicted_Value();
-  }
 
   if (node->get_Left_Node() && left_Index) {
     tree_Prediction(data, result, *left_Index, node->get_Left_Node());

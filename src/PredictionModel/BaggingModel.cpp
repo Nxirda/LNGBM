@@ -81,7 +81,9 @@ Parameters : Dataset for training
 Inputs     : const DataSet
 Outputs    :
 */
-void BaggingModel::train(const DataSet &data) { train(data, this->forest.get_size()); }
+void BaggingModel::train(const DataSet &data) {
+  this->train(data, this->forest.get_size());
+}
 
 /*
 train the model on the DataSet with the operator and depth fixed

@@ -1,10 +1,13 @@
 #ifndef VALIDATION_H_
 #define VALIDATION_H_
 
-#include "BaggingModel.hpp"
+#include <numeric>
+#include <cmath>
+
 #include "MAE.hpp"
 #include "MAPE.hpp"
-#include <numeric>
+#include "BaggingModel.hpp"
+#include "ReductionInVar.hpp"
 
 namespace metric {
 /*
@@ -13,22 +16,16 @@ Parameters : Prediction Model, DataSet
 Inputs     : BaggingModel, const DataSet
 Outputs    : double
 */
-std::tuple<double, double> compute_accuracy(BaggingModel &model,
-                                            const DataSet &data) {
+std::tuple<double, double, double> compute_accuracy(BaggingModel &model,
+                                            const DataSet &data) {                                              
+  std::vector<float> exact = data.get_Labels(); 
+  std::vector<float> prediction = model.predict(data);
 
-  auto exact = data.get_Labels();
-  auto prediction = model.predict(data);
+  double error = MAE::apply(exact, prediction);
+  double percentage_Error = MAPE::apply(exact, prediction);
+  double standard_deviation = std::sqrt(ReductionInVar::apply(exact, prediction));
 
-  auto error = MAE::apply(exact, prediction);
-  auto percentage_Error = MAPE::apply(exact, prediction);
-
-  /* std::cout << "\n=== RESULTS OF VALIDATION ===\n";
-  std::cout << "\nGlobal Mean Absolute Error            : " << error << " \n";
-  std::cout << "Global Mean Absolute Percentage Error : " << percentage_Error
-            << " \n";
-  std::cout << std::endl; */
-
-  return std::make_tuple(error, percentage_Error);
+  return std::make_tuple(error, percentage_Error, standard_deviation);
 }
 
 }; // namespace metric

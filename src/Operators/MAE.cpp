@@ -93,7 +93,7 @@ float MAE::compute(int position, const DataSet &data,
 Computes the MAE of two vectors
 Parameters : exact results, prediction results
 Inputs     : const vector<float>, const vector<float>
-Outputs    : float
+Outputs    : double
 */
 double MAE::apply(const std::vector<float> &exact,
                  const std::vector<float> &prediction) {

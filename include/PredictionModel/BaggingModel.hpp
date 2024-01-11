@@ -34,7 +34,6 @@ public:
 
   void train(const DataSet &data);
   void train(const DataSet &data, int n);
-  //void reset_Forest();
   std::vector<float> predict(const DataSet &datas);
   void print_Available_Operators();
 };

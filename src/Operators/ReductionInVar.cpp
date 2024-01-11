@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include "ReductionInVar.hpp"
 #include "TreeNode.hpp"
@@ -12,7 +13,7 @@
 /*
 Constructor
 Parameters :
-Inputs     : 
+Inputs     :
 Outputs    :
 */
 ReductionInVar::ReductionInVar() {}
@@ -73,4 +74,24 @@ float ReductionInVar::compute(int position, const DataSet &data,
                                 right_Weighted_Average * right_Variance);
 
   return weighted_Average_Var;
+}
+
+/*
+Computes the Variance of two vectors
+Parameters : exact results, prediction results
+Inputs     : const vector<float>, const vector<float>
+Outputs    : double
+*/
+double ReductionInVar::apply(const std::vector<float> &exact,
+                             const std::vector<float> &prediction) {
+  double res = 0;
+  float size = prediction.size();
+
+  for (unsigned long int i = 0; i < size; ++i) {
+    res += std::pow((exact[i] - prediction[i]), 2);
+  }
+
+  // Compute the Variance
+  res = res / size;
+  return res;
 }
