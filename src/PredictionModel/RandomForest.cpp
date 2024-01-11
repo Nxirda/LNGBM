@@ -68,7 +68,6 @@ void RandomForest::generate_Forest(int size) {
     elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
-    //this->trees[i] = tree;
     this->trees.insert({i, tree});
   }
 }

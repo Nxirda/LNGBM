@@ -18,6 +18,11 @@ struct TrainingElement {
 
   TrainingElement();
   TrainingElement(TreeNode *node, std::vector<int> const index, int depth);
+  TrainingElement(const TrainingElement& TE);
+
+  //Operator Overloading 
+
+  TrainingElement& operator=(const TrainingElement& TE);
 
   // Destructor
 
