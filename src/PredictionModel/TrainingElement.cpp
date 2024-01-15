@@ -169,7 +169,8 @@ TrainingElement::split_Index(const DataSet &data, int criterion, int position,
   if (position < data.features_Length() && criterion > 0) {
     return data.split(position, criterion, elem->get_Index());
   } else {
-    return data.split(0, 0, elem->get_Index());
+    std::optional<std::vector<int>> empty_Vec = std::vector<int>{};
+    return {empty_Vec, empty_Vec};
   }
 }
 
@@ -193,6 +194,7 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   elem->node->set_Split_Column(column);
   elem->node->set_Split_Criterion(criterion);
 
+  //If index is empty : predic = -1
   float predic_Left = data.labels_Mean(*left_index);
   float predic_Right = data.labels_Mean(*right_index);
 

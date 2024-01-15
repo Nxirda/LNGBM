@@ -32,39 +32,39 @@ std::vector<int> compute_Train(std::vector<int> global_Index,
 
 /*
 Computes indexes for the folds on the DataSet
-Parameters : Global index, Total size of DataSet, K (nb of folds)
-Inputs     : const vector<int>, int, int
-Outputs    : tuple<vector<vector<int>>, vector<vector<int>>>
+Parameters : Dataset, Global index, Total size of DataSet, K (nb of folds)
+Inputs     : const DataSet, const vector<int>, int, int
+Outputs    : tuple<vector<DataSet>, vector<DataSet>>
 */
-std::tuple<std::vector<std::vector<int>>, std::vector<std::vector<int>>>
-compute_Folds(const std::vector<int> &global_Index, int total_Size, int K) {
+std::tuple<std::vector<DataSet>, std::vector<DataSet>>
+compute_Folds(const DataSet data, const std::vector<int> &global_Index,
+              int total_Size, int K) {
   int foldSize = total_Size / K;
-  
-  std::vector<std::vector<int>> test_Folds(K);
-  std::vector<std::vector<int>> train_Folds(K);
+
+  std::vector<DataSet> test_Folds(K);
+  std::vector<DataSet> train_Folds(K);
 
   for (int j = 0; j < K; ++j) {
+
     std::vector<int> test_Folds_Construct(foldSize, 0);
     int test_Curr_Index = 0;
 
-    std::vector<int> train_Folds_Construct(total_Size - foldSize, 0);
+    std::vector<int> train_Folds_Construct(total_Size - foldSize + 1, 0);
     int train_Curr_Index = 0;
 
     int upper_Bound = (j + 1) * foldSize;
     int lower_Bound = j * foldSize;
-
     for (int i = 0; i < total_Size; ++i) {
       if ((i > lower_Bound) && (i < upper_Bound)) {
         test_Folds_Construct[test_Curr_Index] = global_Index[i];
-        test_Curr_Index ++;
+        test_Curr_Index++;
       } else {
         train_Folds_Construct[train_Curr_Index] = global_Index[i];
-        train_Curr_Index ++;
+        train_Curr_Index++;
       }
     }
-
-    test_Folds[j] = test_Folds_Construct;
-    train_Folds[j] = train_Folds_Construct;
+    test_Folds[j] = DataSet(data, test_Folds_Construct);
+    train_Folds[j] = DataSet(data, train_Folds_Construct);
   }
   return std::make_tuple(test_Folds, train_Folds);
 }
@@ -95,15 +95,15 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
   }
 
   // Computes the indexes of the folds
-  auto [test_Folds, train_Folds] = compute_Folds(global_Index, total_Size, K);
+  auto [test_Folds, train_Folds] =
+      compute_Folds(data, global_Index, total_Size, K);
 
   for (int i = 0; i < K; ++i) {
-
     // Creating Test Dataset for this iteration
-    DataSet test_Set(data, test_Folds[i]);
+    DataSet test_Set = test_Folds[i];
 
     // Creating Training Dataset for this iteration
-    DataSet train_Set(data, train_Folds[i]);
+    DataSet train_Set = train_Folds[i];
 
     // Train the model on the sub data set
     model.train(train_Set);
@@ -116,9 +116,6 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
     global_MAPE += fold_Mape;
     global_Std_Dev += fold_Std_Dev;
 
-    /* std::cout << "Fold number " << i << "\n"
-              << "MAE is      " << fold_Mae << "\n"
-              << "MAPE is     " << fold_Mape << "\n"; */
   }
 
   // Means the result
@@ -126,6 +123,7 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
   global_MAPE /= K;
   global_Std_Dev /= K;
 
+  //Printing everything to the user
   std::cout << "\n=== RESULTS OF CROSS-VALIDATION ===\n";
   std::cout << "\nGlobal Mean Absolute Error            : " << global_MAE
             << " for " << K << " folds\n";

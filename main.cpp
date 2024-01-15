@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 
   model.train(DS, number_Of_Trees);
 
-  //CrossValidation::K_Folds(model, DS, 5);
+  CrossValidation::K_Folds(model, DS, 5);
 
   /*  DataSet test_DS{};
   test_DS.load("../data/datasets/d1_Test.csv");
