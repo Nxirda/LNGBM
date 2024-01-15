@@ -16,7 +16,9 @@ using namespace std;
 int main(int argc, char **argv) {
 
   if (argc != 5) {
-    std::cout << "Usage is : " << argv[0] << " [Path to DataSet] [Split Metric] [Depth] [Number of Trees]\n";
+    std::cout
+        << "Usage is : " << argv[0]
+        << " [Path to DataSet] [Split Metric] [Depth] [Number of Trees]\n";
     std::cout << "\n";
     std::cout << "== Split Metrics Available are ==\n";
     BaggingModel m{};
@@ -35,10 +37,11 @@ int main(int argc, char **argv) {
 
   model.train(DS, number_Of_Trees);
 
-  //CrossValidation::K_Folds(model, DS, 5);
+  CrossValidation::K_Folds(model, DS, 5);
+
   /*  DataSet test_DS{};
-  test_DS.load("../data/datasets/d1_Test.csv"); */
-  DataSet test_DS = DataSet::load("../data/datasets/d1_Test.csv");
-  metric::compute_accuracy(model, test_DS);
+  test_DS.load("../data/datasets/d1_Test.csv");
+  DataSet test_DS = DataSet::load("../data/d1_Test.csv");
+  metric::compute_accuracy(model, test_DS);*/
   return 0;
 }

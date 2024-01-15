@@ -95,7 +95,7 @@ float MAPE::compute(int position, const DataSet &data,
 Computes the MAPE of two vectors
 Parameters : exact results, prediction results
 Inputs     : const vector<float>, const vector<float>
-Outputs    : float
+Outputs    : double
 */
 double MAPE::apply(const std::vector<float> &exact,
                   const std::vector<float> &prediction) {

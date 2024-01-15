@@ -1,7 +1,8 @@
+#include <fstream>
+#include <stdio.h>
+
 #include "Benchmark.hpp"
 #include "CrossValidation.hpp"
-
-#include <stdio.h>
 #include "Timer.hpp"
 
 //
@@ -12,11 +13,11 @@ void dataSet_Loading(std::string PATH) {
   DataSet DS{PATH};
 
   t.stop();
-  t.print("DataSet Loading took : ");
+  t.print("DataSet Loading took ");
 }
 
 //
-void RIV_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
+void RIV_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
   std::cout << "      ===== RIV =====\n";
   DataSet ds{PATH};
 
@@ -26,16 +27,16 @@ void RIV_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
   t.start();
   RIV_Bench.train(ds, nb_Trees);
   t.stop();
-  t.print("Reduction in variance splitting took : ");
-  
+  t.print("Reduction in variance splitting took ");
+
   t.start();
-  CrossValidation::K_Folds(RIV_Bench, ds, 10);
+  CrossValidation::K_Folds(RIV_Bench, ds, K);
   t.stop();
-  t.print("Reduction in variance validation on 5 folds took : ");
+  t.print("Reduction in variance cross-validation took ");
 }
 
 //
-void MAE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
+void MAE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
   std::cout << "      ===== MAE =====\n";
   DataSet ds{PATH};
 
@@ -45,16 +46,16 @@ void MAE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
   t.start();
   MAE_Bench.train(ds, nb_Trees);
   t.stop();
-  t.print("Mean absolute error splitting took : ");
-  
+  t.print("Mean absolute error splitting took ");
+
   t.start();
-  CrossValidation::K_Folds(MAE_Bench, ds, 10);
+  CrossValidation::K_Folds(MAE_Bench, ds, K);
   t.stop();
-  t.print("Mean absolute error validation on 5 folds took : ");
+  t.print("Mean absolute error cross-validation took ");
 }
 
 //
-void MAPE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
+void MAPE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
   std::cout << "      ===== MAPE =====\n";
   DataSet ds{PATH};
 
@@ -64,16 +65,16 @@ void MAPE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
   t.start();
   MAPE_Bench.train(ds, nb_Trees);
   t.stop();
-  t.print("Mean absolute percentage error splitting took : ");
-  
+  t.print("Mean absolute percentage error splitting took ");
+
   t.start();
-  CrossValidation::K_Folds(MAPE_Bench, ds, 10);
+  CrossValidation::K_Folds(MAPE_Bench, ds, K);
   t.stop();
-  t.print("Mean absolute percentage error validation on 5 folds took : ");
+  t.print("Mean absolute percentage error cross-validation took ");
 }
 
 //
-void RMSE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
+void RMSE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
   std::cout << "      ===== RMSE =====\n";
   DataSet ds{PATH};
   BaggingModel RMSE_Bench("RMSE", tree_Depth);
@@ -82,10 +83,10 @@ void RMSE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees) {
   t.start();
   RMSE_Bench.train(ds, nb_Trees);
   t.stop();
-  t.print("Mean absolute error splitting took : ");
-  
+  t.print("Mean absolute error splitting took ");
+
   t.start();
-  CrossValidation::K_Folds(RMSE_Bench, ds, 10);
+  CrossValidation::K_Folds(RMSE_Bench, ds, K);
   t.stop();
-  t.print("Mean absolute error validation on 5 folds took : ");
+  t.print("Root mean square error cross-validation took ");
 }
