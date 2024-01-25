@@ -169,8 +169,9 @@ TrainingElement::split_Index(const DataSet &data, int criterion, int position,
   if (position < data.features_Length() && criterion > 0) {
     return data.split(position, criterion, elem->get_Index());
   } else {
-    std::optional<std::vector<int>> empty_Vec = std::vector<int>{};
-    return {empty_Vec, empty_Vec};
+    // std::optional<std::vector<int>> empty_Vec =
+    // std::nullopt;//std::vector<int>{};
+    return {std::nullopt, std::nullopt};
   }
 }
 
@@ -184,20 +185,6 @@ std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
 TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
                             const IOperator *splitting_Operator) {
 
-  auto [column, criterion] = find_Best_Split(data, elem, splitting_Operator);
-
-  auto [left_index, right_index] = split_Index(data, criterion, column, elem);
-
-  int next_Depth = elem->depth + 1;
-
-  // Set the datas for the current node
-  elem->node->set_Split_Column(column);
-  elem->node->set_Split_Criterion(criterion);
-
-  //If index is empty : predic = -1
-  float predic_Left = data.labels_Mean(*left_index);
-  float predic_Right = data.labels_Mean(*right_index);
-
   // Left node
   TreeNode left{};
   std::optional<TrainingElement> train_Left = std::nullopt;
@@ -206,43 +193,53 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   TreeNode right{};
   std::optional<TrainingElement> train_Right = std::nullopt;
 
-  //To cut the Tree if we dont gain much/we will go to far in the tree
-  long unsigned int treshold = 5;
+  // Compute split attributes
+  auto [column, criterion] = find_Best_Split(data, elem, splitting_Operator);
+
+  // Compute new indexes
+  auto [left_index, right_index] = split_Index(data, criterion, column, elem);
+
+  if (!left_index && !right_index) {
+    return {train_Left, train_Right};
+  }
+
+  int next_Depth = elem->depth + 1;
+
+  // Set the datas for the current node
+  elem->node->set_Split_Column(column);
+  elem->node->set_Split_Criterion(criterion);
+
+  // If index is empty : predic = -1
+  float predic_Left = data.labels_Mean(*left_index);
+  float predic_Right = data.labels_Mean(*right_index);
 
   // Case 1 : Build only Right Node (if information gained)
   if (predic_Left < 0 && right_index.has_value()) {
-    if (right_index.value().size() >= treshold) {
-      elem->node->add_Right(std::make_unique<TreeNode>(right));
-      elem->node->get_Right_Node()->set_Predicted_Value(predic_Right);
-      train_Right = TrainingElement(elem->node->get_Right_Node(), *right_index,
-                                    next_Depth);
-    }
+    elem->node->add_Right(std::make_unique<TreeNode>(right));
+    elem->node->get_Right_Node()->set_Predicted_Value(predic_Right);
+    train_Right =
+        TrainingElement(elem->node->get_Right_Node(), *right_index, next_Depth);
   }
 
   // Case 2 : Build only Left Node (if information gained)
   else if (predic_Right < 0 && left_index.has_value()) {
-    if (left_index.value().size() >= treshold) {
-      elem->node->add_Left(std::make_unique<TreeNode>(left));
-      elem->node->get_Left_Node()->set_Predicted_Value(predic_Left);
-      train_Left =
-          TrainingElement(elem->node->get_Left_Node(), *left_index, next_Depth);
-    }
+    elem->node->add_Left(std::make_unique<TreeNode>(left));
+    elem->node->get_Left_Node()->set_Predicted_Value(predic_Left);
+    train_Left =
+        TrainingElement(elem->node->get_Left_Node(), *left_index, next_Depth);
   }
 
-  //Case 3 : Build right and Left Node (if information gained)
+  // Case 3 : Build right and Left Node (if information gained)
   else if (right_index.has_value() && left_index.has_value()) {
-    if (right_index.value().size() >= treshold) {
-      elem->node->add_Right(std::make_unique<TreeNode>(right));
-      elem->node->get_Right_Node()->set_Predicted_Value(predic_Right);
-      train_Right = TrainingElement(elem->node->get_Right_Node(), *right_index,
-                                    next_Depth);
-    }
-    if (left_index.value().size() >= treshold) {
-      elem->node->add_Left(std::make_unique<TreeNode>(left));
-      elem->node->get_Left_Node()->set_Predicted_Value(predic_Left);
-      train_Left =
-          TrainingElement(elem->node->get_Left_Node(), *left_index, next_Depth);
-    }
+    elem->node->add_Right(std::make_unique<TreeNode>(right));
+    elem->node->get_Right_Node()->set_Predicted_Value(predic_Right);
+    train_Right =
+        TrainingElement(elem->node->get_Right_Node(), *right_index, next_Depth);
+
+    elem->node->add_Left(std::make_unique<TreeNode>(left));
+    elem->node->get_Left_Node()->set_Predicted_Value(predic_Left);
+    train_Left =
+        TrainingElement(elem->node->get_Left_Node(), *left_index, next_Depth);
   }
   return {train_Left, train_Right};
 }
@@ -255,7 +252,8 @@ Inputs     : const DataSet, IOperator*, int
 Outputs    :
 */
 void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
-                            int max_Depth) {
+                            int max_Depth, long unsigned int treshold) {
+
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
 
@@ -273,13 +271,23 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
     if (elem.depth >= max_Depth) {
       continue;
     }
+
     auto [left, right] = split_Node(data, &elem, splitting_Operator);
 
     if (left) {
-      remaining.push(*left);
+      if (left.value().index.size() != elem.index.size() &&
+          left.value().index.size() > treshold) {
+
+        remaining.push(*left);
+      }
     }
+    
     if (right) {
-      remaining.push(*right);
+      if (right.value().index.size() != elem.index.size() &&
+          right.value().index.size() > treshold) {
+
+        remaining.push(*right);
+      }
     }
   }
 }

@@ -18,11 +18,11 @@ struct TrainingElement {
 
   TrainingElement();
   TrainingElement(TreeNode *node, std::vector<int> const index, int depth);
-  TrainingElement(const TrainingElement& TE);
+  TrainingElement(const TrainingElement &TE);
 
-  //Operator Overloading 
+  // Operator Overloading
 
-  TrainingElement& operator=(const TrainingElement& TE);
+  TrainingElement &operator=(const TrainingElement &TE);
 
   // Destructor
 
@@ -52,7 +52,8 @@ struct TrainingElement {
   split_Index(const DataSet &data, int criterion, int position,
               TrainingElement *elem);
 
-  void train(const DataSet &data, IOperator *splitting_Operator, int max_Depth);
+  void train(const DataSet &data, IOperator *splitting_Operator, int max_Depth,
+             long unsigned int treshold);
 
   void set_Root(int dataset_Size, TreeNode *node, float value);
   void bootstrap_Index(int dataset_Size);
