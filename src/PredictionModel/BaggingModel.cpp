@@ -1,3 +1,5 @@
+#include <errno.h>
+
 #include "BaggingModel.hpp"
 #include "EnumOperator.hpp"
 
@@ -27,7 +29,15 @@ Inputs     : string, int
 Outputs    :
 */
 BaggingModel::BaggingModel(std::string split_Metric, int max_Depth) {
+
   // Here we just prepare the infos for the model
+
+  if (max_Depth < 1) {
+    errno = EINVAL;
+    perror("Depth parameter should be at least 1");
+    abort();
+  }
+
   this->metric = split_Metric;
   this->max_Depth = max_Depth;
 
@@ -36,7 +46,8 @@ BaggingModel::BaggingModel(std::string split_Metric, int max_Depth) {
   it = operator_Dictionnary.find(this->metric);
 
   if (it == operator_Dictionnary.end()) {
-    std::cout << "Chosen metric is invalid \n" << std::endl;
+    errno = EINVAL;
+    perror("Chosen metric is invalid");
     abort();
   }
 
@@ -54,7 +65,8 @@ BaggingModel::BaggingModel(std::string split_Metric, int max_Depth) {
     this->split_Metric = new ReductionInVar();
     break;
   default:
-    std::cout << "Chosen metric is invalid \n" << std::endl;
+    errno = EINVAL;
+    perror("Chosen metric is invalid");
     abort();
   }
 }
@@ -92,6 +104,13 @@ Inputs     : const DataSet, int
 Outputs    :
 */
 void BaggingModel::train(const DataSet &data, int n) {
+
+  if (n < 1) {
+    errno = EINVAL;
+    perror("Number of Trees should be at least 1");
+    abort();
+  }
+
   this->forest = RandomForest(data, this->split_Metric, n, this->max_Depth);
 
   this->forest.generate_Forest(n);

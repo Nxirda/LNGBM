@@ -60,12 +60,16 @@ Inputs     : int
 Outputs    :
 */
 void RandomForest::generate_Forest(int size) {
-  for (int i = 0; i < size; ++i) {
-    DecisionTree tree{};
+  long unsigned int treshold = 5;
 
+  for (int i = 0; i < size; ++i) {
+
+    DecisionTree tree{};
     TrainingElement elem{};
+
     elem.set_Node(tree.get_Root());
-    elem.train(this->dataset, this->splitting_Operator, this->max_Depth);
+    elem.train(this->dataset, this->splitting_Operator, this->max_Depth,
+               treshold);
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
     this->trees.insert({i, tree});
@@ -96,6 +100,7 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
     // Computes the prediction for the current tree
     if (this->trees.find(i) == this->trees.end()) {
       perror("Couldnt find wanted tree");
+      exit(1);
     }
 
     tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
