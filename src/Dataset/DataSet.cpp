@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cmath> //for std lerp in percentiles function
 #include <fstream>
 #include <iostream>
 #include <numeric>
@@ -379,7 +381,7 @@ std::vector<float> DataSet::get_Column(int position,
 Return 2 vector which contains the index of each subtree datasets after split
 Split is based on the criteria on a row at the column specified by position
 Parameters : position, criterion, index
-Inputs     : int, float, constvector<int>
+Inputs     : int, float, const vector<int>
 Ouputs     : tuple<optional<vector<int>, optional<vector<int>>
 */
 std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
@@ -410,6 +412,30 @@ DataSet::split(int position, float criterion,
 }
 
 /*
+Compute and returns the percentiles of a column
+Percentiles have to be given as an input
+Parameters : position, index, percentile list
+Inputs     : int, const vector<int>, const vector<float>
+Ouputs     : vector<float> 
+*/
+std::vector<float>
+DataSet::column_Percentiles(int position, const std::vector<int> &idx,
+                            const std::vector<float> &percentiles) const {
+
+  std::vector<float> percentile_Values;
+
+  // Sort the data
+  std::vector<float> sorted_Data = this->get_Column(position, idx);
+  std::sort(sorted_Data.begin(), sorted_Data.end());
+
+  for (float current_Centil : percentiles) {
+    float res = sorted_Data[sorted_Data.size() * (current_Centil / 100)];
+    percentile_Values.push_back(res);
+  }
+  return percentile_Values;
+}
+
+/*
 Computes the Mean of a given Column of the DataSet
 Parameters : position, index
 Inputs     : int, const vector<int>
@@ -418,7 +444,8 @@ Outputs    : float
 float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
 
   float mean = 0;
-  // CHeck column in bounds
+
+  // Check column in bounds
   if (position >= this->features_Length() || position < 0) {
     return mean;
   }
@@ -468,7 +495,7 @@ float DataSet::labels_Mean(const std::vector<int> &idx) const {
 
 /*
 Computes the mean of all the labels of the DataSet
-Parameters : 
+Parameters :
 Inputs     :
 Outputs    : float
 */

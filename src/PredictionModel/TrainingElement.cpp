@@ -137,22 +137,35 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
                                  const IOperator *splitting_Operator) {
 
   int best_Feature = 0;
+  float criterion = 0;
   // We try to minimize the mean absolute error for a split
   float min = INT_MAX;
 
+  std::vector<float> quartiles = {25.0, 50.0, 75.0};
+  std::vector<float> percentiles = {10.0, 20.0, 30.0, 40.0, 50.0,
+                                    60.0, 70.0, 80.0, 90.0};
+
   std::vector<std::string> features = data.get_Features();
 
-  // Minimize the error by trying multiple splits
-  for (unsigned long int i = 0; i < features.size(); ++i) {
-    float tmp_var = splitting_Operator->compute(i, data, elem->index);
+  // Minimize the error by trying multiple splits on features
+  for (size_t i = 0; i < features.size(); ++i) {
 
-    if (tmp_var < min) {
-      min = tmp_var;
-      best_Feature = i;
+    std::vector<float> criterias =
+        data.column_Percentiles(i, index, quartiles);
+    // Test multiple split criteria
+    for (size_t j = 0; j < criterias.size(); ++j) {
+      float tmp_var =
+          splitting_Operator->compute(i, data, elem->index, criterias[j]);
+
+      if (tmp_var < min) {
+        min = tmp_var;
+        best_Feature = i;
+        criterion = criterias[j];
+      }
     }
   }
 
-  float criterion = data.column_Mean(best_Feature, elem->index);
+  // float criterion = data.column_Mean(best_Feature, elem->index);
   return std::make_tuple(best_Feature, criterion);
 }
 
@@ -281,7 +294,7 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
         remaining.push(*left);
       }
     }
-    
+
     if (right) {
       if (right.value().index.size() != elem.index.size() &&
           right.value().index.size() > treshold) {
