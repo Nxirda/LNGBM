@@ -49,10 +49,6 @@ float MAE::compute(int position, const DataSet &data, std::vector<int> index,
   float left_MAE = 0;
   float right_MAE = 0;
 
-  // Computes the split criteria, needs to be not hardcoded in the future
-
-  // float split_Criteria = data.column_Mean(position, index);
-
   // Computes the DataSet Row Indexes that child nodes can access
   auto [left_index, right_index] = data.split(position, split_Criteria, index);
 

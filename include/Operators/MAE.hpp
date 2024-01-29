@@ -9,7 +9,7 @@ class MAE : public IOperator {
 private:
   // Parameters
 
-  float split_Criterion;
+  //float split_Criterion;
   const std::string name = "MAE";
 
 public:

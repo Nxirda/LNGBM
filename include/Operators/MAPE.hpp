@@ -9,7 +9,7 @@ class MAPE : public IOperator {
 private:
   // Parameters
 
-  float split_Criterion;
+  //float split_Criterion;
   const std::string name = "MAPE";
 
 public:

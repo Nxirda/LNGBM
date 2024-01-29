@@ -153,9 +153,9 @@ DataSet DataSet::load(std::string file_Path) {
 }
 
 /*
-Explicit Constructor, takes two vectors and builds a DataSet Object
+Explicit Constructor, takes three vectors and builds a DataSet Object
 Parameters : features, samples, labels
-Inputs     : vector<string>, vector<vector<float>>
+Inputs     : vector<string>, vector<vector<float>>, vector<float>
 Ouputs     : Object of DataSet Class
 */
 DataSet::DataSet(std::vector<std::string> features,
@@ -170,6 +170,7 @@ DataSet::DataSet(std::vector<std::string> features,
 Constructor to copy partially a DataSet at the given indexes
 Parameters : Dataset, index
 Inputs     : const DataSet,  vector<int>
+Outputs    : Object of DataSet Class
 */
 DataSet::DataSet(const DataSet &data, std::vector<int> idx) {
   this->features = data.get_Features();

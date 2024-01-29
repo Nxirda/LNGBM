@@ -1,6 +1,13 @@
 #include "TrainingElement.hpp"
 #include <stack>
 
+// TEMP
+#include "Histogram.hpp"
+#include "Percentiles.hpp"
+#include "Quartiles.hpp"
+#include "Random_Values.hpp"
+#include "Unique_Values.hpp"
+
 /*
 Default Constructor
 Parameters :
@@ -134,16 +141,13 @@ Ouputs     : tuple<int, float>
 */
 std::tuple<int, float>
 TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
-                                 const IOperator *splitting_Operator) {
+                                 const IOperator *splitting_Operator,
+                                 const ICriterias *splitting_Criteria) {
 
   int best_Feature = 0;
   float criterion = 0;
   // We try to minimize the mean absolute error for a split
   float min = INT_MAX;
-
-  std::vector<float> quartiles = {25.0, 50.0, 75.0};
-  std::vector<float> percentiles = {10.0, 20.0, 30.0, 40.0, 50.0,
-                                    60.0, 70.0, 80.0, 90.0};
 
   std::vector<std::string> features = data.get_Features();
 
@@ -151,7 +155,8 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
   for (size_t i = 0; i < features.size(); ++i) {
 
     std::vector<float> criterias =
-        data.column_Percentiles(i, index, quartiles);
+        splitting_Criteria->compute(data.get_Column(i, index));
+
     // Test multiple split criteria
     for (size_t j = 0; j < criterias.size(); ++j) {
       float tmp_var =
@@ -206,8 +211,16 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   TreeNode right{};
   std::optional<TrainingElement> train_Right = std::nullopt;
 
+  // TEMP
+  // const ICriterias *test = new Percentiles();
+  // const ICriterias *test = new Quartiles();
+  // const ICriterias *test = new Random_Values();
+  // const ICriterias *test = new Unique_Values();
+  const ICriterias *test = new Histogram();
+
   // Compute split attributes
-  auto [column, criterion] = find_Best_Split(data, elem, splitting_Operator);
+  auto [column, criterion] =
+      find_Best_Split(data, elem, splitting_Operator, test);
 
   // Compute new indexes
   auto [left_index, right_index] = split_Index(data, criterion, column, elem);
@@ -254,6 +267,8 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
     train_Left =
         TrainingElement(elem->node->get_Left_Node(), *left_index, next_Depth);
   }
+
+  delete (test);
   return {train_Left, train_Right};
 }
 
@@ -288,6 +303,7 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
     auto [left, right] = split_Node(data, &elem, splitting_Operator);
 
     if (left) {
+      // Verify we gained information
       if (left.value().index.size() != elem.index.size() &&
           left.value().index.size() > treshold) {
 
@@ -296,6 +312,7 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
     }
 
     if (right) {
+      // Verify we gained information
       if (right.value().index.size() != elem.index.size() &&
           right.value().index.size() > treshold) {
 
