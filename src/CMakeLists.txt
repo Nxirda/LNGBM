@@ -5,10 +5,18 @@ add_library(Source_Lib
             Dataset/DataSet.cpp
             Tree/TreeNode.cpp
             Tree/DecisionTree.cpp
+            #Operator part
             Operators/MAE.cpp
             Operators/MAPE.cpp
             Operators/ReductionInVar.cpp
             Operators/RMSE.cpp
+            #Criteria part
+            Criterias/Quartiles.cpp
+            Criterias/Percentiles.cpp
+            Criterias/Random_Values.cpp
+            Criterias/Unique_Values.cpp
+            Criterias/Histogram.cpp
+            #Model part
             PredictionModel/RandomForest.cpp
             PredictionModel/BaggingModel.cpp
             PredictionModel/TrainingElement.cpp
@@ -21,6 +29,7 @@ target_include_directories(Source_Lib
     PUBLIC
     ${CMAKE_SOURCE_DIR}/include/Dataset
     ${CMAKE_SOURCE_DIR}/include/Operators
+    ${CMAKE_SOURCE_DIR}/include/Criterias
     ${CMAKE_SOURCE_DIR}/include/PredictionModel
     ${CMAKE_SOURCE_DIR}/include/Tree
     ${CMAKE_SOURCE_DIR}/include/Validation

@@ -1,5 +1,5 @@
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 #include "ReductionInVar.hpp"
 #include "TreeNode.hpp"
@@ -45,10 +45,8 @@ Inputs     : int, DataSet, vector<int>
 Outputs    : float
 */
 float ReductionInVar::compute(int position, const DataSet &data,
-                              std::vector<int> index) const {
-
-  // Computes the split criteria, needs to be not hardcoded in the future
-  float split_Criteria = data.column_Mean(position, index);
+                              std::vector<int> index,
+                              const float split_Criteria) const {
 
   // Computes the DataSet Row Indexes that child nodes can access
   auto [left_index, right_index] = data.split(position, split_Criteria, index);

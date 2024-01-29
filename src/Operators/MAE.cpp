@@ -43,14 +43,11 @@ Parameters : position, DataSet, index
 Inputs     : int, DataSet, vector<int>
 Outputs    : float
 */
-float MAE::compute(int position, const DataSet &data,
-                   std::vector<int> index) const {
+float MAE::compute(int position, const DataSet &data, std::vector<int> index,
+                   const float split_Criteria) const {
 
   float left_MAE = 0;
   float right_MAE = 0;
-
-  // Computes the split criteria, needs to be not hardcoded in the future
-  float split_Criteria = data.column_Mean(position, index);
 
   // Computes the DataSet Row Indexes that child nodes can access
   auto [left_index, right_index] = data.split(position, split_Criteria, index);
@@ -96,7 +93,7 @@ Inputs     : const vector<float>, const vector<float>
 Outputs    : double
 */
 double MAE::apply(const std::vector<float> &exact,
-                 const std::vector<float> &prediction) {
+                  const std::vector<float> &prediction) {
 
   double res = 0;
   float size = prediction.size();
