@@ -30,7 +30,7 @@ public:
   float compute(int position, const DataSet &data, std::vector<int> index,
                 const float split_Criteria) const override;
 
-  static double apply(const std::vector<float> &exact,
+  static float apply(const std::vector<float> &exact,
                       const std::vector<float> &prediction);
 };
 

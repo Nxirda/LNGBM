@@ -54,6 +54,7 @@ public:
   int labels_Number() const;
   int samples_Number() const;
   int features_Length() const;
+  int element_Size() const;
 
   float whole_Labels_Mean() const;
   float labels_Mean(const std::vector<int> &idx) const;

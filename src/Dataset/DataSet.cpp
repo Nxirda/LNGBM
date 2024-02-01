@@ -318,6 +318,13 @@ std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
 }
 
 /*
+*/
+int DataSet::element_Size() const{
+  return sizeof(this->samples[0][0]);
+}
+
+
+/*
 Return True if there are no values in the DataSet
 Parameters :
 Inputs     :

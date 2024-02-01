@@ -79,31 +79,38 @@ Parameters : Prediction Model, DataSet, K
 Inputs     : BaggingModel, const DataSet, int
 Outputs    : double
 */
-std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
-                                   int K) {
+std::tuple<float, float> K_Folds(BaggingModel &model, const DataSet &data,
+                                 int K) {
   if (K <= 1) {
     perror("K-Folds methods needs at least K=2");
     return {};
   }
 
-  double global_MAE = 0;
-  double global_MAPE = 0;
-  double global_Std_Dev = 0;
+  float global_MAE = 0;
+  float global_MAPE = 0;
+  float global_Std_Dev = 0;
 
+  // Getting infos on the model
   int depth = model.get_Depth();
   int trees = model.get_Trees_Number();
-  
-  // Initialize header for the print
+  int width = data.features_Length();
+  int element_Size = data.element_Size();
+  int precision = 5;
+  std::string formatted_File_Size = tools::matrix_Memory_Size(
+      data.samples_Number(), width, element_Size, precision);
+
+  // Initialize header for the metrics we want
   std::vector<std::string> header = {"Folds", "Depth", "Trees",   "File_size",
                                      "MAE",   "MAPE",  "Std_dev", "Train_time"};
   tools::display_Header(header);
 
-  int total_Size = data.samples_Number();
-  std::vector<int> global_Index(total_Size, 0);
-
   // Initialize timer so it count the whole time the function takes
   Timer t_Global;
   t_Global.start();
+
+  // Actual infos for the function
+  int total_Size = data.samples_Number();
+  std::vector<int> global_Index(total_Size, 0);
 
   // Computes the index for the given DataSet
   for (int i = 0; i < total_Size; ++i) {
@@ -122,6 +129,9 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
     // Creating Training Dataset for this iteration
     DataSet train_Set = train_Folds[i];
 
+    std::string formatted_Matrix_Size = tools::matrix_Memory_Size(
+        train_Set.samples_Number(), width, element_Size, precision);
+
     Timer t_Intern;
     t_Intern.start();
 
@@ -138,9 +148,9 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
     global_MAPE += fold_Mape;
     global_Std_Dev += fold_Std_Dev;
 
-    tools::display_Values("Fold n*" + std::to_string(i), depth, trees, 1,
-                          fold_Mae, fold_Mape, fold_Std_Dev,
-                          t_Intern.get_Duration());
+    tools::display_Values("Fold n*" + std::to_string(i), depth, trees,
+                          formatted_Matrix_Size, fold_Mae, fold_Mape,
+                          fold_Std_Dev, t_Intern.get_Duration());
   }
 
   // Means the result
@@ -150,8 +160,8 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
 
   t_Global.stop();
 
-  tools::display_Values("Global", depth, trees, 1, global_MAE, global_MAPE,
-                        global_Std_Dev, t_Global.get_Duration());
+  tools::display_Values("Global", depth, trees, formatted_File_Size, global_MAE,
+                        global_MAPE, global_Std_Dev, t_Global.get_Duration());
 
   return std::make_tuple(global_MAE, global_MAPE);
 }

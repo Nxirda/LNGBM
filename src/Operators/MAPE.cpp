@@ -103,10 +103,10 @@ Parameters : exact results, prediction results
 Inputs     : const vector<float>, const vector<float>
 Outputs    : double
 */
-double MAPE::apply(const std::vector<float> &exact,
+float MAPE::apply(const std::vector<float> &exact,
                    const std::vector<float> &prediction) {
 
-  double res = 0;
+  float res = 0;
   float size = prediction.size();
   for (unsigned long int i = 0; i < size; ++i) {
     res += std::abs(exact[i] - prediction[i]) / exact[i];
