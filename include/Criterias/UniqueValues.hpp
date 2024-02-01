@@ -4,19 +4,21 @@
 #include "ICriteria.hpp"
 #include <string>
 
-class Unique_Values : public ICriterias {
+class UniqueValues : public ICriteria {
 private:
   // Parameters
   const std::string name = "Unique_Values";
 
 public:
   // Constructor
-  Unique_Values();
+  UniqueValues();
 
   // Destructor
-  ~Unique_Values() override;
+  ~UniqueValues() override;
 
   // Methods
+  static std::string get_Name();
+
   void print() override;
 
   std::vector<float> compute(const std::vector<float> list) const override;

@@ -17,7 +17,7 @@ private:
   int size;
   int max_Depth;
   IOperator *splitting_Operator;
-  ICriterias *splitting_Criteria;
+  ICriteria *splitting_Criteria;
   std::map<int, DecisionTree> trees;
   DataSet dataset;
 
@@ -25,7 +25,7 @@ public:
   // Constructor
 
   RandomForest();
-  RandomForest(const DataSet &dataset, IOperator *op, ICriterias *crit, int n, int depth);
+  RandomForest(const DataSet &dataset, IOperator *op, ICriteria *crit, int n, int depth);
 
   // Destructor
 

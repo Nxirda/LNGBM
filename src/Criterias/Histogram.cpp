@@ -42,7 +42,7 @@ Outputs    :
 Histogram::~Histogram() {}
 
 /*
-Print function to see the name of the operator
+Print function to see the name of the criteria
 (For debugging mainly)
 Parameters :
 Inputs     :
@@ -51,6 +51,15 @@ Outputs    :
 void Histogram::print() {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
+
+/*
+Return the name of the criteria
+(For debugging mainly)
+Parameters :
+Inputs     :
+Outputs    :
+*/
+std::string Histogram::get_Name() { return "Histogram"; }
 
 /*
 Compute the historgam of the given vector

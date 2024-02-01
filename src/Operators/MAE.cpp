@@ -37,6 +37,15 @@ void MAE::print() {
 }
 
 /*
+Return the name of the operator
+(For debugging mainly)
+Parameters :
+Inputs     :
+Outputs    :
+*/
+std::string MAE::get_Name() { return "Mean Absolute Value"; }
+
+/*
 Computes the Mean Absolute Error of a split on a given column
 Index is used to get the column of the dataset that can be accessed
 Parameters : position, DataSet, index

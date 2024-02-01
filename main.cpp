@@ -26,10 +26,10 @@ int main(int argc, char **argv) {
 
     std::cout << "\n";
 
-    std::cout << "== Split Metrics Available are ==\n";
+    std::cout << "== Split Metrics are ==\n";
     operators::print();
 
-    std::cout << "== Split Criterias Available are ==\n";
+    std::cout << "\n== Split Criterias are ==\n";
     criterias::print();
 
     return 1;

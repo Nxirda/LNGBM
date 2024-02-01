@@ -7,7 +7,7 @@
 #include "MAE.hpp"
 #include "MAPE.hpp"
 #include "BaggingModel.hpp"
-#include "ReductionInVar.hpp"
+#include "RIV.hpp"
 
 namespace metric {
 /*
@@ -23,7 +23,7 @@ std::tuple<double, double, double> compute_accuracy(BaggingModel &model,
 
   double error = MAE::apply(exact, prediction);
   double percentage_Error = MAPE::apply(exact, prediction);
-  double standard_deviation = std::sqrt(ReductionInVar::apply(exact, prediction));
+  double standard_deviation = std::sqrt(RIV::apply(exact, prediction));
 
   return std::make_tuple(error, percentage_Error, standard_deviation);
 }

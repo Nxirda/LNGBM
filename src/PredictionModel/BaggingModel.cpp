@@ -71,8 +71,8 @@ void BaggingModel::set_Metric(std::string metric) {
   case (operators::type::RMSE):
     this->split_Metric = new RMSE();
     break;
-  case (operators::type::ReductionInVar):
-    this->split_Metric = new ReductionInVar();
+  case (operators::type::RIV):
+    this->split_Metric = new RIV();
     break;
   default:
     errno = EINVAL;
@@ -91,9 +91,9 @@ void BaggingModel::set_Criteria(std::string criteria) {
 
   std::map<std::string, criterias::type>::iterator it;
 
-  it = criterias::dictionnary.find(criteria);
+  it = criterias::dictionary.find(criteria);
 
-  if (it == criterias::dictionnary.end()) {
+  if (it == criterias::dictionary.end()) {
     errno = EINVAL;
     perror("Chosen criteria is invalid");
     abort();
@@ -109,11 +109,11 @@ void BaggingModel::set_Criteria(std::string criteria) {
   case (criterias::type::Quartiles):
     this->split_Criteria = new Quartiles();
     break;
-  case (criterias::type::Random_Values):
-    this->split_Criteria = new Random_Values();
+  case (criterias::type::RandomValues):
+    this->split_Criteria = new RandomValues();
     break;
-  case (criterias::type::Unique_Values):
-    this->split_Criteria = new Unique_Values();
+  case (criterias::type::UniqueValues):
+    this->split_Criteria = new UniqueValues();
     break;
   default:
     errno = EINVAL;

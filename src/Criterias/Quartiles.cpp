@@ -26,7 +26,7 @@ Outputs    :
 Quartiles::~Quartiles() {}
 
 /*
-Print function to see the name of the operator
+Print function to see the name of the criteria
 (For debugging mainly)
 Parameters :
 Inputs     :
@@ -35,6 +35,15 @@ Outputs    :
 void Quartiles::print() {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
+
+/*
+Return the name of the criteria
+(For debugging mainly)
+Parameters :
+Inputs     :
+Outputs    :
+*/
+std::string Quartiles::get_Name() { return "Quartiles"; }
 
 /*
 Compute the Quartiles of the given vector

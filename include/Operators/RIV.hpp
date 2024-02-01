@@ -4,26 +4,28 @@
 #include "IOperator.hpp"
 #include <string>
 
-class ReductionInVar : public IOperator {
+class RIV : public IOperator {
 
 private:
   // Parameters
 
-  //float split_Criterion;
+  // float split_Criterion;
   const std::string name = "RIV";
 
 public:
   // Constructor
 
-  ReductionInVar();
+  RIV();
 
   // Destructor
 
-  ~ReductionInVar() override;
+  ~RIV() override;
 
   // Methods
 
   void print() override;
+
+  static std::string get_Name();
 
   float compute(int position, const DataSet &data, std::vector<int> index,
                 const float split_Criteria) const override;

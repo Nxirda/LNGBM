@@ -1,7 +1,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "ReductionInVar.hpp"
+#include "RIV.hpp"
 #include "TreeNode.hpp"
 
 /********************/
@@ -16,7 +16,7 @@ Parameters :
 Inputs     :
 Outputs    :
 */
-ReductionInVar::ReductionInVar() {}
+RIV::RIV() {}
 
 /*
 Destructor
@@ -24,7 +24,7 @@ Parameters :
 Inputs     :
 Outputs    :
 */
-ReductionInVar::~ReductionInVar() {}
+RIV::~RIV() {}
 
 /*
 Print function to see the name of the operator
@@ -33,9 +33,18 @@ Parameters :
 Inputs     :
 Outputs    :
 */
-void ReductionInVar::print() {
+void RIV::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
 }
+
+/*
+Return the name of the operator
+(For debugging mainly)
+Parameters :
+Inputs     :
+Outputs    :
+*/
+std::string RIV::get_Name() { return "Reduction In Variance"; }
 
 /*
 Computes the Variance of a split on a given column
@@ -44,7 +53,7 @@ Parameters : position, DataSet, index
 Inputs     : int, DataSet, vector<int>
 Outputs    : float
 */
-float ReductionInVar::compute(int position, const DataSet &data,
+float RIV::compute(int position, const DataSet &data,
                               std::vector<int> index,
                               const float split_Criteria) const {
 
@@ -80,7 +89,7 @@ Parameters : exact results, prediction results
 Inputs     : const vector<float>, const vector<float>
 Outputs    : double
 */
-double ReductionInVar::apply(const std::vector<float> &exact,
+double RIV::apply(const std::vector<float> &exact,
                              const std::vector<float> &prediction) {
   double res = 0;
   float size = prediction.size();

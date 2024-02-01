@@ -13,7 +13,7 @@ private:
   // Parameters
   // Might wanna add a train/Test splitter for the dataset somewhere
   IOperator *split_Metric;
-  ICriterias *split_Criteria;
+  ICriteria *split_Criteria;
   RandomForest forest;
 
   int max_Depth;

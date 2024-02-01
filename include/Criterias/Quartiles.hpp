@@ -4,7 +4,7 @@
 #include "ICriteria.hpp"
 #include <string>
 
-class Quartiles : public ICriterias {
+class Quartiles : public ICriteria {
 private:
   // Parameters
   const std::string name = "Quartiles";
@@ -18,7 +18,10 @@ public:
   ~Quartiles() override;
 
   // Methods
+  static std::string get_Name();
+
   void print() override;
+
   std::vector<float> compute(const std::vector<float> list) const override;
 };
 

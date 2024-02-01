@@ -4,7 +4,7 @@
 #include "ICriteria.hpp"
 #include <string>
 
-class Percentiles : public ICriterias {
+class Percentiles : public ICriteria {
 private:
   // Parameters
   const std::string name = "Percentiles";
@@ -19,6 +19,8 @@ public:
   ~Percentiles() override;
 
   // Methods
+  static std::string get_Name();
+
   void print() override;
 
   std::vector<float> compute(const std::vector<float> list) const override;

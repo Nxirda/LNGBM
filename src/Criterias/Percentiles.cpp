@@ -26,7 +26,7 @@ Outputs    :
 Percentiles::~Percentiles() {}
 
 /*
-Print function to see the name of the operator
+Print function to see the name of the criteria
 (For debugging mainly)
 Parameters :
 Inputs     :
@@ -35,6 +35,15 @@ Outputs    :
 void Percentiles::print() {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
+
+/*
+Return the name of the criteria
+(For debugging mainly)
+Parameters :
+Inputs     :
+Outputs    :
+*/
+std::string Percentiles::get_Name() { return "Percentiles"; }
 
 /*
 Compute the percentiles of the given vector

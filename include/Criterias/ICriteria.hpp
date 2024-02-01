@@ -7,17 +7,16 @@
 #include "DataSet.hpp"
 
 // Interface to build Operators on
-class ICriterias {
+class ICriteria {
 
 private:
   const std::string name;
 
 public:
-  virtual ~ICriterias(){};
 
-  //virtual std::vector<float> compute(const std::vector<float> column) const = 0;
-
-  virtual std::vector<float> compute(const std::vector<float> column) const = 0;
+  virtual ~ICriteria(){};
+  
+  virtual std::vector<float> compute(const std::vector<float> list) const = 0;
 
   virtual void print() = 0;
 };

@@ -141,7 +141,7 @@ Ouputs     : tuple<int, float>
 std::tuple<int, float>
 TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
                                  const IOperator *splitting_Operator,
-                                 const ICriterias *splitting_Criteria) {
+                                 const ICriteria *splitting_Criteria) {
 
   int best_Feature = 0;
   float criterion = 0;
@@ -199,7 +199,7 @@ Outputs    : tuple<optional<TrainingElement>, <optional<TrainingElement>>
 std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
 TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
                             const IOperator *splitting_Operator,
-                            const ICriterias *splitting_Criteria) {
+                            const ICriteria *splitting_Criteria) {
 
   // Left node
   TreeNode left{};
@@ -271,7 +271,7 @@ Outputs    :
 */
 void TrainingElement::train(const DataSet &data,
                             const IOperator *splitting_Operator,
-                            const ICriterias *splitting_Criteria, int max_Depth,
+                            const ICriteria *splitting_Criteria, int max_Depth,
                             long unsigned int treshold) {
 
   // Initialize the stack of Node that will be splitted

@@ -4,7 +4,7 @@
 #include "ICriteria.hpp"
 #include <string>
 
-class Random_Values : public ICriterias {
+class RandomValues : public ICriteria {
 private:
   // Parameters
   const std::string name = "Random_Values";
@@ -12,15 +12,19 @@ private:
 
 public:
   // Constructor
-  Random_Values();
+  RandomValues();
 
-  Random_Values(int x);
+  RandomValues(int x);
 
   // Destructor
-  ~Random_Values() override;
+  ~RandomValues() override;
+
+  static std::string get_Name();
 
   // Methods
   void print() override;
+    static void printf();
+
 
   std::vector<float> compute(const std::vector<float> list) const override;
 

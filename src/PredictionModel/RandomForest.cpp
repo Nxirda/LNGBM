@@ -29,7 +29,7 @@ Inputs     : const DataSet, IOperator*, ICriteria*, int, int
 Outputs    : Object of RandomForest class
 */
 RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
-                           ICriterias *split_Criteria, int n, int depth) {
+                           ICriteria *split_Criteria, int n, int depth) {
   this->size = n;
   this->max_Depth = depth;
   this->dataset = dataset;
