@@ -1,18 +1,17 @@
 #include "TrainingElement.hpp"
 #include <stack>
 
-// TEMP
-#include "Histogram.hpp"
-#include "Percentiles.hpp"
-#include "Quartiles.hpp"
-#include "Random_Values.hpp"
-#include "Unique_Values.hpp"
+/**************************/
+/*                        */
+/* TRAINING ELEMENT CLASS */
+/*                        */
+/**************************/
 
 /*
 Default Constructor
 Parameters :
 Inputs     :
-Outputs    :
+Outputs    : Object of TrainingElement class
 */
 TrainingElement::TrainingElement() {
   this->depth = 0;
@@ -24,7 +23,7 @@ TrainingElement::TrainingElement() {
 Constructor to set up the node of the training element
 Parameters : Node, index, depth
 Inputs     : TreeNode*, const vector<int>, int
-Outputs    :
+Outputs    : Object of TrainingElement class
 */
 TrainingElement::TrainingElement(TreeNode *node, std::vector<int> const index,
                                  int depth) {
@@ -37,7 +36,7 @@ TrainingElement::TrainingElement(TreeNode *node, std::vector<int> const index,
 Copy Assignment
 Parameters : Training Element to copy
 Inputs     : const TrainingElement
-Outputs    :
+Outputs    : Object of TrainingElement class
  */
 TrainingElement::TrainingElement(const TrainingElement &TE) {
   this->depth = TE.depth;
@@ -49,7 +48,7 @@ TrainingElement::TrainingElement(const TrainingElement &TE) {
 Copy constructor
 Parameters : Training Element to copy
 Inputs     : const TrainingElement
-Outputs    :
+Outputs    : Object of TrainingElement class
  */
 TrainingElement &TrainingElement::operator=(const TrainingElement &TE) {
   this->depth = TE.depth;
@@ -135,14 +134,14 @@ void TrainingElement::bootstrap_Index(int dataset_Size) {
 /*
 Search for the best feature to split the dataset on at a given Node
 Gives the split criterion at the same time
-Parameters : Dataset, Element, Splitting operator
-Inputs     : const DataSet, TrainingElem* , IOperator*
+Parameters : Dataset, Element, Splitting operator, Splitting Criteria
+Inputs     : const DataSet, TrainingElem*, IOperator*, ICriteria*
 Ouputs     : tuple<int, float>
 */
 std::tuple<int, float>
 TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
                                  const IOperator *splitting_Operator,
-                                 const ICriterias *splitting_Criteria) {
+                                 const ICriteria *splitting_Criteria) {
 
   int best_Feature = 0;
   float criterion = 0;
@@ -187,21 +186,20 @@ TrainingElement::split_Index(const DataSet &data, int criterion, int position,
   if (position < data.features_Length() && criterion > 0) {
     return data.split(position, criterion, elem->get_Index());
   } else {
-    // std::optional<std::vector<int>> empty_Vec =
-    // std::nullopt;//std::vector<int>{};
     return {std::nullopt, std::nullopt};
   }
 }
 
 /*
 Splits the element according to the specified operator
-Parameters : Dataset, element, operator
-Inputs     : const DataSet, TrainingElement*, IOperator*, int
+Parameters : Dataset, element, operator, criteria
+Inputs     : const DataSet, TrainingElement*, IOperator*, ICriteria*
 Outputs    : tuple<optional<TrainingElement>, <optional<TrainingElement>>
 */
 std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
 TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
-                            const IOperator *splitting_Operator) {
+                            const IOperator *splitting_Operator,
+                            const ICriteria *splitting_Criteria) {
 
   // Left node
   TreeNode left{};
@@ -211,16 +209,9 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   TreeNode right{};
   std::optional<TrainingElement> train_Right = std::nullopt;
 
-  // TEMP
-  // const ICriterias *test = new Percentiles();
-  // const ICriterias *test = new Quartiles();
-  // const ICriterias *test = new Random_Values();
-  // const ICriterias *test = new Unique_Values();
-  const ICriterias *test = new Histogram();
-
   // Compute split attributes
   auto [column, criterion] =
-      find_Best_Split(data, elem, splitting_Operator, test);
+      find_Best_Split(data, elem, splitting_Operator, splitting_Criteria);
 
   // Compute new indexes
   auto [left_index, right_index] = split_Index(data, criterion, column, elem);
@@ -268,19 +259,20 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
         TrainingElement(elem->node->get_Left_Node(), *left_index, next_Depth);
   }
 
-  delete (test);
   return {train_Left, train_Right};
 }
 
 /*
 Train the model by splitting nodes till they have reach max Depth or dont bring
 anymore informations
-Parameters : Dataset, operator, max depth
-Inputs     : const DataSet, IOperator*, int
+Parameters : Dataset, operator, criteria, max depth, treshold
+Inputs     : const DataSet, IOperator*, ICriteria*, int, long unsigned int
 Outputs    :
 */
-void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
-                            int max_Depth, long unsigned int treshold) {
+void TrainingElement::train(const DataSet &data,
+                            const IOperator *splitting_Operator,
+                            const ICriteria *splitting_Criteria, int max_Depth,
+                            long unsigned int treshold) {
 
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
@@ -300,7 +292,8 @@ void TrainingElement::train(const DataSet &data, IOperator *splitting_Operator,
       continue;
     }
 
-    auto [left, right] = split_Node(data, &elem, splitting_Operator);
+    auto [left, right] =
+        split_Node(data, &elem, splitting_Operator, splitting_Criteria);
 
     if (left) {
       // Verify we gained information

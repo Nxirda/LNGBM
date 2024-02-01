@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include "TrainingElement.hpp"
-#include "Unique_Values.hpp"
+#include "UniqueValues.hpp"
 
 /**************************/
 /*                        */
@@ -15,9 +15,9 @@
 Constructor
 Parameters :
 Inputs     :
-Outputs    :
+Outputs    : Object of Unique Values class
 */
-Unique_Values::Unique_Values() {}
+UniqueValues::UniqueValues() {}
 
 /*
 Destructor
@@ -25,26 +25,39 @@ Parameters :
 Inputs     :
 Outputs    :
 */
-Unique_Values::~Unique_Values() {}
+UniqueValues::~UniqueValues() {}
 
 /*
-Print function to see the name of the operator
+Print function to see the name of the criteria
 (For debugging mainly)
 Parameters :
 Inputs     :
 Outputs    :
 */
-void Unique_Values::print() {
+void UniqueValues::print() {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
 /*
- */
+Return the name of the criteria
+(For debugging mainly)
+Parameters :
+Inputs     :
+Outputs    :
+*/
+std::string UniqueValues::get_Name() { return "Unique Values"; }
+
+/*
+Compute the Uniques Values of the given vector
+Parameters : Element distribution
+Inputs     : const vector<float>
+Outputs    : vector<float>
+*/
 std::vector<float>
-Unique_Values::compute(const std::vector<float> column) const {
+UniqueValues::compute(const std::vector<float> list) const {
 
   // Cast in set to get unique values (unordered set of efficiency)
-  std::unordered_set<float> unique(column.begin(), column.end());
+  std::unordered_set<float> unique(list.begin(), list.end());
 
   // Cast back in array for the result
   std::vector<float> res(unique.begin(), unique.end());

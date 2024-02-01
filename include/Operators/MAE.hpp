@@ -25,6 +25,8 @@ public:
 
   void print() override;
 
+  static std::string get_Name();
+
   float compute(int position, const DataSet &data, std::vector<int> index,
                 const float split_Criteria) const override;
 

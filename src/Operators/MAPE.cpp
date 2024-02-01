@@ -37,6 +37,15 @@ void MAPE::print() {
 }
 
 /*
+Return the name of the operator
+(For debugging mainly)
+Parameters :
+Inputs     :
+Outputs    :
+*/
+std::string MAPE::get_Name() { return "Mean Absolute Percentage Value"; }
+
+/*
 Computes the Mean Absolute Percentage Error of a split on a given column
 Index is used to get the column of the dataset that can be accessed
 Parameters : position, DataSet, index

@@ -49,9 +49,9 @@ gtest_discover_tests(Tests)
 
 # ===== Benchmark Part =====
 
-add_executable(Benchmarks Benchmark/mainBenchmark.cpp)
+add_executable(Benchmarks benchmark/mainBenchmark.cpp)
 
-add_subdirectory(Benchmark)
+add_subdirectory(benchmark)
 
 target_link_libraries(Benchmarks PUBLIC Benchmark_Lib)
 

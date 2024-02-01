@@ -1,10 +1,10 @@
 #ifndef RANDOM_VALUES_H_
 #define RANDOM_VALUES_H_
 
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 #include <string>
 
-class Random_Values : public ICriterias {
+class RandomValues : public ICriteria {
 private:
   // Parameters
   const std::string name = "Random_Values";
@@ -12,17 +12,21 @@ private:
 
 public:
   // Constructor
-  Random_Values();
+  RandomValues();
 
-  Random_Values(int x);
+  RandomValues(int x);
 
   // Destructor
-  ~Random_Values() override;
+  ~RandomValues() override;
+
+  static std::string get_Name();
 
   // Methods
   void print() override;
+    static void printf();
 
-  std::vector<float> compute(const std::vector<float> column) const override;
+
+  std::vector<float> compute(const std::vector<float> list) const override;
 
   float get_Random_Float(float min , float max) const;
 };

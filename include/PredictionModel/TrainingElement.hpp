@@ -3,8 +3,8 @@
 
 #include <optional>
 
+#include "ICriteria.hpp"
 #include "IOperator.hpp"
-#include "ICriterias.hpp"
 #include "TreeNode.hpp"
 
 struct TrainingElement {
@@ -43,18 +43,19 @@ struct TrainingElement {
 
   std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
   split_Node(const DataSet &data, TrainingElement *elem,
-             const IOperator *splitting_Operator);
+             const IOperator *splitting_Operator,
+             const ICriteria *splitting_Criteria);
 
   std::tuple<int, float> find_Best_Split(const DataSet &data,
                                          TrainingElement *elem,
                                          const IOperator *splitting_Operator,
-                                         const ICriterias *splitting_Criteria);
+                                         const ICriteria *splitting_Criteria);
 
   std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
   split_Index(const DataSet &data, int criterion, int position,
               TrainingElement *elem);
 
-  void train(const DataSet &data, IOperator *splitting_Operator, int max_Depth,
+  void train(const DataSet &data, const IOperator *splitting_Operator, const ICriteria *splitting_Criteria, int max_Depth,
              long unsigned int treshold);
 
   void set_Root(int dataset_Size, TreeNode *node, float value);

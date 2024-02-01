@@ -21,7 +21,7 @@ void RIV_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
   std::cout << "      ===== RIV =====\n";
   DataSet ds{PATH};
 
-  BaggingModel RIV_Bench("RIV", tree_Depth);
+  BaggingModel RIV_Bench("RIV","Q", tree_Depth);
 
   Timer t;
   t.start();
@@ -40,7 +40,7 @@ void MAE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
   std::cout << "      ===== MAE =====\n";
   DataSet ds{PATH};
 
-  BaggingModel MAE_Bench("MAE", tree_Depth);
+  BaggingModel MAE_Bench("MAE","Q", tree_Depth);
 
   Timer t;
   t.start();
@@ -59,7 +59,7 @@ void MAPE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
   std::cout << "      ===== MAPE =====\n";
   DataSet ds{PATH};
 
-  BaggingModel MAPE_Bench("RMSE", tree_Depth);
+  BaggingModel MAPE_Bench("RMSE","Q", tree_Depth);
 
   Timer t;
   t.start();
@@ -77,7 +77,7 @@ void MAPE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
 void RMSE_Benchmark(std::string PATH, int tree_Depth, int nb_Trees, int K) {
   std::cout << "      ===== RMSE =====\n";
   DataSet ds{PATH};
-  BaggingModel RMSE_Bench("RMSE", tree_Depth);
+  BaggingModel RMSE_Bench("RMSE","Q", tree_Depth);
 
   Timer t;
   t.start();

@@ -37,6 +37,15 @@ void RMSE::print() {
 }
 
 /*
+Return the name of the operator
+(For debugging mainly)
+Parameters :
+Inputs     :
+Outputs    :
+*/
+std::string RMSE::get_Name() { return "Root Mean Square Error"; }
+
+/*
 Computes the Root Mean Square Error of a split on a given column
 Index is used to get the column of the dataset that can be accessed
 Parameters : position, DataSet, index
