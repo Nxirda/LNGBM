@@ -22,7 +22,7 @@ public:
   // Methods
   void print() override;
 
-  std::vector<float> compute(const std::vector<float> column) const override;
+  std::vector<float> compute(const std::vector<float> list) const override;
 };
 
 #endif

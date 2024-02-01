@@ -14,12 +14,16 @@
 Constructor
 Parameters :
 Inputs     :
-Outputs    :
+Outputs    : Object of Random_Values class
 */
 Random_Values::Random_Values() {}
 
 /*
- */
+Constructor with argument for the number of values to compute
+Parameters : number of values
+Inputs     : int
+Outputs    : Object of Random Values class
+*/
 Random_Values::Random_Values(int x) {
   if (x <= 0) {
     errno = EINVAL;
@@ -39,6 +43,10 @@ Outputs    :
 Random_Values::~Random_Values() {}
 
 /*
+Computes a random float between min and max
+Parameters : minimum value, maximum value
+Inputs     : float, float
+Outputs    : float
  */
 float Random_Values::get_Random_Float(float min, float max) const {
   // Hardware based entropy
@@ -61,12 +69,15 @@ void Random_Values::print() {
 }
 
 /*
- */
-std::vector<float>
-Random_Values::compute(const std::vector<float> column) const {
+Compute random values in the given vector
+Parameters : Element distribution
+Inputs     : const vector<float>
+Outputs    : vector<float>
+*/
+std::vector<float> Random_Values::compute(const std::vector<float> list) const {
 
-  auto min = std::min_element(column.begin(), column.end());
-  auto max = std::max_element(column.begin(), column.end());
+  auto min = std::min_element(list.begin(), list.end());
+  auto max = std::max_element(list.begin(), list.end());
 
   std::vector<float> res(this->number_Of_Elements, 0);
   res[0] = *min;

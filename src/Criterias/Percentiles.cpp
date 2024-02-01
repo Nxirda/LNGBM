@@ -13,7 +13,7 @@
 Constructor
 Parameters :
 Inputs     :
-Outputs    :
+Outputs    : Object of Percentile class
 */
 Percentiles::Percentiles() {}
 
@@ -37,12 +37,16 @@ void Percentiles::print() {
 }
 
 /*
- */
-std::vector<float> Percentiles::compute(const std::vector<float> column) const {
+Compute the percentiles of the given vector
+Parameters : Element distribution
+Inputs     : const vector<float>
+Outputs    : vector<float>
+*/
+std::vector<float> Percentiles::compute(const std::vector<float> list) const {
 
   std::vector<float> percentiles_Values(this->percentiles.size(), 0);
   // Sort the data
-  std::vector<float> sorted_Data = column;
+  std::vector<float> sorted_Data = list;
   std::sort(sorted_Data.begin(), sorted_Data.end());
 
   for (size_t i = 0; i < this->percentiles.size(); ++i) {

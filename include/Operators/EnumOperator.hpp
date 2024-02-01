@@ -10,21 +10,25 @@
 #include "RMSE.hpp"
 #include "ReductionInVar.hpp"
 
-/**/
-enum class OperatorType {
-  MAE,
-  MAPE,
-  RMSE,
-  ReductionInVar,
-  Other
-
-};
+namespace operators {
 
 /**/
-std::map<std::string, OperatorType> operator_Dictionnary = {
-    {"MAE", OperatorType::MAE},
-    {"MAPE", OperatorType::MAPE},
-    {"RMSE", OperatorType::RMSE},
-    {"RIV", OperatorType::ReductionInVar}};
+enum class type { MAE, MAPE, RMSE, ReductionInVar, Other };
+
+/**/
+inline std::map<std::string, type> dictionnary = {
+    {"MAE", type::MAE},
+    {"MAPE", type::MAPE},
+    {"RMSE", type::RMSE},
+    {"RIV", type::ReductionInVar}};
+
+/**/
+inline void print() {
+  for (auto const &pair : dictionnary) {
+    std::cout << "{" << pair.first << "}\n";
+  }
+  return;
+}
+} // namespace operators
 
 #endif

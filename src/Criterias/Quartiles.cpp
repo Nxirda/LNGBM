@@ -13,7 +13,7 @@
 Constructor
 Parameters :
 Inputs     :
-Outputs    :
+Outputs    : Object of Quartiles class
 */
 Quartiles::Quartiles() {}
 
@@ -37,12 +37,16 @@ void Quartiles::print() {
 }
 
 /*
+Compute the Quartiles of the given vector
+Parameters : Element distribution
+Inputs     : const vector<float>
+Outputs    : vector<float>
 */
-std::vector<float> Quartiles::compute(const std::vector<float> column) const{
+std::vector<float> Quartiles::compute(const std::vector<float> list) const{
 
     std::vector<float> quartiles_Values(this->quartiles.size(), 0);
     // Sort the data
-    std::vector<float> sorted_Data = column;
+    std::vector<float> sorted_Data = list;
     std::sort(sorted_Data.begin(), sorted_Data.end());
 
     for (size_t i = 0; i < this->quartiles.size(); ++i) {

@@ -1,4 +1,6 @@
-# LAPACK DGTERF performance prediction via Machine Learning
+# Machine Learning : regression tool
+
+    This project has been developped in order to predict the performance of the DGETRF core from the LAPACK library
 
 ## Build with docker :
 
@@ -14,6 +16,7 @@ $ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugi
 #Make sure install went right :
 $ sudo docker run hello-world
 ```
+
 Docker documentation is available [here](https://docs.docker.com/engine/install/)
 
 ### Build the project :

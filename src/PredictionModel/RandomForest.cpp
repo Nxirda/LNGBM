@@ -13,7 +13,7 @@
 Default Constructor : Initialize empty Forest
 Parameters :
 Inputs     :
-Outputs    :
+Outputs    : Object of RandomForest class
 */
 RandomForest::RandomForest() {
   this->size = 0;
@@ -24,16 +24,17 @@ RandomForest::RandomForest() {
 
 /*
 Constructor with arguments
-Parameters : Dataset, splitting operator, forest size, depth for the trees
-Inputs     : const DataSet, IOperator*, int, int
-Outputs    :
+Parameters : Dataset, splitting operator, splitting criteria, forest size, depth for the trees
+Inputs     : const DataSet, IOperator*, ICriteria*, int, int
+Outputs    : Object of RandomForest class
 */
 RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
-                           int n, int depth) {
+                           ICriterias *split_Criteria, int n, int depth) {
   this->size = n;
   this->max_Depth = depth;
   this->dataset = dataset;
   this->splitting_Operator = split_Operator;
+  this->splitting_Criteria = split_Criteria;
   this->trees = std::map<int, DecisionTree>();
 }
 
@@ -68,8 +69,8 @@ void RandomForest::generate_Forest(int size) {
     TrainingElement elem{};
 
     elem.set_Node(tree.get_Root());
-    elem.train(this->dataset, this->splitting_Operator, this->max_Depth,
-               treshold);
+    elem.train(this->dataset, this->splitting_Operator,
+               this->splitting_Criteria, this->max_Depth, treshold);
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
     this->trees.insert({i, tree});

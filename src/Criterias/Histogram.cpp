@@ -13,12 +13,16 @@
 Constructor
 Parameters :
 Inputs     :
-Outputs    :
+Outputs    : Object of Histogram class
 */
 Histogram::Histogram() {}
 
 /*
- */
+Constructor with argument for the number of bins
+Parameters : number of bins
+Inputs     : int
+Outputs    : Object of Histogram class
+*/
 Histogram::Histogram(int x) {
   if (x <= 0) {
     errno = EINVAL;
@@ -49,11 +53,15 @@ void Histogram::print() {
 }
 
 /*
- */
-std::vector<float> Histogram::compute(const std::vector<float> column) const {
+Compute the historgam of the given vector
+Parameters : Element distribution
+Inputs     : const vector<float>
+Outputs    : vector<float>
+*/
+std::vector<float> Histogram::compute(const std::vector<float> list) const {
 
-  auto min = std::min_element(column.begin(), column.end());
-  auto max = std::max_element(column.begin(), column.end());
+  auto min = std::min_element(list.begin(), list.end());
+  auto max = std::max_element(list.begin(), list.end());
 
   std::vector<float> res(this->number_Of_Bins, 0.0);
 

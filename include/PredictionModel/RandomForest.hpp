@@ -4,9 +4,10 @@
 #include <map>
 #include <vector>
 
-#include "DecisionTree.hpp"
-#include "IOperator.hpp"
 #include "TrainingElement.hpp"
+#include "DecisionTree.hpp"
+#include "ICriterias.hpp"
+#include "IOperator.hpp"
 
 class RandomForest {
 
@@ -16,6 +17,7 @@ private:
   int size;
   int max_Depth;
   IOperator *splitting_Operator;
+  ICriterias *splitting_Criteria;
   std::map<int, DecisionTree> trees;
   DataSet dataset;
 
@@ -23,7 +25,7 @@ public:
   // Constructor
 
   RandomForest();
-  RandomForest(const DataSet &dataset, IOperator *op, int n, int depth);
+  RandomForest(const DataSet &dataset, IOperator *op, ICriterias *crit, int n, int depth);
 
   // Destructor
 
