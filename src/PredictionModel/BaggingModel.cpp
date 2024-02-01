@@ -1,8 +1,8 @@
 #include <errno.h>
 
 #include "BaggingModel.hpp"
-#include "EnumOperator.hpp"
 #include "EnumCriteria.hpp"
+#include "EnumOperator.hpp"
 
 /********************/
 /*                  */
@@ -121,6 +121,14 @@ void BaggingModel::set_Criteria(std::string criteria) {
     abort();
   }
 }
+
+/*
+ */
+int BaggingModel::get_Depth() { return this->max_Depth; }
+
+/*
+ */
+int BaggingModel::get_Trees_Number() { return this->forest.get_size(); };
 
 /*
 Train the trees on the given dataset on the configured max depth

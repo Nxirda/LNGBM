@@ -1,8 +1,12 @@
 #ifndef CROSS_VALIDATION_H_
 #define CROSS_VALIDATION_H_
 
+#include <iomanip>
+
 #include "BaggingModel.hpp"
 #include "DataSet.hpp"
+#include "Timer.hpp"
+#include "Tools.hpp"
 #include "Validation.hpp"
 
 namespace CrossValidation {
@@ -86,8 +90,20 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
   double global_MAPE = 0;
   double global_Std_Dev = 0;
 
+  int depth = model.get_Depth();
+  int trees = model.get_Trees_Number();
+  
+  // Initialize header for the print
+  std::vector<std::string> header = {"Folds", "Depth", "Trees",   "File_size",
+                                     "MAE",   "MAPE",  "Std_dev", "Train_time"};
+  tools::display_Header(header);
+
   int total_Size = data.samples_Number();
   std::vector<int> global_Index(total_Size, 0);
+
+  // Initialize timer so it count the whole time the function takes
+  Timer t_Global;
+  t_Global.start();
 
   // Computes the index for the given DataSet
   for (int i = 0; i < total_Size; ++i) {
@@ -99,14 +115,20 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
       compute_Folds(data, global_Index, total_Size, K);
 
   for (int i = 0; i < K; ++i) {
+
     // Creating Test Dataset for this iteration
     DataSet test_Set = test_Folds[i];
 
     // Creating Training Dataset for this iteration
     DataSet train_Set = train_Folds[i];
 
+    Timer t_Intern;
+    t_Intern.start();
+
     // Train the model on the sub data set
     model.train(train_Set);
+
+    t_Intern.stop();
 
     auto [fold_Mae, fold_Mape, fold_Std_Dev] =
         metric::compute_accuracy(model, test_Set);
@@ -116,6 +138,9 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
     global_MAPE += fold_Mape;
     global_Std_Dev += fold_Std_Dev;
 
+    tools::display_Values("Fold n*" + std::to_string(i), depth, trees, 1,
+                          fold_Mae, fold_Mape, fold_Std_Dev,
+                          t_Intern.get_Duration());
   }
 
   // Means the result
@@ -123,15 +148,10 @@ std::tuple<double, double> K_Folds(BaggingModel &model, const DataSet &data,
   global_MAPE /= K;
   global_Std_Dev /= K;
 
-  //Printing everything to the user
-  std::cout << "\n=== RESULTS OF CROSS-VALIDATION ===\n";
-  std::cout << "\nGlobal Mean Absolute Error            : " << global_MAE
-            << " for " << K << " folds\n";
-  std::cout << "Global Mean Absolute Percentage Error : " << global_MAPE
-            << " for " << K << " folds\n";
-  std::cout << "Global Standard Deviation             : " << global_Std_Dev
-            << " for " << K << " folds\n";
-  std::cout << std::endl;
+  t_Global.stop();
+
+  tools::display_Values("Global", depth, trees, 1, global_MAE, global_MAPE,
+                        global_Std_Dev, t_Global.get_Duration());
 
   return std::make_tuple(global_MAE, global_MAPE);
 }

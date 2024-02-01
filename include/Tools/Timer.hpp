@@ -18,6 +18,7 @@ public:
 
     void start();
     void stop();
+    std::string get_Duration();
     void print(std::string func_name);
 };
 
