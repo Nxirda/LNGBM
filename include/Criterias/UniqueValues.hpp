@@ -1,7 +1,7 @@
 #ifndef UNIQUE_VALUES_H_
 #define UNIQUE_VALUES_H_
 
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 #include <string>
 
 class Unique_Values : public ICriterias {

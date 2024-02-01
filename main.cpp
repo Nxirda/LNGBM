@@ -2,7 +2,7 @@
 #include "CrossValidation.hpp"
 #include "DataSet.hpp"
 
-#include "EnumCriterias.hpp"
+#include "EnumCriteria.hpp"
 #include "EnumOperator.hpp"
 
 #include "Validation.hpp"

@@ -8,13 +8,13 @@ add_library(Source_Lib
             #Operator part
             Operators/MAE.cpp
             Operators/MAPE.cpp
-            Operators/ReductionInVar.cpp
+            Operators/RIV.cpp
             Operators/RMSE.cpp
             #Criteria part
             Criterias/Quartiles.cpp
             Criterias/Percentiles.cpp
-            Criterias/Random_Values.cpp
-            Criterias/Unique_Values.cpp
+            Criterias/RandomValues.cpp
+            Criterias/UniqueValues.cpp
             Criterias/Histogram.cpp
             #Model part
             PredictionModel/RandomForest.cpp

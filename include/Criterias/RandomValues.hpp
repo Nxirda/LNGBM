@@ -1,7 +1,7 @@
 #ifndef RANDOM_VALUES_H_
 #define RANDOM_VALUES_H_
 
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 #include <string>
 
 class Random_Values : public ICriterias {

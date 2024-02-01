@@ -1,7 +1,7 @@
 #ifndef PERCENTILES_H_
 #define PERCENTILES_H_
 
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 #include <string>
 
 class Percentiles : public ICriterias {

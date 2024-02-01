@@ -1,7 +1,7 @@
 #ifndef QUARTILES_H_
 #define QUARTILES_H_
 
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 #include <string>
 
 class Quartiles : public ICriterias {

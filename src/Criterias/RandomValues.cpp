@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <random>
 
-#include "Random_Values.hpp"
+#include "RandomValues.hpp"
 #include "TrainingElement.hpp"
 
 /**************************/

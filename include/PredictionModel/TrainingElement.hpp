@@ -3,7 +3,7 @@
 
 #include <optional>
 
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 #include "IOperator.hpp"
 #include "TreeNode.hpp"
 

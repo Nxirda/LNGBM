@@ -3,7 +3,7 @@
 
 #include "DataSet.hpp"
 #include "IOperator.hpp"
-#include "ICriterias.hpp" 
+#include "ICriteria.hpp" 
 #include "RandomForest.hpp"
 
 

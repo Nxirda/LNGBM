@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include "TrainingElement.hpp"
-#include "Unique_Values.hpp"
+#include "UniqueValues.hpp"
 
 /**************************/
 /*                        */

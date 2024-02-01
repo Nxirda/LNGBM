@@ -6,7 +6,7 @@
 
 #include "TrainingElement.hpp"
 #include "DecisionTree.hpp"
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 #include "IOperator.hpp"
 
 class RandomForest {

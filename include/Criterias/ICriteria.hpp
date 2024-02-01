@@ -1,5 +1,5 @@
-#ifndef I_CRITERIAS_H_
-#define I_CRITERIAS_H_
+#ifndef I_CRITERIA_H_
+#define I_CRITERIA_H_
 
 #include <memory>
 #include <string>

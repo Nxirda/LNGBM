@@ -1,7 +1,7 @@
 #ifndef HISTOGRAM_H_
 #define HISTOGRAM_H_
 
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 #include <string>
 
 class Histogram : public ICriterias {

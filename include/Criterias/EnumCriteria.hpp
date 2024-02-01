@@ -3,13 +3,13 @@
 
 #include <map>
 
-#include "ICriterias.hpp"
+#include "ICriteria.hpp"
 
 #include "Histogram.hpp"
 #include "Percentiles.hpp"
 #include "Quartiles.hpp"
-#include "Random_Values.hpp"
-#include "Unique_Values.hpp"
+#include "RandomValues.hpp"
+#include "UniqueValues.hpp"
 
 namespace criterias {
 

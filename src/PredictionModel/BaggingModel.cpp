@@ -2,7 +2,7 @@
 
 #include "BaggingModel.hpp"
 #include "EnumOperator.hpp"
-#include "EnumCriterias.hpp"
+#include "EnumCriteria.hpp"
 
 /********************/
 /*                  */
