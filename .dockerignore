@@ -1,5 +1,5 @@
-#Exclude build folder if it exists locally
+# Exclude build folder if it exists locally
 build/
 
-#VS code specific
+# VS code specific
 .vscode/
