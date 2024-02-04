@@ -39,20 +39,34 @@ Then you can skip to the Usage section below
 
 ### Dependencies :
 
-You will need gtest 
+You will need :
+
+Gtest : 
 
 ```sh
 sudo apt install libgtest-dev
 ```
 
+MPI :
+
+Boost : 
+
 ### Build :
 
 ```sh
-git clone https://github.com/Nxirda/PPN_Projet_MEM.git
-cd PPN_Projet_MEM && mkdir build
-cd build && cmake ..
-make -j
+$ git clone https://github.com/Nxirda/PPN_Projet_MEM.git
+$ cd PPN_Projet_MEM && mkdir build
+$ cd build && cmake ..
+$ make -j
 ```
+
+If your installation of MPI isnt in your path you can do the following command
+instead of "cmake .."
+
+```sh
+$ cmake -DCMAKE_CXX_COMPILER=/path/to/your/mpi/c++/compiler -DCMAKE_PREFIX_PATH=/path/to/your/mpi/installation ..
+```
+
 
 ## Usage :
 

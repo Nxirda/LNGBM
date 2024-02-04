@@ -9,17 +9,27 @@ project(PPN)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#Add compilation options 
-add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
-
 #Add the subdirectory for the source files
 add_subdirectory(src)
 
 #Add the executable
 add_executable(main main.cpp)
 
+# Set MPI 
+find_package(MPI REQUIRED)
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+target_link_libraries(main PUBLIC ${MPI_C_LIBRARIES})
+set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
+
+# Set Boost
+find_package(Boost REQUIRED COMPONENTS serialization mpi)
+target_link_libraries(main PUBLIC Boost::serialization Boost::mpi)
+
 #Add the Libraries
 target_link_libraries(main PUBLIC Source_Lib)
+
+#Add compilation options    
+add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
 
 # ===== Testing Part =====
 

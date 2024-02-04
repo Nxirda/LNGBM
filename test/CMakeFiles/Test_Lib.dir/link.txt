@@ -1,0 +1,2 @@
+/usr/bin/ar qc libTest_Lib.a CMakeFiles/Test_Lib.dir/DataSet_Test.cpp.o CMakeFiles/Test_Lib.dir/DecisionTree_Test.cpp.o CMakeFiles/Test_Lib.dir/TreeNode_Test.cpp.o
+/usr/bin/ranlib libTest_Lib.a
