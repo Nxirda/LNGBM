@@ -4,15 +4,10 @@
 
 #include "EnumCriteria.hpp"
 #include "EnumOperator.hpp"
-#include "NodeSerializer.hpp"
+#include "Serializer.hpp"
 
 #include "boost/mpi.hpp"
 
-//#include "Validation.hpp"
-
-// extern "C" {
-#include <mpi.h>
-//}
 #include <stdio.h>
 
 using namespace std;
@@ -39,26 +34,10 @@ int main(int argc, char **argv) {
   pid_t pid = getpid();
   std::string filename = "serialized_tree_node.bin";
 
-  /**************** TEMP
-   * *******************************************************/
-  // Create a TreeNode object with a tree structure
-  /*
-
-  TreeNode deserialized = Serializer::deserializeNode(filename);
-  originalNode.node_Print_Criterion();
-  std::cout << "\n";
-  deserialized.node_Print_Criterion(); */
-  /*****************************************************************************/
-
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  std::cout << "rank is : " << rank << "\n";
-  std::cout << "size is : " << size << "\n";
-  std::cout << "pid is  : " << pid << "\n";
-
-
-  if ((argc != 6 || std::atoi(argv[5]) < size)&& rank == 0 ) {
+  if ((argc != 6 || std::atoi(argv[5]) < size) && rank == 0) {
     std::cout << "Usage is : mpiexec -np [Process] " << argv[0]
               << " [Path to DataSet] [Split Metric] [Split Criteria] [Depth] "
                  "[Number of Trees]\n";
@@ -71,7 +50,9 @@ int main(int argc, char **argv) {
     std::cout << "\n== Split Criterias are ==\n";
     criterias::print();
 
-    MPI_Abort(MPI_COMM_WORLD, 1);
+    if (size > 0)
+      MPI_Abort(MPI_COMM_WORLD, 1);
+
     return 1;
   }
 
@@ -89,41 +70,47 @@ int main(int argc, char **argv) {
 
   model.train(DS, trees_For_Proc);
 
-  //MPI_Barrier(MPI_COMM_WORLD);
-
   // Get the result of the other processes to aggregate them
   if (rank == 0) {
-    int filenameSize;
+    int counter = 0;
 
-    MPI_Status status;
+    while (counter < size - 1) {
+      int flag = 0;
+      // Checks for incoming message
+      MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &flag, MPI_STATUS_IGNORE);
 
-    MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
-    MPI_Get_count(&status, MPI_CHAR, &filenameSize);
+      if (flag) {
+        int filenameSize;
+        MPI_Status status;
 
-    std::vector<char> filenameBuffer(filenameSize);
+        // Get infos
+        MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+        MPI_Get_count(&status, MPI_CHAR, &filenameSize);
 
-    MPI_Recv(filenameBuffer.data(), filenameSize, MPI_CHAR, 1, 0,
-             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        std::vector<char> filenameBuffer(filenameSize);
 
-    std::string filename_recv(filenameBuffer.begin(), filenameBuffer.end());
+        // Get message and handle infos
+        MPI_Recv(filenameBuffer.data(), filenameSize, MPI_CHAR,
+                 status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-    TreeNode deserialized = Serializer::deserializeNode(filename_recv);
-    deserialized.node_Print_Criterion(); 
+        std::string filename_recv(filenameBuffer.begin(), filenameBuffer.end());
 
-    // Process the received file name
-    std::cout << "Received file name: " << filename_recv << std::endl;
+        std::map<int, DecisionTree> res = Serializer::deserializeMap<int, DecisionTree>(filename_recv);
+        model.aggregate_Forest(res);
 
+        ++counter;
+      }
+    }
+    std::cout << "Total number of trees is : " << model.get_Forest().size() << "\n";
   } else {
-    TreeNode originalNode(1, 0.5, 42.0);
-    originalNode.add_Left(std::make_unique<TreeNode>(2, 0.3, 30.0));
-    originalNode.add_Right(std::make_unique<TreeNode>(3, 0.7, 70.0));
-
-    Serializer::serializeNode(originalNode, filename); 
-    MPI_Send(filename.c_str(), filename.size() + 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+    Serializer::serializeMap<int, DecisionTree>(model.get_Forest(), filename);
+    MPI_Send(filename.c_str(), filename.size() + 1, MPI_CHAR, 0, 0,
+             MPI_COMM_WORLD);
   }
 
   std::cout << "Process with rank:= " << rank << " with pid:= " << pid
             << " finished training on " << trees_For_Proc << " Trees\n";
+
   // CrossValidation::K_Folds(model, DS, 5);
 
   MPI_Finalize();

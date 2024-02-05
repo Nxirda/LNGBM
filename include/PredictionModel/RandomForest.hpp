@@ -33,10 +33,12 @@ public:
 
   // Getters
 
+  std::map<int, DecisionTree> get_Trees() const;
   int get_size();
-  std::vector<float> get_results();
+  //std::vector<float> get_results();
 
   // Methods
+  void aggregate_Trees(const std::map<int, DecisionTree> &forest);
   void generate_Forest(int size);
   std::vector<float> predict_Results(const DataSet &dataset);
   void tree_Prediction(const DataSet &data,

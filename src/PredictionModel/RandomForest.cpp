@@ -54,6 +54,19 @@ Outputs    : int
 */
 int RandomForest::get_size() { return this->size; }
 
+//
+std::map<int, DecisionTree> RandomForest::get_Trees() const{
+  return this->trees;
+}
+
+/*
+*/
+void RandomForest::aggregate_Trees(const std::map<int, DecisionTree> &forest){
+  int n = this->trees.size();
+  for(auto &pair : forest)
+    this->trees.insert({pair.first + n, pair.second});
+}
+
 /*
 Generate the forest by training a specified number of trees
 Parameters : Size (number of Trees)

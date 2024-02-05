@@ -27,6 +27,7 @@ public:
   
   int get_Depth();
   int get_Trees_Number();
+  std::map<int, DecisionTree> get_Forest() const;
 
   // Setters
 
@@ -38,7 +39,7 @@ public:
   ~BaggingModel();
 
   // Methods
-
+  void aggregate_Forest(const std::map<int, DecisionTree> &forest);
   void train(const DataSet &data);
   void train(const DataSet &data, int n);
   std::vector<float> predict(const DataSet &datas);

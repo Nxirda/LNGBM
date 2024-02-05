@@ -15,6 +15,15 @@ protected:
 
   std::unique_ptr<TreeNode> root;
 
+  // Boost part to serialize the trees so we can send them to other MPIs Process
+  // Might need to build some sort of verif for MPI/Boost install at some point
+  // so we can use it with or without them
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version) {
+    ar &root;
+  }
+
 public:
   // Constructor
 
