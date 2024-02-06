@@ -63,6 +63,7 @@ std::map<int, DecisionTree> RandomForest::get_Trees() const{
 */
 void RandomForest::aggregate_Trees(const std::map<int, DecisionTree> &forest){
   int n = this->trees.size();
+  this->size += forest.size();
   for(auto &pair : forest)
     this->trees.insert({pair.first + n, pair.second});
 }

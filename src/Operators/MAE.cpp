@@ -3,6 +3,8 @@
 #include "MAE.hpp"
 #include "TrainingElement.hpp"
 
+#include <omp.h>
+
 /********************/
 /*                  */
 /*    MAE CLASS     */
@@ -75,6 +77,8 @@ float MAE::compute(int position, const DataSet &data, std::vector<int> index,
   // Computes the Mean Absolute Error for left child
   float left_Prediction = data.labels_Mean(left_index.value());
   float left_Population = left_index.value().size();
+  
+  #pragma omp parallel for
   for (int idx : left_index.value()) {
     left_MAE += std::abs(labels[idx] - left_Prediction);
   }
@@ -83,6 +87,8 @@ float MAE::compute(int position, const DataSet &data, std::vector<int> index,
   // Computes the Mean Absolute Error for right child
   float right_Prediction = data.labels_Mean(right_index.value());
   float right_Population = right_index.value().size();
+  
+  #pragma omp parallel for
   for (int idx : right_index.value()) {
     right_MAE += std::abs(labels[idx] - right_Prediction);
   }

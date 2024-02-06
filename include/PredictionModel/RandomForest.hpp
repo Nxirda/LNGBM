@@ -4,10 +4,10 @@
 #include <map>
 #include <vector>
 
-#include "TrainingElement.hpp"
 #include "DecisionTree.hpp"
 #include "ICriteria.hpp"
 #include "IOperator.hpp"
+#include "TrainingElement.hpp"
 
 class RandomForest {
 
@@ -25,7 +25,8 @@ public:
   // Constructor
 
   RandomForest();
-  RandomForest(const DataSet &dataset, IOperator *op, ICriteria *crit, int n, int depth);
+  RandomForest(const DataSet &dataset, IOperator *op, ICriteria *crit, int n,
+               int depth);
 
   // Destructor
 
@@ -35,11 +36,11 @@ public:
 
   std::map<int, DecisionTree> get_Trees() const;
   int get_size();
-  //std::vector<float> get_results();
+  // std::vector<float> get_results();
 
   // Methods
-  void aggregate_Trees(const std::map<int, DecisionTree> &forest);
   void generate_Forest(int size);
+  void aggregate_Trees(const std::map<int, DecisionTree> &forest);
   std::vector<float> predict_Results(const DataSet &dataset);
   void tree_Prediction(const DataSet &data,
                        std::shared_ptr<std::vector<float>> result,

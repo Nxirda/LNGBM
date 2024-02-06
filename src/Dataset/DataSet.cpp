@@ -7,6 +7,8 @@
 #include <stdexcept> // std::runtime_error
 #include <vector>
 
+#include <omp.h>
+
 #include "DataSet.hpp"
 
 /********************/
@@ -318,11 +320,8 @@ std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
 }
 
 /*
-*/
-int DataSet::element_Size() const{
-  return sizeof(this->samples[0][0]);
-}
-
+ */
+int DataSet::element_Size() const { return sizeof(this->samples[0][0]); }
 
 /*
 Return True if there are no values in the DataSet
@@ -406,8 +405,11 @@ DataSet::split(int position, float criterion,
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
 
+  #pragma omp parallel for
   for (int row : idx) {
+    //std::cout << "Thread " << omp_get_thread_num() << std::endl;
     // Row in bounds
+    // Push back sucks
     if (row < this->samples_Number() && row >= 0) {
       if (this->samples[row][position] < criterion) {
         sub_Index_Left.push_back(row);
@@ -424,7 +426,7 @@ Compute and returns the percentiles of a column
 Percentiles have to be given as an input
 Parameters : position, index, percentile list
 Inputs     : int, const vector<int>, const vector<float>
-Ouputs     : vector<float> 
+Ouputs     : vector<float>
 */
 std::vector<float>
 DataSet::column_Percentiles(int position, const std::vector<int> &idx,

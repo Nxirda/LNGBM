@@ -5,12 +5,13 @@
 #include "EnumCriteria.hpp"
 #include "EnumOperator.hpp"
 #include "Serializer.hpp"
+#include "Timer.hpp"
 
+#include <omp.h>
 #include "boost/mpi.hpp"
 
+#include <cstdio>
 #include <stdio.h>
-
-using namespace std;
 
 /*********************/
 /*                   */
@@ -27,35 +28,12 @@ int balancer(int total_Elements, int num_Processes, int process_Rank) {
 }
 
 //
-int main(int argc, char **argv) {
+void MPI_Handler(int argc, char **argv, int rank, int size) {
 
-  int rank, size;
-  MPI_Init(&argc, &argv);
+  Timer t;
+  t.start();
+
   pid_t pid = getpid();
-  std::string filename = "serialized_tree_node.bin";
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-  if ((argc != 6 || std::atoi(argv[5]) < size) && rank == 0) {
-    std::cout << "Usage is : mpiexec -np [Process] " << argv[0]
-              << " [Path to DataSet] [Split Metric] [Split Criteria] [Depth] "
-                 "[Number of Trees]\n";
-
-    std::cout << "\n- Where process should be <= Number of Trees\n";
-
-    std::cout << "\n== Split Metrics are ==\n";
-    operators::print();
-
-    std::cout << "\n== Split Criterias are ==\n";
-    criterias::print();
-
-    if (size > 0)
-      MPI_Abort(MPI_COMM_WORLD, 1);
-
-    return 1;
-  }
-
   std::string dataset_Path = argv[1];
   std::string metric = argv[2];
   std::string criteria = argv[3];
@@ -80,38 +58,84 @@ int main(int argc, char **argv) {
       MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &flag, MPI_STATUS_IGNORE);
 
       if (flag) {
-        int filenameSize;
+        int filename_Size;
         MPI_Status status;
 
         // Get infos
         MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
-        MPI_Get_count(&status, MPI_CHAR, &filenameSize);
+        MPI_Get_count(&status, MPI_CHAR, &filename_Size);
 
-        std::vector<char> filenameBuffer(filenameSize);
+        std::vector<char> filename_Buffer(filename_Size);
 
         // Get message and handle infos
-        MPI_Recv(filenameBuffer.data(), filenameSize, MPI_CHAR,
+        MPI_Recv(filename_Buffer.data(), filename_Size, MPI_CHAR,
                  status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-        std::string filename_recv(filenameBuffer.begin(), filenameBuffer.end());
+        std::string filename_Recv(filename_Buffer.begin(),
+                                  filename_Buffer.end());
 
-        std::map<int, DecisionTree> res = Serializer::deserializeMap<int, DecisionTree>(filename_recv);
-        model.aggregate_Forest(res);
+        std::map<int, DecisionTree> forest_Recv =
+            Serializer::deserializeMap<int, DecisionTree>(filename_Recv);
+        std::remove(filename_Recv.c_str());
+        model.aggregate_Forest(forest_Recv);
 
         ++counter;
       }
     }
-    std::cout << "Total number of trees is : " << model.get_Forest().size() << "\n";
   } else {
+    std::string filename = std::to_string(rank) + "_serialized_forest.bin";
     Serializer::serializeMap<int, DecisionTree>(model.get_Forest(), filename);
     MPI_Send(filename.c_str(), filename.size() + 1, MPI_CHAR, 0, 0,
              MPI_COMM_WORLD);
   }
 
-  std::cout << "Process with rank:= " << rank << " with pid:= " << pid
-            << " finished training on " << trees_For_Proc << " Trees\n";
+  t.stop();
 
-  // CrossValidation::K_Folds(model, DS, 5);
+  std::cout << "Process infos : rank:= " << rank << " pid:= " << pid
+            << " trees:= " << trees_For_Proc << " run time:= "<< t.get_Duration() <<"\n";
+
+  //MPI_Barrier(MPI_COMM_WORLD);
+
+  /* if (rank == 0)
+    CrossValidation::K_Folds(model, DS, 5); */
+}
+
+//
+int main(int argc, char **argv) {
+
+  int rank, size;
+  MPI_Init(&argc, &argv);
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  if ((argc != 6 || std::atoi(argv[5]) < size) && rank == 0) {
+    std::cout << "Usage is : mpiexec -np [Process] " << argv[0]
+              << " [Path to DataSet] [Split Metric] [Split Criteria] [Depth] "
+                 "[Number of Trees]\n";
+
+    std::cout << "\n- Where process should be <= Number of Trees\n";
+
+    std::cout << "\n== Split Metrics are ==\n";
+    operators::print();
+
+    std::cout << "\n== Split Criterias are ==\n";
+    criterias::print();
+
+    if (size > 0)
+      MPI_Abort(MPI_COMM_WORLD, 1);
+
+    return 1;
+  }
+
+  #pragma omp parallel
+    {
+        int thread_id = omp_get_thread_num();
+        #pragma omp critical
+        std::cout << "Thread ID: " << thread_id << " Hello, OpenMP!" << std::endl;
+    }
+
+  MPI_Handler(argc, argv, rank, size);
 
   MPI_Finalize();
 

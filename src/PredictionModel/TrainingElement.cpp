@@ -1,4 +1,5 @@
 #include "TrainingElement.hpp"
+#include <omp.h>
 #include <stack>
 
 /**************************/
@@ -147,25 +148,42 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
   float criterion = 0;
   // We try to minimize the mean absolute error for a split
   float min = INT_MAX;
+  // int max_threads = omp_get_max_threads();
+
+  // Set the number of threads for the parallel region
+  // omp_set_num_threads(4);
 
   std::vector<std::string> features = data.get_Features();
 
   // Minimize the error by trying multiple splits on features
+  //#pragma omp parallel for
   for (size_t i = 0; i < features.size(); ++i) {
 
     std::vector<float> criterias =
         splitting_Criteria->compute(data.get_Column(i, index));
 
-    // Test multiple split criteria
+    int local_Best_Feature = 0;
+    float local_Criterion = 0;
+    // We try to minimize the mean absolute error for a split
+    float local_min = INT_MAX;
+
+    // Test multiple split criteria || make local infos for the inner loop so
+    // the critical part only comes 1 time per proc
     for (size_t j = 0; j < criterias.size(); ++j) {
       float tmp_var =
           splitting_Operator->compute(i, data, elem->index, criterias[j]);
 
-      if (tmp_var < min) {
-        min = tmp_var;
-        best_Feature = i;
-        criterion = criterias[j];
+      if (tmp_var < local_min) {
+        local_min = tmp_var;
+        local_Best_Feature = i;
+        local_Criterion = criterias[j];
       }
+    }
+    //#pragma omp critical
+    if (local_min < min) {
+      min = local_min;
+      best_Feature = local_Best_Feature;
+      criterion = local_Criterion;
     }
   }
 
@@ -209,7 +227,7 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   TreeNode right{};
   std::optional<TrainingElement> train_Right = std::nullopt;
 
-  // Compute split attributes
+  // Compute split attributes || parallel
   auto [column, criterion] =
       find_Best_Split(data, elem, splitting_Operator, splitting_Criteria);
 

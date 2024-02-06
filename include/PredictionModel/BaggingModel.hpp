@@ -10,7 +10,6 @@ class BaggingModel {
 
 private:
   // Parameters
-  // Might wanna add a train/Test splitter for the dataset somewhere
   IOperator *split_Metric;
   ICriteria *split_Criteria;
   RandomForest forest;
