@@ -58,7 +58,8 @@ DecisionTree deserializeTree(const std::string &filename) {
 
 //
 template <typename Key, typename Value>
-void serializeMap(const std::map<Key, Value> &inputMap, const std::string &filename) {
+void serializeMap(const std::map<Key, Value> &inputMap,
+                  const std::string &filename) {
   std::ofstream ofs(filename, std::ios::binary);
   boost::archive::binary_oarchive oa(ofs);
   oa << inputMap;
@@ -81,5 +82,4 @@ std::map<Key, Value> deserializeMap(const std::string &filename) {
 
   return deserializedMap;
 }
-
 } // namespace Serializer

@@ -139,9 +139,6 @@ public:
   float labels_Mean(const std::vector<int> &idx) const;
   float labels_Variance(const std::vector<int> &idx) const;
   float column_Mean(int position, const std::vector<int> &idx) const;
-  std::vector<float>
-  column_Percentiles(int position, const std::vector<int> &idx,
-                     const std::vector<float> &percentiles) const;
 
   std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
   split(int position, float criterion, const std::vector<int> &idx) const;

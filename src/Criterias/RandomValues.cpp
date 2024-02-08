@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <execution>
+#include <omp.h>
 #include <random>
 
 #include "RandomValues.hpp"
@@ -85,14 +87,15 @@ Outputs    : vector<float>
 */
 std::vector<float> RandomValues::compute(const std::vector<float> list) const {
 
-  auto min = std::min_element(list.begin(), list.end());
-  auto max = std::max_element(list.begin(), list.end());
+  auto min = std::min_element(std::execution::par, list.begin(), list.end());
+  auto max = std::max_element(std::execution::par, list.begin(), list.end());
 
   std::vector<float> res(this->number_Of_Elements, 0);
   res[0] = *min;
   res[this->number_Of_Elements - 1] = *max;
 
   if (this->number_Of_Elements > 0) {
+#pragma omp parallel for
     for (int i = 1; i < this->number_Of_Elements - 1; ++i) {
       res[i] = get_Random_Float(*min, *max);
     }

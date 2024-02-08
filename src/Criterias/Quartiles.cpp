@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <execution>
+#include <omp.h>
 
 #include "Quartiles.hpp"
 #include "TrainingElement.hpp"
@@ -51,16 +53,17 @@ Parameters : Element distribution
 Inputs     : const vector<float>
 Outputs    : vector<float>
 */
-std::vector<float> Quartiles::compute(const std::vector<float> list) const{
+std::vector<float> Quartiles::compute(const std::vector<float> list) const {
 
-    std::vector<float> quartiles_Values(this->quartiles.size(), 0);
-    // Sort the data
-    std::vector<float> sorted_Data = list;
-    std::sort(sorted_Data.begin(), sorted_Data.end());
+  std::vector<float> quartiles_Values(this->quartiles.size(), 0);
+  // Sort the data
+  std::vector<float> sorted_Data = list;
+  std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
 
-    for (size_t i = 0; i < this->quartiles.size(); ++i) {
-        float res = sorted_Data[sorted_Data.size() * (this->quartiles[i] / 100)];
-        quartiles_Values[i] = res;
-    }
-    return quartiles_Values;
+#pragma omp parallel for
+  for (size_t i = 0; i < this->quartiles.size(); ++i) {
+    float res = sorted_Data[sorted_Data.size() * (this->quartiles[i] / 100)];
+    quartiles_Values[i] = res;
+  }
+  return quartiles_Values;
 }

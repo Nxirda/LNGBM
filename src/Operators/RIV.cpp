@@ -1,5 +1,5 @@
 #include <cmath>
-#include <iostream>
+#include <omp.h>
 
 #include "RIV.hpp"
 #include "TreeNode.hpp"
@@ -92,9 +92,10 @@ Outputs    : double
 float RIV::apply(const std::vector<float> &exact,
                              const std::vector<float> &prediction) {
   float res = 0;
-  float size = prediction.size();
+  int size = prediction.size();
 
-  for (unsigned long int i = 0; i < size; ++i) {
+#pragma omp parallel for reduction(+ : res)
+  for (int i = 0; i < size; ++i) {
     res += std::pow((exact[i] - prediction[i]), 2);
   }
 

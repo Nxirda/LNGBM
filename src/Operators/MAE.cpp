@@ -1,9 +1,8 @@
 #include <cmath>
+#include <omp.h>
 
 #include "MAE.hpp"
 #include "TrainingElement.hpp"
-
-#include <omp.h>
 
 /********************/
 /*                  */
@@ -77,8 +76,8 @@ float MAE::compute(int position, const DataSet &data, std::vector<int> index,
   // Computes the Mean Absolute Error for left child
   float left_Prediction = data.labels_Mean(left_index.value());
   float left_Population = left_index.value().size();
-  
-  #pragma omp parallel for
+
+#pragma omp parallel for reduction(+ : left_MAE)
   for (int idx : left_index.value()) {
     left_MAE += std::abs(labels[idx] - left_Prediction);
   }
@@ -87,8 +86,8 @@ float MAE::compute(int position, const DataSet &data, std::vector<int> index,
   // Computes the Mean Absolute Error for right child
   float right_Prediction = data.labels_Mean(right_index.value());
   float right_Population = right_index.value().size();
-  
-  #pragma omp parallel for
+
+#pragma omp parallel for reduction(+ : right_MAE)
   for (int idx : right_index.value()) {
     right_MAE += std::abs(labels[idx] - right_Prediction);
   }
@@ -108,11 +107,12 @@ Inputs     : const vector<float>, const vector<float>
 Outputs    : double
 */
 float MAE::apply(const std::vector<float> &exact,
-                  const std::vector<float> &prediction) {
+                 const std::vector<float> &prediction) {
 
   float res = 0;
-  float size = prediction.size();
-  for (unsigned long int i = 0; i < size; ++i) {
+  int size = prediction.size();
+#pragma omp parallel for reduction(+ : res)
+  for (int i = 0; i < size; ++i) {
     res += std::abs(exact[i] - prediction[i]);
   }
 

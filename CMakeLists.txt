@@ -33,8 +33,20 @@ endif()
 
 target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
 
+find_package(TBB REQUIRED)
+
+# Find BLAS library
+find_package(BLAS REQUIRED)
+
+target_include_directories(main PRIVATE ${BLAS_INCLUDE_DIRS})
+# Link with BLAS (CBLAS)
+target_link_libraries(main PRIVATE BLAS::BLAS)
+
 #Add our Libraries
 target_link_libraries(main PRIVATE Source_Lib)
+
+#For parallel execution policies
+target_link_libraries(main PRIVATE TBB::tbb)
 
 #Add compilation options    
 add_compile_options(-std=c++23 -fopenmp -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
@@ -62,6 +74,9 @@ target_include_directories(Tests PUBLIC include/ )
 target_link_libraries(Tests PRIVATE Test_Lib)
 target_link_libraries(Tests PRIVATE GTest::GTest GTest::Main)
 target_link_libraries(Tests PRIVATE Source_Lib)
+target_link_libraries(Tests PRIVATE TBB::tbb)
+target_link_libraries(Tests PRIVATE BLAS::BLAS)
+
 
 gtest_discover_tests(Tests)
 
@@ -73,3 +88,6 @@ add_subdirectory(benchmark)
 
 target_link_libraries(Benchmarks PRIVATE Benchmark_Lib)
 target_link_libraries(Benchmarks PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(Benchmarks PRIVATE TBB::tbb)
+target_link_libraries(Benchmarks PRIVATE BLAS::BLAS)
+
