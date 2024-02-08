@@ -30,9 +30,6 @@ int balancer(int total_Elements, int num_Processes, int process_Rank) {
 //
 void MPI_Handler(int argc, char **argv, int rank, int size) {
 
-  Timer t;
-  t.start();
-
   pid_t pid = getpid();
   std::string dataset_Path = argv[1];
   std::string metric = argv[2];
@@ -46,9 +43,12 @@ void MPI_Handler(int argc, char **argv, int rank, int size) {
 
   DataSet DS{dataset_Path};
 
+  Timer t;
+  t.start();
+
   model.train(DS, trees_For_Proc);
 
-  //CrossValidation::K_Folds(model, DS, 5);
+  // CrossValidation::K_Folds(model, DS, 5);
 
   t.stop();
 
@@ -90,12 +90,12 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-/* #pragma omp parallel
-  {
-    int thread_id = omp_get_thread_num();
-#pragma omp critical
-    std::cout << "Thread ID: " << thread_id << std::endl;
-  } */
+  /* #pragma omp parallel
+    {
+      int thread_id = omp_get_thread_num();
+  #pragma omp critical
+      std::cout << "Thread ID: " << thread_id << std::endl;
+    } */
 
   MPI_Handler(argc, argv, rank, size);
 
