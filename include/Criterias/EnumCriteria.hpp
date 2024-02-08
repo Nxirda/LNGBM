@@ -14,7 +14,12 @@
 
 namespace criterias {
 
-/**/
+/**
+ * @brief Enumeration representing the different types of splitting criteria.
+ *
+ * This enumeration defines the implemented types of criteria:
+ * Histogram, Percentiles, Quartiles, RandomValues, UniqueValues.
+ */
 enum class type {
   Histogram,
   Percentiles,
@@ -24,14 +29,24 @@ enum class type {
   Other
 };
 
-/**/
+/**
+ * @brief Dictionary mapping string representations to enum values.
+ *
+ * This map associates string representations with the corresponding enum
+ * values from the 'type' enumeration.
+ */
 inline std::map<std::string, type> dictionary = {{"H", type::Histogram},
                                                  {"P", type::Percentiles},
                                                  {"Q", type::Quartiles},
                                                  {"RV", type::RandomValues},
                                                  {"UV", type::UniqueValues}};
 
-/**/
+/**
+ * @brief Prints the names associated with each enum value.
+ *
+ * This function iterates through the 'dictionary' map and prints the names
+ * associated with each 'type' enum value.
+ */
 inline void print() {
 
   for (auto const &pair : dictionary) {

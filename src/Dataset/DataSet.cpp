@@ -1,11 +1,15 @@
 #include <algorithm>
-#include <cmath> //for std lerp in percentiles function
+#include <cmath>     //for std lerp in percentiles function
+#include <execution> // for parallel execution policies
 #include <fstream>
 #include <iostream>
 #include <numeric>
 #include <sstream>   // std::stringstream
 #include <stdexcept> // std::runtime_error
 #include <vector>
+
+#include <cblas.h>
+#include <omp.h>
 
 #include "DataSet.hpp"
 
@@ -318,6 +322,10 @@ std::vector<float> DataSet::get_Labels(const std::vector<int> &idx) const {
 }
 
 /*
+ */
+int DataSet::element_Size() const { return sizeof(this->samples[0][0]); }
+
+/*
 Return True if there are no values in the DataSet
 Parameters :
 Inputs     :
@@ -399,8 +407,11 @@ DataSet::split(int position, float criterion,
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
 
+#pragma omp parallel for
   for (int row : idx) {
-    // Row in bounds
+    // std::cout << "Thread " << omp_get_thread_num() << std::endl;
+    //  Row in bounds
+    //  Push back sucks
     if (row < this->samples_Number() && row >= 0) {
       if (this->samples[row][position] < criterion) {
         sub_Index_Left.push_back(row);
@@ -410,30 +421,6 @@ DataSet::split(int position, float criterion,
     }
   }
   return std::make_tuple(sub_Index_Left, sub_Index_Right);
-}
-
-/*
-Compute and returns the percentiles of a column
-Percentiles have to be given as an input
-Parameters : position, index, percentile list
-Inputs     : int, const vector<int>, const vector<float>
-Ouputs     : vector<float> 
-*/
-std::vector<float>
-DataSet::column_Percentiles(int position, const std::vector<int> &idx,
-                            const std::vector<float> &percentiles) const {
-
-  std::vector<float> percentile_Values;
-
-  // Sort the data
-  std::vector<float> sorted_Data = this->get_Column(position, idx);
-  std::sort(sorted_Data.begin(), sorted_Data.end());
-
-  for (float current_Centil : percentiles) {
-    float res = sorted_Data[sorted_Data.size() * (current_Centil / 100)];
-    percentile_Values.push_back(res);
-  }
-  return percentile_Values;
 }
 
 /*
@@ -463,7 +450,8 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
     return mean;
   }
 
-  mean = std::reduce(current_Column.begin(), current_Column.end(), 0.0);
+  mean = std::reduce(std::execution::par, current_Column.begin(),
+                     current_Column.end(), 0.0f);
   mean /= len;
   return mean;
 }
@@ -489,8 +477,9 @@ float DataSet::labels_Mean(const std::vector<int> &idx) const {
     return mean;
   }
 
-  mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0.0);
-  mean /= len;
+  mean = std::reduce(std::execution::par, current_Labels.begin(),
+                     current_Labels.end(), 0.0f) /
+         len;
   return (mean);
 }
 
@@ -511,8 +500,9 @@ float DataSet::whole_Labels_Mean() const {
     return mean;
   }
 
-  mean = std::reduce(current_Labels.begin(), current_Labels.end(), 0.0);
-  mean /= len;
+  mean = std::reduce(std::execution::par, current_Labels.begin(),
+                     current_Labels.end(), 0.0f) /
+         len;
   return (mean);
 }
 
@@ -539,12 +529,17 @@ float DataSet::labels_Variance(const std::vector<int> &idx) const {
   }
 
   float mean = this->labels_Mean(idx);
-  float variance = 0.0;
 
-  for (float i : current_Labels) {
-    float difference = i - mean;
-    variance += difference * difference;
+  std::vector<float> tmp_res(len);
+
+  float sum = 0.0;
+#pragma omp parallel for reduction(+ : sum)
+  for (int i = 0; i < len; ++i) {
+    float difference = current_Labels[i] - mean;
+    sum += difference * difference;
   }
-  variance /= len;
+
+  float variance = sum / len;
+
   return variance;
 }

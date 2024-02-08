@@ -1,4 +1,5 @@
 #include "TrainingElement.hpp"
+#include <omp.h>
 #include <stack>
 
 /**************************/
@@ -108,6 +109,7 @@ void TrainingElement::set_Root(int dataset_Size, TreeNode *node, float value) {
 
   // Computes the index for the given DataSet
   std::vector<int> idx(dataset_Size);
+#pragma omp parallel for
   for (int i = 0; i < dataset_Size; ++i) {
     idx[i] = i;
   }
@@ -125,6 +127,7 @@ Outputs    :
 */
 void TrainingElement::bootstrap_Index(int dataset_Size) {
   std::vector<int> idx(dataset_Size);
+#pragma omp parallel for
   for (int i = 0; i < dataset_Size; ++i) {
     idx[i] = rand() % (dataset_Size - 1);
   }
@@ -153,19 +156,34 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
   // Minimize the error by trying multiple splits on features
   for (size_t i = 0; i < features.size(); ++i) {
 
+    // Can be parallelized ppbly
     std::vector<float> criterias =
         splitting_Criteria->compute(data.get_Column(i, index));
 
-    // Test multiple split criteria
+    int local_Best_Feature = 0;
+    float local_Criterion = 0;
+    // We try to minimize the mean absolute error for a split
+    float local_min = INT_MAX;
+
+    // Test multiple split criteria || make local infos for the inner loop so
+    // the critical part only comes 1 time per proc (to be fixed, this doesnt typically need to be parallelized)
+    // As the computing happens more inside the operator computing
     for (size_t j = 0; j < criterias.size(); ++j) {
+      
+      // Needs to be parallelized
       float tmp_var =
           splitting_Operator->compute(i, data, elem->index, criterias[j]);
 
-      if (tmp_var < min) {
-        min = tmp_var;
-        best_Feature = i;
-        criterion = criterias[j];
+      if (tmp_var < local_min) {
+        local_min = tmp_var;
+        local_Best_Feature = i;
+        local_Criterion = criterias[j];
       }
+    }
+    if (local_min < min) {
+      min = local_min;
+      best_Feature = local_Best_Feature;
+      criterion = local_Criterion;
     }
   }
 
@@ -209,11 +227,11 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   TreeNode right{};
   std::optional<TrainingElement> train_Right = std::nullopt;
 
-  // Compute split attributes
+  // Compute split attributes || parallel
   auto [column, criterion] =
       find_Best_Split(data, elem, splitting_Operator, splitting_Criteria);
 
-  // Compute new indexes
+  // Compute new indexes || parallel
   auto [left_index, right_index] = split_Index(data, criterion, column, elem);
 
   if (!left_index && !right_index) {
@@ -226,7 +244,7 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   elem->node->set_Split_Column(column);
   elem->node->set_Split_Criterion(criterion);
 
-  // If index is empty : predic = -1
+  // If index is empty : predic = -1 || parallel
   float predic_Left = data.labels_Mean(*left_index);
   float predic_Right = data.labels_Mean(*right_index);
 

@@ -1,8 +1,8 @@
 #include <errno.h>
 
 #include "BaggingModel.hpp"
-#include "EnumOperator.hpp"
 #include "EnumCriteria.hpp"
+#include "EnumOperator.hpp"
 
 /********************/
 /*                  */
@@ -120,6 +120,25 @@ void BaggingModel::set_Criteria(std::string criteria) {
     perror("Chosen criteria is invalid");
     abort();
   }
+}
+
+/*
+ */
+int BaggingModel::get_Depth() { return this->max_Depth; }
+
+/*
+ */
+int BaggingModel::get_Trees_Number() { return this->forest.get_size(); };
+
+/**/
+std::map<int, DecisionTree> BaggingModel::get_Forest() const {
+  return this->forest.get_Trees();
+}
+
+/*
+ */
+void BaggingModel::aggregate_Forest(const std::map<int, DecisionTree> &forest) {
+  this->forest.aggregate_Trees(forest);
 }
 
 /*

@@ -3,7 +3,7 @@ project(Bench_Lib)
 # Make a lib 
 add_library(Benchmark_Lib
     src/Benchmark.cpp
-    src/Timer.cpp
+    #src/Timer.cpp
 
     ${CMAKE_SOURCE_DIR}/src/Dataset/DataSet.cpp
     ${CMAKE_SOURCE_DIR}/src/Tree/TreeNode.cpp
@@ -23,6 +23,9 @@ add_library(Benchmark_Lib
     ${CMAKE_SOURCE_DIR}/src/PredictionModel/RandomForest.cpp
     ${CMAKE_SOURCE_DIR}/src/PredictionModel/BaggingModel.cpp
     ${CMAKE_SOURCE_DIR}/src/PredictionModel/TrainingElement.cpp
+    #Tools part
+    ${CMAKE_SOURCE_DIR}/src/Tools/Timer.cpp
+
 )   
 
 
@@ -35,5 +38,6 @@ target_include_directories(Benchmark_Lib
     ${CMAKE_SOURCE_DIR}/include/PredictionModel
     ${CMAKE_SOURCE_DIR}/include/Tree
     ${CMAKE_SOURCE_DIR}/include/Validation
+    ${CMAKE_SOURCE_DIR}/include/Tools
     ${CMAKE_SOURCE_DIR}/benchmark/include/
 )

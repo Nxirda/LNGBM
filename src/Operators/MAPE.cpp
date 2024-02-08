@@ -1,4 +1,5 @@
 #include <cmath>
+#include <omp.h>
 
 #include "MAPE.hpp"
 #include "TreeNode.hpp"
@@ -75,6 +76,8 @@ float MAPE::compute(int position, const DataSet &data, std::vector<int> index,
   // Computes the Mean Absolute Percentage Error for left child
   float left_Prediction = data.labels_Mean(left_index.value());
   float left_Population = left_index.value().size();
+
+#pragma omp parallel for reduction(+ : left_MAPE)
   for (int idx : left_index.value()) {
     left_MAPE += (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
@@ -84,6 +87,8 @@ float MAPE::compute(int position, const DataSet &data, std::vector<int> index,
   // Computes the Mean Absolute Percentage Error for left child
   float right_Prediction = data.labels_Mean(right_index.value());
   float right_Population = right_index.value().size();
+
+#pragma omp parallel for reduction(+ : right_MAPE)
   for (int idx : right_index.value()) {
     right_MAPE += (std::abs(labels[idx] - right_Prediction)) / right_Prediction;
   }
@@ -103,12 +108,13 @@ Parameters : exact results, prediction results
 Inputs     : const vector<float>, const vector<float>
 Outputs    : double
 */
-double MAPE::apply(const std::vector<float> &exact,
-                   const std::vector<float> &prediction) {
+float MAPE::apply(const std::vector<float> &exact,
+                  const std::vector<float> &prediction) {
 
-  double res = 0;
-  float size = prediction.size();
-  for (unsigned long int i = 0; i < size; ++i) {
+  float res = 0;
+  int size = prediction.size();
+#pragma omp parallel for reduction(+ : res)
+  for (int i = 0; i < size; ++i) {
     res += std::abs(exact[i] - prediction[i]) / exact[i];
   }
 

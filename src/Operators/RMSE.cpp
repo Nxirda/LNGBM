@@ -1,4 +1,5 @@
 #include <cmath>
+#include <omp.h>
 
 #include "RMSE.hpp"
 #include "TreeNode.hpp"
@@ -75,6 +76,8 @@ float RMSE::compute(int position, const DataSet &data, std::vector<int> index,
   // Computes the Root Mean Square Error for left child
   float left_Prediction = data.labels_Mean(left_index.value());
   float left_Population = left_index.value().size();
+
+#pragma omp parallel for reduction(+ : left_RMSE)
   for (int idx : left_index.value()) {
     left_RMSE += pow((std::abs(labels[idx] - left_Prediction)), 2)/left_Population;
   }
@@ -83,6 +86,8 @@ float RMSE::compute(int position, const DataSet &data, std::vector<int> index,
   // Computes the Root Mean Square Error for left child
   float right_Prediction = data.labels_Mean(right_index.value());
   float right_Population = right_index.value().size();
+
+#pragma omp parallel for reduction(+ : right_RMSE)
   for (int idx : right_index.value()) {
     right_RMSE += pow((std::abs(labels[idx] - right_Prediction)), 2)/right_Population;
   }

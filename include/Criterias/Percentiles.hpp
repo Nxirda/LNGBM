@@ -4,25 +4,56 @@
 #include "ICriteria.hpp"
 #include <string>
 
+/**
+ * @class Percentiles
+ * @brief Class computing the percentiles of a given value distribution.
+ *
+ * This class implements the ICriteria interface.
+ */
 class Percentiles : public ICriteria {
 private:
   // Parameters
-  const std::string name = "Percentiles";
-  const std::vector<float> percentiles = {10.0, 20.0, 30.0, 40.0, 50.0,
-                                          60.0, 70.0, 80.0, 90.0};
+  const std::string name =
+      "Percentiles"; /**< A string variable to display the name. */
+  const std::vector<float> percentiles = {
+      10.0, 20.0, 30.0, 40.0, 50.0,
+      60.0, 70.0, 80.0, 90.0}; /**< Array containing the values in % of the
+                                  percentiles*/
 
 public:
-  // Constructor
+  /**
+   * @brief Default constructor for the Percentiles class.
+   *
+   * Initializes the class with default parameters.
+   */
   Percentiles();
 
-  // Destructor
+  /**
+   * @brief Destructor for the Percentiles class.
+   */
   ~Percentiles() override;
 
-  // Methods
-  static std::string get_Name();
-
+  /**
+   * @brief Prints the name of the class on standard output.
+   */
   void print() override;
 
+  /**
+   * @brief Static method to get the name of the Percentiles criteria.
+   *
+   * @return The name of the Percentiles criteria.
+   */
+  static std::string get_Name();
+
+  /**
+   * @brief Computes percentiles values for a given data distribution.
+   *
+   * This method implements the computation of the values of the percentiles
+   * of the provided list of data and the bin parameter.
+   *
+   * @param vector<float> list: The distribution of data 
+   * @return Type: vector<float>, A vector of the values of the percentiles
+   */
   std::vector<float> compute(const std::vector<float> list) const override;
 };
 

@@ -177,7 +177,8 @@ TreeNode *TreeNode::get_Left_Node() const { return this->left.get(); }
 Returns a pointer to the right node of the current node
 Parameters : 
 Inputs     :
-Outputs    : TreeNode**/
+Outputs    : TreeNode
+*/
 TreeNode *TreeNode::get_Right_Node() const { return this->right.get(); }
 
 /*

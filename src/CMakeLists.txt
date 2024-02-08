@@ -20,6 +20,8 @@ add_library(Source_Lib
             PredictionModel/RandomForest.cpp
             PredictionModel/BaggingModel.cpp
             PredictionModel/TrainingElement.cpp
+            #Tools part
+            Tools/Timer.cpp
 )   
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -33,4 +35,5 @@ target_include_directories(Source_Lib
     ${CMAKE_SOURCE_DIR}/include/PredictionModel
     ${CMAKE_SOURCE_DIR}/include/Tree
     ${CMAKE_SOURCE_DIR}/include/Validation
+    ${CMAKE_SOURCE_DIR}/include/Tools
 )
