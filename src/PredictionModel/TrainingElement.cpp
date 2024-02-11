@@ -158,7 +158,7 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
 
     // Can be parallelized ppbly
     std::vector<float> criterias =
-        splitting_Criteria->compute(data.get_Column(i, index));
+        splitting_Criteria->compute(std::move(data.get_Column(i, index)));
 
     int local_Best_Feature = 0;
     float local_Criterion = 0;

@@ -366,7 +366,7 @@ Ouputs     : vector<float>
 std::vector<float> DataSet::get_Column(int position,
                                        const std::vector<int> &idx) const {
 
-  std::vector<float> Col(0);
+  std::vector<float> Col(idx.size(), 0);
 
   // Check olumn in bounds
   if (position >= this->features_Length() || position < 0) {
@@ -377,10 +377,15 @@ std::vector<float> DataSet::get_Column(int position,
     return Col;
   }
 
+  // Col.reserve(idx.size());
+  int i = 0;
   for (int row : idx) {
     // Check row in bounds
-    if (row < this->samples_Number() && row >= 0)
-      Col.push_back(this->samples[row][position]);
+    if (row < this->samples_Number() && row >= 0){
+      Col[i] = this->samples[row][position];
+    }
+    i++;
+    // Col.push_back(this->samples[row][position]);
   }
 
   return Col;
@@ -450,7 +455,7 @@ float DataSet::column_Mean(int position, const std::vector<int> &idx) const {
     return mean;
   }
 
-  mean = std::reduce(std::execution::par, current_Column.begin(),
+  mean = std::reduce(std::execution::par_unseq, current_Column.begin(),
                      current_Column.end(), 0.0f);
   mean /= len;
   return mean;
@@ -477,7 +482,7 @@ float DataSet::labels_Mean(const std::vector<int> &idx) const {
     return mean;
   }
 
-  mean = std::reduce(std::execution::par, current_Labels.begin(),
+  mean = std::reduce(std::execution::par_unseq, current_Labels.begin(),
                      current_Labels.end(), 0.0f) /
          len;
   return (mean);
@@ -500,7 +505,7 @@ float DataSet::whole_Labels_Mean() const {
     return mean;
   }
 
-  mean = std::reduce(std::execution::par, current_Labels.begin(),
+  mean = std::reduce(std::execution::par_unseq, current_Labels.begin(),
                      current_Labels.end(), 0.0f) /
          len;
   return (mean);
@@ -533,6 +538,7 @@ float DataSet::labels_Variance(const std::vector<int> &idx) const {
   std::vector<float> tmp_res(len);
 
   float sum = 0.0;
+
 #pragma omp parallel for reduction(+ : sum)
   for (int i = 0; i < len; ++i) {
     float difference = current_Labels[i] - mean;

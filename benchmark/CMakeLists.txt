@@ -25,6 +25,7 @@ add_library(Benchmark_Lib
     ${CMAKE_SOURCE_DIR}/src/PredictionModel/TrainingElement.cpp
     #Tools part
     ${CMAKE_SOURCE_DIR}/src/Tools/Timer.cpp
+    ${CMAKE_SOURCE_DIR}/src/Validation/Answers.cpp
 
 )   
 
@@ -39,5 +40,6 @@ target_include_directories(Benchmark_Lib
     ${CMAKE_SOURCE_DIR}/include/Tree
     ${CMAKE_SOURCE_DIR}/include/Validation
     ${CMAKE_SOURCE_DIR}/include/Tools
+    ${CMAKE_SOURCE_DIR}/include/MpiWrapper
     ${CMAKE_SOURCE_DIR}/benchmark/include/
 )

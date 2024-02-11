@@ -15,31 +15,34 @@ add_subdirectory(src)
 #Add the executable
 add_executable(main main.cpp)
 
-# Set MPI 
+#Required dependencies 
 find_package(MPI REQUIRED)
+find_package(Boost REQUIRED COMPONENTS serialization mpi)
+find_package(OpenMP REQUIRED)
+find_package(TBB REQUIRED)
+find_package(BLAS REQUIRED)
+
+
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-target_link_libraries(main PRIVATE ${MPI_C_LIBRARIES})
 set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
 
 # Set Boost
-find_package(Boost REQUIRED COMPONENTS serialization mpi)
 target_link_libraries(main PRIVATE Boost::serialization Boost::mpi)
 
 # Set OpenMP 
-find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+target_include_directories(main PRIVATE ${BLAS_INCLUDE_DIRS})
+
+#For MPI Distribution
+target_link_libraries(main PRIVATE ${MPI_C_LIBRARIES})
+
+#For omp pragmas
 target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
 
-find_package(TBB REQUIRED)
-
-# Find BLAS library
-find_package(BLAS REQUIRED)
-
-target_include_directories(main PRIVATE ${BLAS_INCLUDE_DIRS})
-# Link with BLAS (CBLAS)
+#Link with BLAS (CBLAS)
 target_link_libraries(main PRIVATE BLAS::BLAS)
 
 #Add our Libraries
@@ -82,12 +85,14 @@ gtest_discover_tests(Tests)
 
 # ===== Benchmark Part =====
 
-add_executable(Benchmarks benchmark/mainBenchmark.cpp)
+#add_executable(Benchmarks benchmark/mainBenchmark.cpp)
 
-add_subdirectory(benchmark)
+#add_subdirectory(benchmark)
 
-target_link_libraries(Benchmarks PRIVATE Benchmark_Lib)
-target_link_libraries(Benchmarks PRIVATE OpenMP::OpenMP_CXX)
-target_link_libraries(Benchmarks PRIVATE TBB::tbb)
-target_link_libraries(Benchmarks PRIVATE BLAS::BLAS)
+#target_link_libraries(Benchmarks PRIVATE Benchmark_Lib)
+#target_link_libraries(Benchmarks PRIVATE OpenMP::OpenMP_CXX)
+#target_link_libraries(Benchmarks PRIVATE TBB::tbb)
+#target_link_libraries(Benchmarks PRIVATE BLAS::BLAS)
+#target_link_libraries(Benchmarks PRIVATE Boost::serialization Boost::mpi)
+
 

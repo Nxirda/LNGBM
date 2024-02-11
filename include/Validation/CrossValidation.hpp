@@ -2,10 +2,11 @@
 #define CROSS_VALIDATION_H_
 
 #include <iomanip>
-#include <mpi.h>
 
+#include "Answers.hpp"
 #include "BaggingModel.hpp"
 #include "DataSet.hpp"
+#include "Serializer.hpp"
 #include "Timer.hpp"
 #include "Tools.hpp"
 #include "Validation.hpp"
@@ -80,32 +81,45 @@ Parameters : Prediction Model, DataSet, K
 Inputs     : BaggingModel, const DataSet, int
 Outputs    : double
 */
-std::tuple<float, float> K_Folds(BaggingModel &model, const DataSet &data,
-                                 int K) {
+Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
   if (K <= 1) {
     perror("K-Folds methods needs at least K=2");
     return {};
   }
 
+  Answers validation_Result{};
+
+  // Getting infos on the model
+  int precision = 5;
+  int depth = model.get_Depth();
+  int width = data.features_Length();
+  int trees = model.get_Trees_Number();
+  int element_Size = data.element_Size();
+
+  //
+  std::string formatted_File_Size = Tools::matrix_Memory_Size(
+      data.samples_Number(), width, element_Size, precision);
+
+  // Initialize header for the metrics we want
+  validation_Result.set_Header({"Folds", "Depth", "Trees", "File_size",
+                                "Train_time", "MAE", "MAPE", "Std_dev"});
+
   float global_MAE = 0;
   float global_MAPE = 0;
   float global_Std_Dev = 0;
 
-  // Getting infos on the model
-  int depth = model.get_Depth();
-  int trees = model.get_Trees_Number(); 
-  int width = data.features_Length();
-  int element_Size = data.element_Size();
-  int precision = 5;
-  std::string formatted_File_Size = tools::matrix_Memory_Size(
-      data.samples_Number(), width, element_Size, precision);
+  std::vector<std::string> inner_Values;
+  std::vector<float> inner_Numerical_Values;
 
-  // Initialize header for the metrics we want
-  std::vector<std::string> header = {"Folds", "Depth", "Trees",   "File_size",
-                                     "MAE",   "MAPE",  "Std_dev", "Train_time"};
-  tools::display_Header(header); 
+  // Size is K + 1 : we need results from each folds and the global result
+  std::vector<std::vector<std::string>> global_Result(
+      K + 1, std::vector<std::string>());
 
-  // Initialize timer so it count the whole time the function takes
+  std::vector<std::vector<float>> global_Numerical_Result(K + 1,
+                                                          std::vector<float>());
+
+  // Initialize timer so it count the whole time the function is "really"
+  // computing stuff
   Timer t_Global;
   t_Global.start();
 
@@ -130,9 +144,6 @@ std::tuple<float, float> K_Folds(BaggingModel &model, const DataSet &data,
     // Creating Training Dataset for this iteration
     DataSet train_Set = train_Folds[i];
 
-    std::string formatted_Matrix_Size = tools::matrix_Memory_Size(
-        train_Set.samples_Number(), width, element_Size, precision);
-
     Timer t_Intern;
     t_Intern.start();
 
@@ -144,18 +155,24 @@ std::tuple<float, float> K_Folds(BaggingModel &model, const DataSet &data,
     auto [fold_Mae, fold_Mape, fold_Std_Dev] =
         metric::compute_accuracy(model, test_Set);
 
+    std::string inner_Formatted_File_Size = Tools::matrix_Memory_Size(
+        train_Set.samples_Number(), width, element_Size, precision);
+
+    inner_Values = {"Folds n*" + std::to_string(i),
+                    std::to_string(model.get_Depth()),
+                    std::to_string(model.get_Trees_Number()),
+                    inner_Formatted_File_Size, t_Intern.get_Duration()};
+
+    inner_Numerical_Values = {fold_Mae, fold_Mape, fold_Std_Dev};
+
     // Add the result
     global_MAE += fold_Mae;
     global_MAPE += fold_Mape;
     global_Std_Dev += fold_Std_Dev;
 
-    //Send && receive values from MPI Process to print in proc 0
-    //Only print once it has ended ppbly 
-    //Serialize the values to display 
-
-    tools::display_Values("Fold n*" + std::to_string(i), depth, trees,
-                          formatted_Matrix_Size, fold_Mae, fold_Mape,
-                          fold_Std_Dev, t_Intern.get_Duration());
+    // Update the vectors to build the answer class
+    global_Result[i] = inner_Values;
+    global_Numerical_Result[i] = inner_Numerical_Values;
   }
 
   // Means the result
@@ -165,54 +182,28 @@ std::tuple<float, float> K_Folds(BaggingModel &model, const DataSet &data,
 
   t_Global.stop();
 
-  tools::display_Values("Global", depth, trees, formatted_File_Size, global_MAE,
-                        global_MAPE, global_Std_Dev, t_Global.get_Duration()); 
+  // Stores the final string values after the folds
+  std::vector<std::string> global_Values = {
+      "Global " + std::to_string(K) + " Folds",
+      std::to_string(model.get_Depth()),
+      std::to_string(model.get_Trees_Number()), formatted_File_Size,
+      t_Global.get_Duration()};
 
-  return std::make_tuple(global_MAE, global_MAPE);
-  
+  // Stores the final numerical result after the folds
+  std::vector<float> global_Numerical_Values = {global_MAE, global_MAPE,
+                                                global_Std_Dev};
+
+  // In the end it contains each fold values and the whole result
+  global_Result[K] = global_Values;
+  global_Numerical_Result[K] = global_Numerical_Values;
+
+  validation_Result.set_Values(global_Result);
+  validation_Result.set_Numeric_Values(global_Numerical_Result);
+
+  validation_Result.print();
+
+  return validation_Result;
 }
 } // namespace CrossValidation
 
 #endif
-
-// Get the result of the other processes to aggregate them
-  /* if (rank == 0) {
-    int counter = 0;
-
-    while (counter < size - 1) {
-      int flag = 0;
-      // Checks for incoming message
-      MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &flag, MPI_STATUS_IGNORE);
-
-      if (flag) {
-        int filename_Size;
-        MPI_Status status;
-
-        // Get infos
-        MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
-        MPI_Get_count(&status, MPI_CHAR, &filename_Size);
-
-        std::vector<char> filename_Buffer(filename_Size);
-
-        // Get message and handle infos
-        MPI_Recv(filename_Buffer.data(), filename_Size, MPI_CHAR,
-                 status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-        std::string filename_Recv(filename_Buffer.begin(),
-                                  filename_Buffer.end());
-
-        std::map<int, DecisionTree> forest_Recv =
-            Serializer::deserializeMap<int, DecisionTree>(filename_Recv); 
-        std::remove(filename_Recv.c_str());
-        model.aggregate_Forest(forest_Recv);
-
-        ++counter;
-      }
-    }
-  } else {
-    std::string filename = std::to_string(rank) + "_serialized_forest.bin";
-    Serializer::serializeMap<int, DecisionTree>(model.get_Forest(), filename);
-
-    MPI_Send(filename.c_str(), filename.size() + 1, MPI_CHAR, 0, 0,
-             MPI_COMM_WORLD);
-  } */

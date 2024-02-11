@@ -113,15 +113,16 @@ public:
   std::vector<float> get_Labels(const std::vector<int> &idx) const;
 
   /**
-   * @brief Method to copy a column of the DataSet (samples value on one feature)
+   * @brief Method to copy a column of the DataSet (samples value on one
+   * feature)
    *
    * @param int position : the feature to copy
    * @param vector<idx> : the samples values to copy in the column
-   * 
+   *
    * @return The values contained at the feature position for the samples in idx
    */
   std::vector<float> get_Column(int position,
-                                const std::vector<int> &idx) const;
+                                  const std::vector<int> &idx) const;
 
   // Methods
 

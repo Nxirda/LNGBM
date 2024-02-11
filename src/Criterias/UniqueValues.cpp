@@ -53,14 +53,14 @@ Parameters : Element distribution
 Inputs     : const vector<float>
 Outputs    : vector<float>
 */
-std::vector<float>
-UniqueValues::compute(const std::vector<float> list) const {
+std::vector<float> UniqueValues::compute(const std::vector<float> list) const {
 
   // Cast in set to get unique values (unordered set of efficiency)
   std::unordered_set<float> unique(list.begin(), list.end());
 
-  // Cast back in array for the result
-  std::vector<float> res(unique.begin(), unique.end());
+  // Cast back in array for the result || move to avoid copy
+  std::vector<float> res(std::make_move_iterator(unique.begin()),
+                         std::make_move_iterator(unique.end()));
 
   return res;
 }
