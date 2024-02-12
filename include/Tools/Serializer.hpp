@@ -2,9 +2,10 @@
 #include <iostream>
 #include <map>
 
-//#include <TreeNode.hpp>
 #include <DecisionTree.hpp>
+#include <Answers.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/vector.hpp>
 
 namespace Serializer {
 
@@ -54,6 +55,30 @@ DecisionTree deserialize_Tree(const std::string &filename) {
   ia >> tree;
 
   return tree;
+}
+
+//
+void serialize_Answers(const Answers &ans, const std::string &filename) {
+  std::ofstream ofs(filename, std::ios::binary);
+  boost::archive::binary_oarchive oa(ofs);
+  oa << ans;
+}
+
+//
+Answers deserialize_Answers(const std::string &filename) {
+  std::ifstream ifs(filename, std::ios::binary);
+
+  if (!ifs.is_open()) {
+    std::cerr << "Error: Unable to open file '" << filename << "'" << std::endl;
+    return Answers();
+  }
+
+  boost::archive::binary_iarchive ia(ifs);
+
+  Answers ans;
+  ia >> ans;
+
+  return ans;
 }
 
 //

@@ -199,9 +199,7 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
 
   validation_Result.set_Values(global_Result);
   validation_Result.set_Numeric_Values(global_Numerical_Result);
-
-  validation_Result.print();
-
+  
   return validation_Result;
 }
 } // namespace CrossValidation

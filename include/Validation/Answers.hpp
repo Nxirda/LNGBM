@@ -25,17 +25,21 @@ private:
 
 public:
   Answers();
+  Answers(const Answers &ans);
 
   ~Answers();
 
+  Answers &operator=(const Answers &ans);
+  void add_And_Mean_Values(const Answers &ans);
+
   void set_Values(const std::vector<std::vector<std::string>> &vals);
-  std::vector<std::vector<std::string>> get_Values();
+  std::vector<std::vector<std::string>> get_Values() const;
 
   void set_Numeric_Values(const std::vector<std::vector<float>> &num_Vals);
-  std::vector<std::vector<float>> get_Numeric_Values();
+  std::vector<std::vector<float>> get_Numeric_Values() const;
 
   void set_Header(const std::vector<std::string> &headers);
-  std::vector<std::string> get_Header();
+  std::vector<std::string> get_Header() const;
 
   void print();
 };

@@ -34,7 +34,7 @@ TreeNode::TreeNode(int split_Column, float split_Criterion,
 }
 
 /*
-COnstructor that copies a Node
+Constructor that copies a Node
 Parameters : Tree Node
 Inputs     : const TreeNode
 Outputs    : 

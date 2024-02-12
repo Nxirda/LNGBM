@@ -11,7 +11,36 @@ Answers::Answers() {
 
 /*
  */
+Answers::Answers(const Answers &ans) {
+  this->header = ans.header;
+  this->values = ans.values;
+  this->numeric_Values = ans.numeric_Values;
+}
+
+/*
+ */
 Answers::~Answers() {}
+
+/*
+ */
+Answers &Answers::operator=(const Answers &ans) {
+  this->header = ans.header;
+  this->values = ans.values;
+  this->numeric_Values = ans.numeric_Values;
+  return *this;
+}
+
+/*
+ */
+void Answers::add_And_Mean_Values(const Answers &ans) {
+  assert(this->numeric_Values.size() == ans.get_Numeric_Values().size());
+  for (size_t i = 0; i < this->numeric_Values.size(); ++i) {
+    for (size_t j = 0; j < this->numeric_Values[i].size(); ++j) {
+      this->numeric_Values[i][j] += ans.get_Numeric_Values()[i][j];
+      this->numeric_Values[i][j] /= 2;
+    }
+  }
+}
 
 /*
  */
@@ -34,17 +63,17 @@ void Answers::set_Numeric_Values(
 
 /*
  */
-std::vector<std::vector<float>> Answers::get_Numeric_Values() {
+std::vector<std::vector<float>> Answers::get_Numeric_Values() const {
   return this->numeric_Values;
 }
 
 /*
  */
-std::vector<std::string> Answers::get_Header() { return this->header; }
+std::vector<std::string> Answers::get_Header() const { return this->header; }
 
 /*
  */
-std::vector<std::vector<std::string>> Answers::get_Values() {
+std::vector<std::vector<std::string>> Answers::get_Values() const {
   return this->values;
 }
 
@@ -60,6 +89,5 @@ void Answers::print() {
     // Then prints the numerical values
     Tools::display_Values_Vector<float>(this->numeric_Values[i]);
     std::cout << std::endl;
-    //Tools::display_Values_Vector(this->header);
   }
 }

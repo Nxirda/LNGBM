@@ -27,27 +27,57 @@ int balancer(int total_Elements, int num_Processes, int process_Rank) {
  */
 void MPI_Cross_Val(BaggingModel &model, const DataSet &data, int K) {
 
-  // tools::display_Header(header);
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  // local_Res.set_Header(header);
-
-  // auto cross_Val_Res = CrossValidation::K_Folds(model, data, K);
-
-  CrossValidation::K_Folds(model, data, K);
-
+  Answers cross_Val_Res = CrossValidation::K_Folds(model, data, K);
 
   // local_Res.set_Values(cross_Val_Res);
   //  Send && receive values from MPI Process to print in proc 0
   //  Only print once it has ended ppbly
   //  Serialize the values to display
 
-  /* tools::display_Values("Fold n*" + std::to_string(i), depth, trees,
-                        formatted_Matrix_Size, fold_Mae, fold_Mape,
-                        fold_Std_Dev, t_Intern.get_Duration());
+  if (rank == 0) {
+    int counter = 0;
 
-  tools::display_Values("Global", depth, trees, formatted_File_Size, global_MAE,
-                        global_MAPE, global_Std_Dev, t_Global.get_Duration());
-*/
+    while (counter < size - 1) {
+      int flag = 0;
+      // Checks for incoming message
+      MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &flag, MPI_STATUS_IGNORE);
+
+      if (flag) {
+        int filename_Size;
+        MPI_Status status;
+
+        // Get infos
+        MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+        MPI_Get_count(&status, MPI_CHAR, &filename_Size);
+
+        std::vector<char> filename_Buffer(filename_Size);
+
+        // Get message and handle infos
+        MPI_Recv(filename_Buffer.data(), filename_Size, MPI_CHAR,
+                 status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        std::string filename_Recv(filename_Buffer.begin(),
+                                  filename_Buffer.end());
+
+        Answers answer_Recv = Serializer::deserialize_Answers(filename_Recv);
+        std::remove(filename_Recv.c_str());
+        cross_Val_Res.add_And_Mean_Values(answer_Recv);
+
+        ++counter;
+      }
+    }
+    cross_Val_Res.print();
+  } else {
+    std::string filename = std::to_string(rank) + "_serialized_answers.bin";
+    Serializer::serialize_Answers(cross_Val_Res, filename);
+
+    MPI_Send(filename.c_str(), filename.size() + 1, MPI_CHAR, 0, 0,
+             MPI_COMM_WORLD);
+  } 
 }
 
 //
@@ -77,18 +107,13 @@ void MPI_Main(int argc, char **argv) {
 
   model.train(DS, trees_For_Proc);
 
-  // CrossValidation::K_Folds(model, DS, 5);
-
   t.stop();
 
   std::cout << "Process infos : rank:= " << rank << " pid:= " << pid
             << " trees:= " << trees_For_Proc
             << " run time:= " << t.get_Duration() << "\n";
 
-  // MPI_Barrier(MPI_COMM_WORLD);
   MPI_Cross_Val(model, DS, 5);
-  /* if (rank == 0)
-    CrossValidation::K_Folds(model, DS, 5); */
 }
 
 } // namespace MPI_Wrapper
