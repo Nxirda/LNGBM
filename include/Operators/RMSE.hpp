@@ -9,7 +9,7 @@ class RMSE : public IOperator {
 private:
   // Parameters
 
-  // float split_Criterion;
+  // double split_Criterion;
   const std::string name = "MAPE";
 
 public:
@@ -27,11 +27,9 @@ public:
 
   static std::string get_Name();
 
-  float compute(int position, const DataSet &data, std::vector<int> index,
-                const float split_Criteria) const override;
+  double compute(int position, const DataSet &data, const std::vector<int> &index,
+                const double split_Criteria) const override;
 
-  /* static float apply(const std::vector<float> &exact,
-                     const std::vector<float> &prediction); */
 };
 
 #endif

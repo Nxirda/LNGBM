@@ -25,6 +25,8 @@ add_library(Source_Lib
             PredictionModel/TrainingElement.cpp
             #Validation
             Validation/Answers.cpp
+            #MPI Wrapper
+            MpiWrapper/MPIWrapper.cpp
 )   
 
 include_directories(${CMAKE_SOURCE_DIR}/include)

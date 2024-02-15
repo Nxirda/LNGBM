@@ -26,7 +26,7 @@ Parameters : Node, index, depth
 Inputs     : TreeNode*, const vector<int>, int
 Outputs    : Object of TrainingElement class
 */
-TrainingElement::TrainingElement(TreeNode *node, std::vector<int> const index,
+TrainingElement::TrainingElement(TreeNode *node, const std::vector<int> &index,
                                  int depth) {
   this->node = node;
   this->index = std::move(index);
@@ -88,7 +88,9 @@ Parameters : index
 Inputs     : vector<int>
 Outputs    :
 */
-void TrainingElement::set_Index(std::vector<int> index) { this->index = index; }
+void TrainingElement::set_Index(const std::vector<int> &index) {
+  this->index = index;
+}
 
 /*
 Sets the depth
@@ -101,10 +103,10 @@ void TrainingElement::set_depth(int depth) { this->depth = depth; }
 /*
 Sets the root element (First node of the tree)
 Parameters : DataSet size, TreeNode, predicted value
-Inputs     : int, TreeNode*, float
+Inputs     : int, TreeNode*, double
 Outputs    :
 */
-void TrainingElement::set_Root(int dataset_Size, TreeNode *node, float value) {
+void TrainingElement::set_Root(int dataset_Size, TreeNode *node, double value) {
   this->depth = 0;
 
   // Computes the index for the given DataSet
@@ -126,6 +128,14 @@ Inputs     : int
 Outputs    :
 */
 void TrainingElement::bootstrap_Index(int dataset_Size) {
+
+  // Generate a unique seed using the current time and the process ID
+  size_t seed =
+      static_cast<size_t>(std::time(nullptr)) + static_cast<size_t>(getpid());
+
+  // Set the seed for the random number generator
+  std::srand(seed);
+
   std::vector<int> idx(dataset_Size);
 #pragma omp parallel for
   for (int i = 0; i < dataset_Size; ++i) {
@@ -139,55 +149,48 @@ Search for the best feature to split the dataset on at a given Node
 Gives the split criterion at the same time
 Parameters : Dataset, Element, Splitting operator, Splitting Criteria
 Inputs     : const DataSet, TrainingElem*, IOperator*, ICriteria*
-Ouputs     : tuple<int, float>
+Ouputs     : tuple<int, double>
 */
-std::tuple<int, float>
+std::tuple<int, double>
 TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
                                  const IOperator *splitting_Operator,
                                  const ICriteria *splitting_Criteria) {
 
   int best_Feature = 0;
-  float criterion = 0;
+  double criterion = 0;
   // We try to minimize the mean absolute error for a split
-  float min = INT_MAX;
+  double min = INT_MAX;
 
   std::vector<std::string> features = data.get_Features();
 
   // Minimize the error by trying multiple splits on features
   for (size_t i = 0; i < features.size(); ++i) {
 
-    // Can be parallelized ppbly
-    std::vector<float> criterias =
-        splitting_Criteria->compute(std::move(data.get_Column(i, index)));
+    // parallel
+    std::vector<double> criterias =
+        splitting_Criteria->compute(data.get_Column(i, index));
 
     int local_Best_Feature = 0;
-    float local_Criterion = 0;
+    double local_Criterion = 0;
     // We try to minimize the mean absolute error for a split
-    float local_min = INT_MAX;
+    double local_min = INT_MAX;
 
-    // Test multiple split criteria || make local infos for the inner loop so
-    // the critical part only comes 1 time per proc (to be fixed, this doesnt typically need to be parallelized)
-    // As the computing happens more inside the operator computing
+    // Test multiple split criteria
     for (size_t j = 0; j < criterias.size(); ++j) {
-      
+
       // Needs to be parallelized
-      float tmp_var =
+      double tmp_var =
           splitting_Operator->compute(i, data, elem->index, criterias[j]);
 
-      if (tmp_var < local_min) {
-        local_min = tmp_var;
-        local_Best_Feature = i;
-        local_Criterion = criterias[j];
+      if (tmp_var < min) {
+        min = tmp_var;
+        best_Feature = i;
+        criterion = criterias[j];
       }
-    }
-    if (local_min < min) {
-      min = local_min;
-      best_Feature = local_Best_Feature;
-      criterion = local_Criterion;
     }
   }
 
-  // float criterion = data.column_Mean(best_Feature, elem->index);
+  // double criterion = data.column_Mean(best_Feature, elem->index);
   return std::make_tuple(best_Feature, criterion);
 }
 
@@ -245,8 +248,8 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   elem->node->set_Split_Criterion(criterion);
 
   // If index is empty : predic = -1 || parallel
-  float predic_Left = data.labels_Mean(*left_index);
-  float predic_Right = data.labels_Mean(*right_index);
+  double predic_Left = data.labels_Mean(*left_index);
+  double predic_Right = data.labels_Mean(*right_index);
 
   // Case 1 : Build only Right Node (if information gained)
   if (predic_Left < 0 && right_index.has_value()) {

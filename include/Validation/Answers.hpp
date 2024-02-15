@@ -13,7 +13,7 @@ class Answers {
 private:
   std::vector<std::string> header;
   std::vector<std::vector<std::string>> values;
-  std::vector<std::vector<float>> numeric_Values;
+  std::vector<std::vector<double>> numeric_Values;
 
   friend class boost::serialization::access;
   template <class Archive>
@@ -35,8 +35,8 @@ public:
   void set_Values(const std::vector<std::vector<std::string>> &vals);
   std::vector<std::vector<std::string>> get_Values() const;
 
-  void set_Numeric_Values(const std::vector<std::vector<float>> &num_Vals);
-  std::vector<std::vector<float>> get_Numeric_Values() const;
+  void set_Numeric_Values(const std::vector<std::vector<double>> &num_Vals);
+  std::vector<std::vector<double>> get_Numeric_Values() const;
 
   void set_Header(const std::vector<std::string> &headers);
   std::vector<std::string> get_Header() const;

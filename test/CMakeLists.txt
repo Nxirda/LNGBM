@@ -5,6 +5,7 @@ add_library(Test_Lib
             DataSet_Test.cpp
             DecisionTree_Test.cpp
             TreeNode_Test.cpp
+
 )   
 
 target_include_directories(Test_Lib 

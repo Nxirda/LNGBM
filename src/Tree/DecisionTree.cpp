@@ -70,4 +70,4 @@ Parameters :
 Inputs     :
 Outputs    : 
 */
-void DecisionTree::print_Tree() { this->root->node_Print_Criterion(); }
+void DecisionTree::print_Tree() { this->root->node_Print(); }

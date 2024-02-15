@@ -6,7 +6,7 @@
 Answers::Answers() {
   this->header = std::vector<std::string>();
   this->values = std::vector<std::vector<std::string>>();
-  this->numeric_Values = std::vector<std::vector<float>>();
+  this->numeric_Values = std::vector<std::vector<double>>();
 }
 
 /*
@@ -57,13 +57,13 @@ void Answers::set_Values(const std::vector<std::vector<std::string>> &vals) {
 /*
  */
 void Answers::set_Numeric_Values(
-    const std::vector<std::vector<float>> &num_Vals) {
+    const std::vector<std::vector<double>> &num_Vals) {
   this->numeric_Values = num_Vals;
 }
 
 /*
  */
-std::vector<std::vector<float>> Answers::get_Numeric_Values() const {
+std::vector<std::vector<double>> Answers::get_Numeric_Values() const {
   return this->numeric_Values;
 }
 
@@ -87,7 +87,7 @@ void Answers::print() {
     // Prints the string values
     Tools::display_Values_Vector<std::string>(this->values[i]);
     // Then prints the numerical values
-    Tools::display_Values_Vector<float>(this->numeric_Values[i]);
+    Tools::display_Values_Vector<double>(this->numeric_Values[i]);
     std::cout << std::endl;
   }
 }

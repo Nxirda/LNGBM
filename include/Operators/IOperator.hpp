@@ -15,8 +15,8 @@ private:
 public:
   virtual ~IOperator(){};
 
-  virtual float compute(int position, const DataSet &data,
-                        std::vector<int> index, const float criteria) const = 0;
+  virtual double compute(int position, const DataSet &data,
+                        const std::vector<int> &index, const double criteria) const = 0;
 
   virtual void print() = 0;
 };

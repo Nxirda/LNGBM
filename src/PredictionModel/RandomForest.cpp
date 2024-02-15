@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <execution>
 #include <stack>
 
 #include "RandomForest.hpp"
@@ -24,8 +25,8 @@ RandomForest::RandomForest() {
 
 /*
 Constructor with arguments
-Parameters : Dataset, splitting operator, splitting criteria, forest size, depth for the trees
-Inputs     : const DataSet, IOperator*, ICriteria*, int, int
+Parameters : Dataset, splitting operator, splitting criteria, forest size, depth
+for the trees Inputs     : const DataSet, IOperator*, ICriteria*, int, int
 Outputs    : Object of RandomForest class
 */
 RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
@@ -55,16 +56,16 @@ Outputs    : int
 int RandomForest::get_size() { return this->size; }
 
 //
-std::map<int, DecisionTree> RandomForest::get_Trees() const{
+std::map<int, DecisionTree> RandomForest::get_Trees() const {
   return this->trees;
 }
 
 /*
-*/
-void RandomForest::aggregate_Trees(const std::map<int, DecisionTree> &forest){
+ */
+void RandomForest::aggregate_Trees(const std::map<int, DecisionTree> &forest) {
   int n = this->trees.size();
   this->size += forest.size();
-  for(auto &pair : forest)
+  for (auto &pair : forest)
     this->trees.insert({pair.first + n, pair.second});
 }
 
@@ -95,11 +96,11 @@ void RandomForest::generate_Forest(int size) {
 Returns the predictions for the current dataset
 Parameters : Dataset to predict on
 Inputs     : const DataSet
-Outputs    : vector<float>
+Outputs    : vector<double>
 */
-std::vector<float> RandomForest::predict_Results(const DataSet &data) {
+std::vector<double> RandomForest::predict_Results(const DataSet &data) {
   int size = data.samples_Number();
-  std::vector<float> result(size, 0);
+  std::vector<double> result(size, 0);
 
   // Computes the index
   std::vector<int> index(size);
@@ -109,8 +110,8 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
 
   // Iterate through the Forest
   for (unsigned long int i = 0; i < this->trees.size(); ++i) {
-    std::shared_ptr<std::vector<float>> tree_Result =
-        std::make_shared<std::vector<float>>(size, 0);
+    std::shared_ptr<std::vector<double>> tree_Result =
+        std::make_shared<std::vector<double>>(size, 0);
 
     // Computes the prediction for the current tree
     if (this->trees.find(i) == this->trees.end()) {
@@ -121,11 +122,12 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
     tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
 
     // Adds two vectors
-    std::transform(result.begin(), result.end(), tree_Result->begin(),
-                   result.begin(), std::plus<float>());
+    std::transform(std::execution::par, result.begin(), result.end(),
+                   tree_Result->begin(), result.begin(), std::plus<double>());
   }
 
   // Divides to have the mean of the answers
+#pragma omp parallel for
   for (int j = 0; j < size; ++j) {
     result.at(j) /= this->trees.size();
   }
@@ -136,16 +138,19 @@ std::vector<float> RandomForest::predict_Results(const DataSet &data) {
 /*
 Predict the result for the current tree
 Parameters : Dataset, results, index for the current node, current node
-Inputs     : const DataSet, shared_ptr<vector<float>>, vector<int>, TreeNode*
+Inputs     : const DataSet, shared_ptr<vector<double>>, vector<int>, TreeNode*
 Outputs    :
 */
 void RandomForest::tree_Prediction(const DataSet &data,
-                                   std::shared_ptr<std::vector<float>> result,
-                                   std::vector<int> index, TreeNode *node) {
+                                   std::shared_ptr<std::vector<double>> result,
+                                   const std::vector<int> &index,
+                                   TreeNode *node) {
 
   // Update the values of the result
+  double pred_Val = node->get_Predicted_Value();
+#pragma omp parallel for
   for (int idx : index) {
-    result->at(idx) = node->get_Predicted_Value();
+    result->at(idx) = pred_Val;
   }
 
   // Put the correct indexes

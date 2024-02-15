@@ -92,31 +92,32 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
   // Getting infos on the model
   int precision = 5;
   int depth = model.get_Depth();
+  int height = data.samples_Number();
   int width = data.features_Length();
   int trees = model.get_Trees_Number();
   int element_Size = data.element_Size();
 
   //
-  std::string formatted_File_Size = Tools::matrix_Memory_Size(
-      data.samples_Number(), width, element_Size, precision);
+  std::string formatted_File_Size =
+      Tools::matrix_Memory_Size(height, width, element_Size, precision);
 
   // Initialize header for the metrics we want
   validation_Result.set_Header({"Folds", "Depth", "Trees", "File_size",
                                 "Train_time", "MAE", "MAPE", "Std_dev"});
 
-  float global_MAE = 0;
-  float global_MAPE = 0;
-  float global_Std_Dev = 0;
+  double global_MAE = 0;
+  double global_MAPE = 0;
+  double global_Std_Dev = 0;
 
   std::vector<std::string> inner_Values;
-  std::vector<float> inner_Numerical_Values;
+  std::vector<double> inner_Numerical_Values;
 
   // Size is K + 1 : we need results from each folds and the global result
   std::vector<std::vector<std::string>> global_Result(
       K + 1, std::vector<std::string>());
 
-  std::vector<std::vector<float>> global_Numerical_Result(K + 1,
-                                                          std::vector<float>());
+  std::vector<std::vector<double>> global_Numerical_Result(
+      K + 1, std::vector<double>());
 
   // Initialize timer so it count the whole time the function is "really"
   // computing stuff
@@ -190,8 +191,8 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
       t_Global.get_Duration()};
 
   // Stores the final numerical result after the folds
-  std::vector<float> global_Numerical_Values = {global_MAE, global_MAPE,
-                                                global_Std_Dev};
+  std::vector<double> global_Numerical_Values = {global_MAE, global_MAPE,
+                                                 global_Std_Dev};
 
   // In the end it contains each fold values and the whole result
   global_Result[K] = global_Values;
@@ -199,7 +200,7 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
 
   validation_Result.set_Values(global_Result);
   validation_Result.set_Numeric_Values(global_Numerical_Result);
-  
+
   return validation_Result;
 }
 } // namespace CrossValidation

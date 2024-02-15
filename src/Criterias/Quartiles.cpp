@@ -51,15 +51,15 @@ std::string Quartiles::get_Name() { return "Quartiles"; }
 /*
 Compute the Quartiles of the given vector
 Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
+Inputs     : const vector<double>
+Outputs    : vector<double>
 */
-std::vector<float> Quartiles::compute(const std::vector<float> list) const {
+std::vector<double> Quartiles::compute(const std::vector<double> &list) const {
 
-  std::vector<float> quartiles_Values(this->quartiles.size());
+  std::vector<double> quartiles_Values(this->quartiles.size());
   // Sort the data
   int len = list.size();
-  std::vector<float> sorted_Data = list;
+  std::vector<double> sorted_Data = list;
   std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
 
 #pragma omp parallel for

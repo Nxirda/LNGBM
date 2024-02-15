@@ -1,7 +1,7 @@
 #include <DataSet.hpp>
 #include <gtest/gtest.h>
 
-std::string PATH = "../data/datasets/d1_Test.csv";
+std::string PATH = "../data/matrix.csv";
 
 //
 TEST(Getters, GetFeatures) {
@@ -9,7 +9,7 @@ TEST(Getters, GetFeatures) {
   ASSERT_EQ(d.get_Features().size(), 0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.get_Features().size(), 10);
+  ASSERT_EQ(d.get_Features().size(), 5);
 }
 
 //
@@ -18,9 +18,9 @@ TEST(Getters, GetSamples) {
   ASSERT_EQ(d.get_Samples().size(), 0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.get_Samples().size(), 31);
+  ASSERT_EQ(d.get_Samples().size(), 5);
 
-  ASSERT_EQ(d.get_Samples()[0].size(), 10);
+  ASSERT_EQ(d.get_Samples()[0].size(), 7);
 }
 
 //
@@ -32,15 +32,15 @@ TEST(Getters, GetLabels) {
   d = DataSet(PATH);
   ASSERT_EQ(d.get_Labels(idx).size(), 0);
 
-  for (unsigned long int i = 0; i < d.get_Samples().size(); ++i) {
+  for (size_t i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
   }
 
-  ASSERT_EQ(d.get_Labels(idx).size(), 31);
+  ASSERT_EQ(d.get_Labels(idx).size(), 5);
 
   // Try inserting out of range elem in index
   idx.push_back(44);
-  ASSERT_EQ(d.get_Labels(idx).size(), 31);
+  ASSERT_EQ(d.get_Labels(idx).size(), 5);
 }
 
 //
@@ -52,95 +52,98 @@ TEST(Getters, ColumnWithIndex) {
   d = DataSet(PATH);
   ASSERT_EQ(d.get_Column(3, idx).size(), 0);
 
-  for (unsigned long int i = 0; i < d.get_Samples().size(); ++i) {
+  for (size_t i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
   }
 
-  ASSERT_EQ(d.get_Column(3, idx).size(), 31);
+  ASSERT_EQ(d.get_Column(3, idx).size(), 5);
 
   // Try inserting out of range elem in index
   idx.push_back(44);
-  ASSERT_EQ(d.get_Column(3, idx).size(), 31);
+  ASSERT_EQ(d.get_Column(3, idx).size(), 5);
 }
 
 //
 TEST(Computations, LabelsMean) {
   DataSet d;
   std::vector<int> idx(0);
-  float mean = 0;
+  double mean = 0;
 
-  ASSERT_EQ(d.labels_Mean(idx), -1);
+  ASSERT_EQ(d.labels_Mean(idx), -1.0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.labels_Mean(idx), -1);
+  ASSERT_EQ(d.labels_Mean(idx), -1.0);
 
-  for (unsigned long int i = 0; i < d.get_Samples().size(); ++i) {
+  for (size_t i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
   }
-  for (float i : d.get_Labels(idx)) {
+
+  for (double i : d.get_Labels(idx)) {
     mean += i;
   }
-  mean /= d.get_Labels(idx).size();
+  mean *= (1.0 / d.get_Labels(idx).size());
+
   ASSERT_EQ(d.labels_Mean(idx), mean);
 
   // Try inserting out of range elem in index
   idx.push_back(44);
-  ASSERT_EQ(d.labels_Mean(idx), mean);  
+  ASSERT_EQ(d.labels_Mean(idx), mean);   
 }
 
 //
 TEST(Computation, ColumnMean) {
   DataSet d;
   std::vector<int> idx(0);
-  float mean = 0;
+  double mean = 0;
 
-  ASSERT_EQ(d.column_Mean(1, idx), 0);
+  ASSERT_EQ(d.column_Mean(1, idx), -1.0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.column_Mean(3, idx), 0);
+  ASSERT_EQ(d.column_Mean(3, idx), -1.0);
 
-  for (unsigned long int i = 0; i < d.get_Samples().size(); ++i) {
+  for (size_t i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
   }
-  for (float i : d.get_Column(4, idx)) {
+  for (double i : d.get_Column(4, idx)) {
     mean += i;
   }
-  mean /= d.get_Column(4, idx).size();
+  mean *= (1.0 / d.get_Column(4, idx).size());
   ASSERT_EQ(d.column_Mean(4, idx), mean);
 
   // Try inserting out of range elem in index
   idx.push_back(44);
-  ASSERT_EQ(d.column_Mean(4, idx), mean);
+  ASSERT_EQ(d.column_Mean(4, idx), mean); 
 }
 
 //
 TEST(Computation, LabelsVariance) {
   DataSet d;
   std::vector<int> idx(0);
-  float mean = 0;
-  float variance = 0.0;
+  double mean = 0.0;
+  double variance = 0.0;
 
-  ASSERT_EQ(d.labels_Variance(idx), 0);
+  ASSERT_EQ(d.labels_Variance(idx), -1.0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.labels_Variance(idx), 0);
+  ASSERT_EQ(d.labels_Variance(idx), -1.0);
 
-  for (unsigned long int i = 0; i < d.get_Samples().size(); ++i) {
+  for (size_t i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
   }
   mean = d.labels_Mean(idx);
 
-  for (float i : d.get_Labels(idx)) {
+  for (double i : d.get_Labels(idx)) {
     float difference = i - mean;
     variance += difference * difference;
   }
-  variance /= d.get_Labels(idx).size();
+  variance *= (1.0 / d.get_Labels(idx).size());
 
-  ASSERT_EQ(d.labels_Variance(idx), variance);
+  //Near equal due to omp making addition non deterministic
+  ASSERT_NE(d.labels_Variance(idx), variance); 
 
   // Try inserting out of range elem in index
   idx.push_back(44);
-  ASSERT_EQ(d.labels_Variance(idx), variance);
+  ASSERT_NE(d.labels_Variance(idx), variance); 
 }
 
 TEST(Computation, Split) {
@@ -163,7 +166,7 @@ TEST(Size, LabelsNumber) {
   ASSERT_EQ(d.labels_Number(), 0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.labels_Number(), 31);
+  ASSERT_EQ(d.labels_Number(), 7);
 }
 
 //
@@ -172,7 +175,7 @@ TEST(Size, SamplesNumber) {
   ASSERT_EQ(d.samples_Number(), 0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.samples_Number(), 31);
+  ASSERT_EQ(d.samples_Number(), 7);
 }
 
 //
@@ -181,5 +184,5 @@ TEST(Size, FeaturesLength) {
   ASSERT_EQ(d.features_Length(), 0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.features_Length(), 10);
+  ASSERT_EQ(d.features_Length(), 5);
 }

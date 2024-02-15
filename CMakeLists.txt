@@ -17,11 +17,10 @@ add_executable(main main.cpp)
 
 #Required dependencies 
 find_package(MPI REQUIRED)
-find_package(Boost REQUIRED COMPONENTS serialization mpi)
-find_package(OpenMP REQUIRED)
 find_package(TBB REQUIRED)
 find_package(BLAS REQUIRED)
-
+find_package(OpenMP REQUIRED)
+find_package(Boost REQUIRED COMPONENTS serialization mpi)
 
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})

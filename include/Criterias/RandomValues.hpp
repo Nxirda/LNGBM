@@ -55,20 +55,20 @@ public:
    * This method implements the computation of number_Of_Elements of random
    * values in the provided list of data.
    *
-   * @param vector<float> list: The distribution of data
-   * @return Type: vector<float>, A vector of the random values
+   * @param vector<double> list: The distribution of data
+   * @return Type: vector<double>, A vector of the random values
    */
-  std::vector<float> compute(const std::vector<float> list) const override;
+  std::vector<double> compute(const std::vector<double> &list) const override;
 
   /**
-   * @brief Computes a random float in given boundaries
+   * @brief Computes a random double in given boundaries
    * 
-   * @param float min: minimal value we can return
-   * @param float max: maximal value we can return
+   * @param double min: minimal value we can return
+   * @param double max: maximal value we can return
    * 
-   * @return Type: float, A random flaot
+   * @return Type: double, A random flaot
   */
-  float get_Random_Float(float min, float max) const;
+  double get_Random_double(double min, double max) const;
 };
 
 #endif

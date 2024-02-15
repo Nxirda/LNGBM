@@ -29,7 +29,7 @@ Histogram::Histogram(int x) {
   if (x <= 0) {
     errno = EINVAL;
     perror("Can't compute split criterias with x <= 0\n x is set to 5");
-    this->number_Of_Bins = 10;
+    this->number_Of_Bins = 25;
   } else {
     this->number_Of_Bins = x;
   }
@@ -66,17 +66,17 @@ std::string Histogram::get_Name() { return "Histogram"; }
 /*
 Compute the historgam of the given vector
 Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
+Inputs     : const vector<double>
+Outputs    : vector<double>
 */
-std::vector<float> Histogram::compute(const std::vector<float> list) const {
+std::vector<double> Histogram::compute(const std::vector<double> &list) const {
 
-  auto min = std::min_element(std::execution::par, list.begin(), list.end());
-  auto max = std::max_element(std::execution::par, list.begin(), list.end());
+  auto min = std::min_element(std::execution::par_unseq, list.begin(), list.end());
+  auto max = std::max_element(std::execution::par_unseq, list.begin(), list.end());
 
-  std::vector<float> res(this->number_Of_Bins, 0.0);
+  std::vector<double> res(this->number_Of_Bins, 0.0);
 
-  int bin_size = (*max - *min) / this->number_Of_Bins;
+  int bin_size = (*max - *min) * (1.0 / this->number_Of_Bins);
 
 #pragma omp parallel for
   for (int i = 0; i < this->number_Of_Bins; ++i) {

@@ -18,7 +18,7 @@ struct TrainingElement {
   // Constructor
 
   TrainingElement();
-  TrainingElement(TreeNode *node, std::vector<int> const index, int depth);
+  TrainingElement(TreeNode *node, const std::vector<int> &index, int depth);
   TrainingElement(const TrainingElement &TE);
 
   // Operator Overloading
@@ -36,7 +36,7 @@ struct TrainingElement {
   // Setters
 
   void set_Node(TreeNode *node);
-  void set_Index(std::vector<int> index);
+  void set_Index(const std::vector<int> &index);
   void set_depth(int depth);
 
   // Methods
@@ -46,7 +46,7 @@ struct TrainingElement {
              const IOperator *splitting_Operator,
              const ICriteria *splitting_Criteria);
 
-  std::tuple<int, float> find_Best_Split(const DataSet &data,
+  std::tuple<int, double> find_Best_Split(const DataSet &data,
                                          TrainingElement *elem,
                                          const IOperator *splitting_Operator,
                                          const ICriteria *splitting_Criteria);
@@ -58,7 +58,7 @@ struct TrainingElement {
   void train(const DataSet &data, const IOperator *splitting_Operator, const ICriteria *splitting_Criteria, int max_Depth,
              long unsigned int treshold);
 
-  void set_Root(int dataset_Size, TreeNode *node, float value);
+  void set_Root(int dataset_Size, TreeNode *node, double value);
   void bootstrap_Index(int dataset_Size);
 };
 

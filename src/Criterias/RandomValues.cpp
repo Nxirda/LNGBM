@@ -45,17 +45,17 @@ Outputs    :
 RandomValues::~RandomValues() {}
 
 /*
-Computes a random float between min and max
+Computes a random double between min and max
 Parameters : minimum value, maximum value
-Inputs     : float, float
-Outputs    : float
+Inputs     : double, double
+Outputs    : double
  */
-float RandomValues::get_Random_Float(float min, float max) const {
+double RandomValues::get_Random_double(double min, double max) const {
   // Hardware based entropy
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  std::uniform_real_distribution<float> dist(min, max);
+  std::uniform_real_distribution<double> dist(min, max);
   return dist(gen);
 }
 
@@ -82,22 +82,22 @@ std::string RandomValues::get_Name() { return "Random Values"; }
 /*
 Compute random values in the given vector
 Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
+Inputs     : const vector<double>
+Outputs    : vector<double>
 */
-std::vector<float> RandomValues::compute(const std::vector<float> list) const {
+std::vector<double> RandomValues::compute(const std::vector<double> &list) const {
 
   auto min = std::min_element(std::execution::par, list.begin(), list.end());
   auto max = std::max_element(std::execution::par, list.begin(), list.end());
 
-  std::vector<float> res(this->number_Of_Elements, 0);
+  std::vector<double> res(this->number_Of_Elements, 0);
   res[0] = *min;
   res[this->number_Of_Elements - 1] = *max;
 
   if (this->number_Of_Elements > 0) {
 #pragma omp parallel for
     for (int i = 1; i < this->number_Of_Elements - 1; ++i) {
-      res[i] = get_Random_Float(*min, *max);
+      res[i] = get_Random_double(*min, *max);
     }
   }
   return res;

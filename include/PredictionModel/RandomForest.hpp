@@ -36,15 +36,15 @@ public:
 
   std::map<int, DecisionTree> get_Trees() const;
   int get_size();
-  // std::vector<float> get_results();
+  // std::vector<double> get_results();
 
   // Methods
   void generate_Forest(int size);
   void aggregate_Trees(const std::map<int, DecisionTree> &forest);
-  std::vector<float> predict_Results(const DataSet &dataset);
+  std::vector<double> predict_Results(const DataSet &dataset);
   void tree_Prediction(const DataSet &data,
-                       std::shared_ptr<std::vector<float>> result,
-                       std::vector<int> index, TreeNode *node);
+                       std::shared_ptr<std::vector<double>> result,
+                       const std::vector<int> &index, TreeNode *node);
 };
 
 #endif

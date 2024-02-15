@@ -28,11 +28,11 @@ public:
   /**
    * @brief Computes a vector of values defined by the criteria implementing it.
    *
-   * @param vector<float> list: The distribution of data
-   * @return Type: vector<float>, A vector of values contained in the
+   * @param vector<double> list: The distribution of data
+   * @return Type: vector<double>, A vector of values contained in the
    * distribution.
    */
-  virtual std::vector<float> compute(const std::vector<float> list) const = 0;
+  virtual std::vector<double> compute(const std::vector<double> &list) const = 0;
 
   /**
    * @brief Should print the name of the class on standard output.

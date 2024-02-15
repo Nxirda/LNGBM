@@ -19,8 +19,8 @@ private:
 
   // Values used to parse the test dataset
   int split_Column = -1;
-  float split_Criterion = -1;
-  float predicted_Value = -1;
+  double split_Criterion = -1.0;
+  double predicted_Value = -1.0;
 
   // Boost part to serialize the nodes so we can send them to other MPIs Process
   // Might need to build some sort of verif for MPI/Boost install at some point
@@ -39,7 +39,7 @@ public:
   // Constructor
 
   TreeNode();
-  TreeNode(int split_Column, float split_Criterion, float predicted_Value);
+  TreeNode(int split_Column, double split_Criterion, double predicted_Value);
 
   TreeNode(const TreeNode &node);
   TreeNode &operator=(const TreeNode &tn); // copy assignment
@@ -51,8 +51,8 @@ public:
   // Setter
 
   void set_Split_Column(int col);
-  void set_Predicted_Value(float value);
-  void set_Split_Criterion(float criterion);
+  void set_Predicted_Value(double value);
+  void set_Split_Criterion(double criterion);
 
   void add_Left(std::unique_ptr<TreeNode> Node);
   void add_Right(std::unique_ptr<TreeNode> Node);
@@ -63,13 +63,13 @@ public:
   TreeNode *get_Right_Node() const;
 
   int get_Split_Column() const;
-  float get_Split_Criterion() const;
-  float get_Predicted_Value() const;
+  double get_Split_Criterion() const;
+  double get_Predicted_Value() const;
 
   // Methods
 
   void node_Print();
-  void node_Print_Criterion();
+  //void node_Print_Criterion();
 };
 
 #endif

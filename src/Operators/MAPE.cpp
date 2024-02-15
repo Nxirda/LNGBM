@@ -51,18 +51,19 @@ Computes the Mean Absolute Percentage Error of a split on a given column
 Index is used to get the column of the dataset that can be accessed
 Parameters : position, DataSet, index
 Inputs     : int, DataSet, vector<int>
-Outputs    : float
+Outputs    : double
 */
-float MAPE::compute(int position, const DataSet &data, std::vector<int> index,
-                    const float split_Criteria) const {
+double MAPE::compute(int position, const DataSet &data,
+                     const std::vector<int> &index,
+                     const double split_Criteria) const {
 
-  float left_MAPE = 0;
-  float right_MAPE = 0;
+  double left_MAPE = 0.0;
+  double right_MAPE = 0.0;
 
   // Computes the DataSet Row Indexes that child nodes can access
   auto [left_index, right_index] = data.split(position, split_Criteria, index);
 
-  float base_Population = index.size();
+  double base_Population = index.size();
 
   // Creating a left child
   TreeNode left_Child{};
@@ -71,32 +72,32 @@ float MAPE::compute(int position, const DataSet &data, std::vector<int> index,
   TreeNode right_Child{};
 
   // Get the labels
-  std::vector<float> labels = data.get_Labels();
+  std::vector<double> labels = data.get_Labels();
 
   // Computes the Mean Absolute Percentage Error for left child
-  float left_Prediction = data.labels_Mean(left_index.value());
-  float left_Population = left_index.value().size();
+  double left_Prediction = data.labels_Mean(left_index.value());
+  double left_Population = left_index.value().size();
+
+  // Computes the Mean Absolute Percentage Error for left child
+  double right_Prediction = data.labels_Mean(right_index.value());
+  double right_Population = right_index.value().size();
 
 #pragma omp parallel for reduction(+ : left_MAPE)
   for (int idx : left_index.value()) {
     left_MAPE += (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
-  left_MAPE *= 100;
-  left_MAPE /= left_Population;
-
-  // Computes the Mean Absolute Percentage Error for left child
-  float right_Prediction = data.labels_Mean(right_index.value());
-  float right_Population = right_index.value().size();
+  left_MAPE *= 100.0;
+  left_MAPE *= (1.0 / left_Population);
 
 #pragma omp parallel for reduction(+ : right_MAPE)
   for (int idx : right_index.value()) {
     right_MAPE += (std::abs(labels[idx] - right_Prediction)) / right_Prediction;
   }
-  right_MAPE *= 100;
-  right_MAPE /= right_Population;
+  right_MAPE *= 100.0;
+  right_MAPE *= (1.0 / right_Population);
 
   // Compute the result of MAPE for the split at position
-  float res =
+  double res =
       ((left_MAPE * left_Population) + (right_MAPE * right_Population)) /
       base_Population;
   return res;
@@ -105,21 +106,21 @@ float MAPE::compute(int position, const DataSet &data, std::vector<int> index,
 /*
 Computes the MAPE of two vectors
 Parameters : exact results, prediction results
-Inputs     : const vector<float>, const vector<float>
+Inputs     : const vector<double>, const vector<double>
 Outputs    : double
 */
-float MAPE::apply(const std::vector<float> &exact,
-                  const std::vector<float> &prediction) {
+double MAPE::apply(const std::vector<double> &exact,
+                   const std::vector<double> &prediction) {
 
-  float res = 0;
+  double res = 0.0;
   int size = prediction.size();
 #pragma omp parallel for reduction(+ : res)
   for (int i = 0; i < size; ++i) {
-    res += std::abs(exact[i] - prediction[i]) / exact[i];
+    res += std::abs(exact[i] - prediction[i]) * (1.0 / exact[i]);
   }
 
   // Compute the MAPE
-  res = (res * 100) / size;
+  res = (res * 100.0) * (1.0 / size);
 
   return res;
 }

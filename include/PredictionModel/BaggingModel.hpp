@@ -41,7 +41,7 @@ public:
   void aggregate_Forest(const std::map<int, DecisionTree> &forest);
   void train(const DataSet &data);
   void train(const DataSet &data, int n);
-  std::vector<float> predict(const DataSet &datas);
+  std::vector<double> predict(const DataSet &datas);
 };
 
 #endif

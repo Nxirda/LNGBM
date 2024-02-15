@@ -15,7 +15,7 @@ private:
   // Parameters
   const std::string name =
       "Percentiles"; /**< A string variable to display the name. */
-  const std::vector<float> percentiles = {
+  const std::vector<double> percentiles = {
       10.0, 20.0, 30.0, 40.0, 50.0,
       60.0, 70.0, 80.0, 90.0}; /**< Array containing the values in % of the
                                   percentiles*/
@@ -51,10 +51,10 @@ public:
    * This method implements the computation of the values of the percentiles
    * of the provided list of data and the bin parameter.
    *
-   * @param vector<float> list: The distribution of data 
-   * @return Type: vector<float>, A vector of the values of the percentiles
+   * @param vector<double> list: The distribution of data 
+   * @return Type: vector<double>, A vector of the values of the percentiles
    */
-  std::vector<float> compute(const std::vector<float> list) const override;
+  std::vector<double> compute(const std::vector<double> &list) const override;
 };
 
 #endif

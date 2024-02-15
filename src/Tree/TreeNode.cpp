@@ -23,11 +23,11 @@ TreeNode::TreeNode() {
 /*
 Constructor of Tree Node with parameters
 Parameters : column, criterion, predicted value
-Inputs     : int, floatt, float
+Inputs     : int, doublet, double
 Outputs    : 
  */
-TreeNode::TreeNode(int split_Column, float split_Criterion,
-                   float predicted_Value) {
+TreeNode::TreeNode(int split_Column, double split_Criterion,
+                   double predicted_Value) {
   this->split_Column = split_Column;
   this->split_Criterion = split_Criterion;
   this->predicted_Value = predicted_Value;
@@ -104,20 +104,20 @@ void TreeNode::set_Split_Column(int col) { this->split_Column = col; }
 Sets the value in the split column that is used to split at
 this Node
 Parameters : criterion
-Inputs     : float
+Inputs     : double
 Outputs    :
 */
-void TreeNode::set_Split_Criterion(float criterion) {
+void TreeNode::set_Split_Criterion(double criterion) {
   this->split_Criterion = criterion;
 }
 
 /*
 Sets the value we predicted for this Node with the split
 Parameters : predicted value
-Inputs     : float
+Inputs     : double
 Outputs    :
 */
-void TreeNode::set_Predicted_Value(float value) {
+void TreeNode::set_Predicted_Value(double value) {
   this->predicted_Value = value;
 }
 
@@ -145,9 +145,9 @@ void TreeNode::add_Right(std::unique_ptr<TreeNode> Node) {
 Get the split criteria to split on at this node
 Parameters : 
 Inputs     :
-Outputs    : float
+Outputs    : double
 */
-float TreeNode::get_Split_Criterion() const { return this->split_Criterion; }
+double TreeNode::get_Split_Criterion() const { return this->split_Criterion; }
 
 /*
 Get the column to split on at this node
@@ -161,9 +161,9 @@ int TreeNode::get_Split_Column() const { return this->split_Column; }
 Get the value we expect of the split at this node
 Parameters : 
 Inputs     :
-Outputs    : float
+Outputs    : double
 */
-float TreeNode::get_Predicted_Value() const { return this->predicted_Value; }
+double TreeNode::get_Predicted_Value() const { return this->predicted_Value; }
 
 /*
 Returns a pointer to the left node of the current node
@@ -187,14 +187,14 @@ Parameters :
 Inputs     :
 Outputs    :
 */
-void TreeNode::node_Print_Criterion() {
-  // std::cout << "-> Split Column is : " << this->split_Column << "\n";
-  // std::cout << "-> Split Criterion is : " << this->split_Criterion << "\n";
+void TreeNode::node_Print() {
+  std::cout << "-> Split Column is : " << this->split_Column << "\n";
+  std::cout << "-> Split Criterion is : " << this->split_Criterion << "\n";
   std::cout << "-> Split Prediction is : " << this->predicted_Value << "\n";
   if (this->left) {
-    this->left->node_Print_Criterion();
+    this->left->node_Print();
   }
   if (this->right) {
-    this->right->node_Print_Criterion();
+    this->right->node_Print();
   }
 }

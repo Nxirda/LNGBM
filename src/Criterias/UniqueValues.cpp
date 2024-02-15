@@ -50,16 +50,16 @@ std::string UniqueValues::get_Name() { return "Unique Values"; }
 /*
 Compute the Uniques Values of the given vector
 Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
+Inputs     : const vector<double>
+Outputs    : vector<double>
 */
-std::vector<float> UniqueValues::compute(const std::vector<float> list) const {
+std::vector<double> UniqueValues::compute(const std::vector<double> &list) const {
 
   // Cast in set to get unique values (unordered set of efficiency)
-  std::unordered_set<float> unique(list.begin(), list.end());
+  std::unordered_set<double> unique(list.begin(), list.end());
 
   // Cast back in array for the result || move to avoid copy
-  std::vector<float> res(std::make_move_iterator(unique.begin()),
+  std::vector<double> res(std::make_move_iterator(unique.begin()),
                          std::make_move_iterator(unique.end()));
 
   return res;

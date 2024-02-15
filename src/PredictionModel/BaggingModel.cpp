@@ -175,8 +175,8 @@ void BaggingModel::train(const DataSet &data, int n) {
 predict the labels for the given dataset with the operator and depth fixed
 Parameters : Dataset for prediction
 Inputs     : const DataSet
-Outputs    : vector<float>
+Outputs    : vector<double>
 */
-std::vector<float> BaggingModel::predict(const DataSet &data) {
+std::vector<double> BaggingModel::predict(const DataSet &data) {
   return this->forest.predict_Results(data);
 }

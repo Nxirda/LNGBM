@@ -13,10 +13,10 @@
  */
 class DataSet {
 protected:
-  std::vector<float> labels; /**< A vector containing the labels as floats */
+  std::vector<double> labels; /**< A vector containing the labels as floats */
   std::vector<std::string>
       features; /**< A vector containing the features as floats */
-  std::vector<std::vector<float>>
+  std::vector<std::vector<double>>
       samples; /**< A 2D Matrix containing the sample values as floats */
 
 public:
@@ -47,8 +47,8 @@ public:
    *
    * Initializes the class with filled parameters.
    */
-  DataSet(std::vector<std::string> features,
-          std::vector<std::vector<float>> values, std::vector<float> labels);
+  DataSet(const std::vector<std::string> &features,
+          const std::vector<std::vector<double>> &values, const std::vector<double> &labels);
 
   /**
    * @brief Copy constructor for the DataSet class, needed for splitting the
@@ -59,7 +59,7 @@ public:
    *
    * Initializes the class with filled parameters.
    */
-  DataSet(const DataSet &data, std::vector<int> idx);
+  DataSet(const DataSet &data, const std::vector<int> &idx);
 
   /**
    * @brief static method to load a new dataset given by the path
@@ -68,7 +68,7 @@ public:
    *
    * Initializes a new DataSet
    */
-  static DataSet load(std::string file_Path);
+  //static DataSet load(std::string file_Path);
 
   /**
    * @brief Destructor for the DataSet class.
@@ -87,7 +87,7 @@ public:
    *
    * @return The samples of the current dataset as a 2D vector of floats
    */
-  std::vector<std::vector<float>> get_Samples() const;
+  std::vector<std::vector<double>> get_Samples() const;
 
   /**
    * @brief Method to copy specified samples of the 2D Matrix (DataSet)
@@ -95,7 +95,7 @@ public:
    * @return The specified samples of the current dataset as a 2D vector of
    * floats
    */
-  std::vector<std::vector<float>>
+  std::vector<std::vector<double>>
   get_Samples(const std::vector<int> &idx) const;
 
   /**
@@ -103,14 +103,14 @@ public:
    *
    * @return The  labels of the current dataset as a vector of floats
    */
-  std::vector<float> get_Labels() const;
+  std::vector<double> get_Labels() const;
 
   /**
    * @brief Method to copy specified labels of the DataSet
    *
    * @return The specified labels of the current dataset as a vector of floats
    */
-  std::vector<float> get_Labels(const std::vector<int> &idx) const;
+  std::vector<double> get_Labels(const std::vector<int> &idx) const;
 
   /**
    * @brief Method to copy a column of the DataSet (samples value on one
@@ -121,7 +121,7 @@ public:
    *
    * @return The values contained at the feature position for the samples in idx
    */
-  std::vector<float> get_Column(int position,
+  std::vector<double> get_Column(int position,
                                   const std::vector<int> &idx) const;
 
   // Methods
@@ -129,20 +129,20 @@ public:
   void print() const;
   bool empty() const;
 
-  void print_With_Index(std::vector<int> idx) const;
+  void print_With_Index(const std::vector<int> &idx) const;
 
   int labels_Number() const;
   int samples_Number() const;
   int features_Length() const;
   int element_Size() const;
 
-  float whole_Labels_Mean() const;
-  float labels_Mean(const std::vector<int> &idx) const;
-  float labels_Variance(const std::vector<int> &idx) const;
-  float column_Mean(int position, const std::vector<int> &idx) const;
+  double whole_Labels_Mean() const;
+  double labels_Mean(const std::vector<int> &idx) const;
+  double labels_Variance(const std::vector<int> &idx) const;
+  double column_Mean(int position, const std::vector<int> &idx) const;
 
   std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
-  split(int position, float criterion, const std::vector<int> &idx) const;
+  split(int position, double criterion, const std::vector<int> &idx) const;
 };
 
 #endif

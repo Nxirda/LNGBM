@@ -51,15 +51,15 @@ std::string Percentiles::get_Name() { return "Percentiles"; }
 /*
 Compute the percentiles of the given vector
 Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
+Inputs     : const vector<double>
+Outputs    : vector<double>
 */
-std::vector<float> Percentiles::compute(const std::vector<float> list) const {
+std::vector<double> Percentiles::compute(const std::vector<double> &list) const {
 
-  std::vector<float> percentiles_Values(this->percentiles.size(), 0);
+  std::vector<double> percentiles_Values(this->percentiles.size(), 0);
   // Sort the data
   int len = list.size();
-  std::vector<float> sorted_Data = list;
+  std::vector<double> sorted_Data = list;
   std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
 
 #pragma omp parallel for
