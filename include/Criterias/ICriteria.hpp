@@ -3,8 +3,9 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
-#include "DataSet.hpp"
+//#include "DataSet.hpp"
 
 /**
  * @interface ICriteria

@@ -19,7 +19,6 @@ Outputs    : Object of RandomForest class
 RandomForest::RandomForest() {
   this->size = 0;
   this->max_Depth = 0;
-  this->dataset = DataSet{};
   this->trees = std::map<int, DecisionTree>();
 }
 
@@ -29,11 +28,10 @@ Parameters : Dataset, splitting operator, splitting criteria, forest size, depth
 for the trees Inputs     : const DataSet, IOperator*, ICriteria*, int, int
 Outputs    : Object of RandomForest class
 */
-RandomForest::RandomForest(const DataSet &dataset, IOperator *split_Operator,
-                           ICriteria *split_Criteria, int n, int depth) {
+RandomForest::RandomForest(IOperator *split_Operator, ICriteria *split_Criteria,
+                           int n, int depth) {
   this->size = n;
   this->max_Depth = depth;
-  this->dataset = dataset;
   this->splitting_Operator = split_Operator;
   this->splitting_Criteria = split_Criteria;
   this->trees = std::map<int, DecisionTree>();
@@ -56,7 +54,7 @@ Outputs    : int
 int RandomForest::get_size() { return this->size; }
 
 //
-std::map<int, DecisionTree> RandomForest::get_Trees() const {
+const std::map<int, DecisionTree> &RandomForest::get_Trees() {
   return this->trees;
 }
 
@@ -75,7 +73,7 @@ Parameters : Size (number of Trees)
 Inputs     : int
 Outputs    :
 */
-void RandomForest::generate_Forest(int size) {
+void RandomForest::generate_Forest(const DataSet &data, int size) {
   long unsigned int treshold = 5;
 
   for (int i = 0; i < size; ++i) {
@@ -84,8 +82,8 @@ void RandomForest::generate_Forest(int size) {
     TrainingElement elem{};
 
     elem.set_Node(tree.get_Root());
-    elem.train(this->dataset, this->splitting_Operator,
-               this->splitting_Criteria, this->max_Depth, treshold);
+    elem.train(data, this->splitting_Operator, this->splitting_Criteria,
+               this->max_Depth, treshold);
 
     tree.set_Root(std::make_unique<TreeNode>(*elem.node));
     this->trees.insert({i, tree});
@@ -108,28 +106,28 @@ std::vector<double> RandomForest::predict_Results(const DataSet &data) {
     index[i] = i;
   }
 
+  std::vector<double> tree_Result(size, 0);
   // Iterate through the Forest
-  for (unsigned long int i = 0; i < this->trees.size(); ++i) {
-    std::shared_ptr<std::vector<double>> tree_Result =
-        std::make_shared<std::vector<double>>(size, 0);
+  for (size_t i = 0; i < this->trees.size(); ++i) {
 
     // Computes the prediction for the current tree
     if (this->trees.find(i) == this->trees.end()) {
-      perror("Couldnt find wanted tree");
+      // perror("Couldnt find wanted tree");
+      std::cerr << "Couldn't find wanted tree \n";
       exit(1);
     }
 
     tree_Prediction(data, tree_Result, index, this->trees[i].get_Root());
 
     // Adds two vectors
-    std::transform(std::execution::par, result.begin(), result.end(),
-                   tree_Result->begin(), result.begin(), std::plus<double>());
+    std::transform(std::execution::unseq, result.begin(), result.end(),
+                   tree_Result.begin(), result.begin(), std::plus<double>());
   }
 
   // Divides to have the mean of the answers
 #pragma omp parallel for
   for (int j = 0; j < size; ++j) {
-    result.at(j) /= this->trees.size();
+    result.at(j) *= (1.0 / this->trees.size());
   }
 
   return result;
@@ -142,15 +140,16 @@ Inputs     : const DataSet, shared_ptr<vector<double>>, vector<int>, TreeNode*
 Outputs    :
 */
 void RandomForest::tree_Prediction(const DataSet &data,
-                                   std::shared_ptr<std::vector<double>> result,
+                                   std::vector<double> &result,
                                    const std::vector<int> &index,
                                    TreeNode *node) {
 
   // Update the values of the result
   double pred_Val = node->get_Predicted_Value();
+
 #pragma omp parallel for
   for (int idx : index) {
-    result->at(idx) = pred_Val;
+    result[idx] = pred_Val;
   }
 
   // Put the correct indexes

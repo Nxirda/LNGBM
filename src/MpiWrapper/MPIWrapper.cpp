@@ -3,6 +3,8 @@
 #include "Answers.hpp"
 #include "CrossValidation.hpp"
 #include "DataSet.hpp"
+#include "Serializer.hpp"
+#include "Timer.hpp"
 
 namespace MPI_Wrapper {
 
@@ -94,20 +96,6 @@ void MPI_Main(int argc, char **argv) {
   BaggingModel model{metric, criteria, depth};
 
   DataSet DS{dataset_Path};
-  //DS.print();
-
-  //DS.samples_Number();
-
-  //std::vector<int> idx = {0,1,2,3,4};
-  //DS.print_With_Index(idx);
-  /* std::vector<std::vector<double>> test = DS.get_Samples(idx);
-
-  for(int i = 0; i < test.size(); ++i){
-    for(int j = 0; j < test[0].size(); j++){
-      std::cout << test[i][j];
-    }
-    std::cout << "\n";
-  } */
 
   Timer t;
   t.start();

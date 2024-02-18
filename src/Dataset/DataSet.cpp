@@ -322,10 +322,10 @@ Inputs     :
 Ouputs     : int
 */
 int DataSet::samples_Number() const {
-  if (this->samples.empty())
+  if (this->empty())
     return 0;
 
-  return this->samples[0].size(); /*this->samples.size();*/
+  return this->samples[0].size(); 
 }
 
 /*
@@ -353,9 +353,10 @@ std::vector<double> DataSet::get_Column(int position,
   std::vector<double> column;
   column.reserve(idx.size());
 
+//#pragma omp parallel for shared(column)
   for (int row : idx) {
     // Check row in bounds
-    if (row < this->samples_Number() && row >= 0) {
+    if (row < this->samples_Number() && row >= 0) {   
       column.push_back(this->samples[position][row]);
     }
   }
@@ -439,7 +440,7 @@ double DataSet::labels_Mean(const std::vector<int> &idx) const {
   double mean = -1.0;
   // No index
   if (idx.empty()) {
-    return mean;
+    return mean;        
   }
 
   std::vector<double> current_Labels = this->get_Labels(idx);

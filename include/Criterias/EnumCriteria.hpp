@@ -1,6 +1,7 @@
 #ifndef ENUM_CRITERIA_H_
 #define ENUM_CRITERIA_H_
 
+#include <iostream>
 #include <iomanip>
 #include <map>
 

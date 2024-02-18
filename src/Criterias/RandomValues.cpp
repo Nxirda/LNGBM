@@ -85,20 +85,22 @@ Parameters : Element distribution
 Inputs     : const vector<double>
 Outputs    : vector<double>
 */
-std::vector<double> RandomValues::compute(const std::vector<double> &list) const {
+std::vector<double>
+RandomValues::compute(const std::vector<double> &list) const {
 
   auto min = std::min_element(std::execution::par, list.begin(), list.end());
   auto max = std::max_element(std::execution::par, list.begin(), list.end());
+
+  if (this->number_Of_Elements < 0)
+    return {};
 
   std::vector<double> res(this->number_Of_Elements, 0);
   res[0] = *min;
   res[this->number_Of_Elements - 1] = *max;
 
-  if (this->number_Of_Elements > 0) {
 #pragma omp parallel for
-    for (int i = 1; i < this->number_Of_Elements - 1; ++i) {
-      res[i] = get_Random_double(*min, *max);
-    }
+  for (int i = 1; i < this->number_Of_Elements - 1; ++i) {
+    res[i] = get_Random_double(*min, *max);
   }
   return res;
 }

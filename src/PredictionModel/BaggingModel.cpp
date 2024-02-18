@@ -1,5 +1,3 @@
-#include <errno.h>
-
 #include "BaggingModel.hpp"
 #include "EnumCriteria.hpp"
 #include "EnumOperator.hpp"
@@ -16,14 +14,13 @@ Parameters : split metric, split criteria, max depth
 Inputs     : string, string, int
 Outputs    : Object of BaggingModel class
 */
-BaggingModel::BaggingModel(std::string split_Metric, std::string split_Criteria,
+BaggingModel::BaggingModel(const std::string &split_Metric, const std::string &split_Criteria,
                            int max_Depth) {
 
   // Here we just prepare the infos for the model
 
   if (max_Depth < 1) {
-    errno = EINVAL;
-    perror("Depth parameter should be at least 1");
+    std::cerr << "Depth parameter should be at least 1\n";
     abort();
   }
 
@@ -49,15 +46,14 @@ Parameters : split metric
 Inputs     : string
 Outputs    :
 */
-void BaggingModel::set_Metric(std::string metric) {
+void BaggingModel::set_Metric(const std::string &metric) {
 
   std::map<std::string, operators::type>::iterator it;
 
   it = operators::dictionnary.find(metric);
 
   if (it == operators::dictionnary.end()) {
-    errno = EINVAL;
-    perror("Chosen metric is invalid");
+    std::cerr << "Chosen metric is invalid\n";
     abort();
   }
 
@@ -75,8 +71,7 @@ void BaggingModel::set_Metric(std::string metric) {
     this->split_Metric = new RIV();
     break;
   default:
-    errno = EINVAL;
-    perror("Chosen metric is invalid");
+    std::cerr << "Chosen metric is invalid\n";
     abort();
   }
 }
@@ -87,15 +82,14 @@ Parameters : split criteria
 Inputs     : string
 Outputs    :
 */
-void BaggingModel::set_Criteria(std::string criteria) {
+void BaggingModel::set_Criteria(const std::string &criteria) {
 
   std::map<std::string, criterias::type>::iterator it;
 
   it = criterias::dictionary.find(criteria);
 
   if (it == criterias::dictionary.end()) {
-    errno = EINVAL;
-    perror("Chosen criteria is invalid");
+    std::cerr << "Chosen criteria is invalid\n";
     abort();
   }
 
@@ -116,8 +110,7 @@ void BaggingModel::set_Criteria(std::string criteria) {
     this->split_Criteria = new UniqueValues();
     break;
   default:
-    errno = EINVAL;
-    perror("Chosen criteria is invalid");
+    std::cerr << "Chosen criteria is invalid\n";
     abort();
   }
 }
@@ -131,7 +124,7 @@ int BaggingModel::get_Depth() { return this->max_Depth; }
 int BaggingModel::get_Trees_Number() { return this->forest.get_size(); };
 
 /**/
-std::map<int, DecisionTree> BaggingModel::get_Forest() const {
+const std::map<int, DecisionTree> &BaggingModel::get_Forest() {
   return this->forest.get_Trees();
 }
 
@@ -160,15 +153,18 @@ Outputs    :
 void BaggingModel::train(const DataSet &data, int n) {
 
   if (n < 1) {
-    errno = EINVAL;
+    /* errno = EINVAL;
     perror("Number of Trees should be at least 1");
+    abort(); */
+    std::cerr << "Number of Trees should be at least 1\n";
     abort();
+    
   }
 
-  this->forest = RandomForest(data, this->split_Metric, this->split_Criteria, n,
+  this->forest = RandomForest(this->split_Metric, this->split_Criteria, n,
                               this->max_Depth);
 
-  this->forest.generate_Forest(n);
+  this->forest.generate_Forest(data, n);
 }
 
 /*

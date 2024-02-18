@@ -5,6 +5,8 @@ add_library(Source_Lib
             #Tools part
             Tools/Timer.cpp
             Tools/Tools.cpp
+            Tools/Serializer.cpp 
+            #Dataset part
             Dataset/DataSet.cpp
             Tree/TreeNode.cpp
             Tree/DecisionTree.cpp
@@ -25,6 +27,8 @@ add_library(Source_Lib
             PredictionModel/TrainingElement.cpp
             #Validation
             Validation/Answers.cpp
+            Validation/CrossValidation.cpp 
+            Validation/Validation.cpp
             #MPI Wrapper
             MpiWrapper/MPIWrapper.cpp
 )   

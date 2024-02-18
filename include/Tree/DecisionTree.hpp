@@ -10,7 +10,7 @@
 
 // Binary Search Tree Class
 class DecisionTree {
-protected:
+private:
   // Parameters
 
   std::unique_ptr<TreeNode> root;
@@ -43,6 +43,9 @@ public:
   void set_Root(std::unique_ptr<TreeNode> node);
 
   // Methods
+
+  //Add a train   method
+  //Add a predict method
 
   void print_Tree();
 };

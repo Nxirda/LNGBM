@@ -19,14 +19,12 @@ private:
   IOperator *splitting_Operator;
   ICriteria *splitting_Criteria;
   std::map<int, DecisionTree> trees;
-  DataSet dataset;
 
 public:
   // Constructor
 
   RandomForest();
-  RandomForest(const DataSet &dataset, IOperator *op, ICriteria *crit, int n,
-               int depth);
+  RandomForest(IOperator *op, ICriteria *crit, int n, int depth);
 
   // Destructor
 
@@ -34,16 +32,15 @@ public:
 
   // Getters
 
-  std::map<int, DecisionTree> get_Trees() const;
+  const std::map<int, DecisionTree> &get_Trees();
   int get_size();
   // std::vector<double> get_results();
 
   // Methods
-  void generate_Forest(int size);
+  void generate_Forest(const DataSet &data, int size);
   void aggregate_Trees(const std::map<int, DecisionTree> &forest);
   std::vector<double> predict_Results(const DataSet &dataset);
-  void tree_Prediction(const DataSet &data,
-                       std::shared_ptr<std::vector<double>> result,
+  void tree_Prediction(const DataSet &data, std::vector<double> &result,
                        const std::vector<int> &index, TreeNode *node);
 };
 
