@@ -342,26 +342,26 @@ Parameters : column, index
 Inputs     : int, const vector<int>
 Ouputs     : vector<double>
 */
-std::vector<double> DataSet::get_Column(int position,
-                                        const std::vector<int> &idx) const {
+const std::vector<double> &DataSet::get_Column(int position) const{
+                                        //const std::vector<int> &idx) const {
 
   // Check olumn in bounds
-  if (idx.empty() || position >= this->features_Length() || position < 0) {
+  if (/*idx.empty() || */position >= this->features_Length() || position < 0) {
     return {};
   }
 
-  std::vector<double> column;
-  column.reserve(idx.size());
+  //std::vector<double> column;
+  //column.reserve(idx.size());
 
 //#pragma omp parallel for shared(column)
-  for (int row : idx) {
+  /* for (int row : idx) {
     // Check row in bounds
     if (row < this->samples_Number() && row >= 0) {   
       column.push_back(this->samples[position][row]);
     }
-  }
+  } */
 
-  return column;
+  return this->samples[position];
 }
 
 /*
@@ -415,7 +415,13 @@ double DataSet::column_Mean(int position, const std::vector<int> &idx) const {
     return mean;
   }
 
-  std::vector<double> current_Column = this->get_Column(position, idx);
+  // Missing index handling
+  std::vector<double> current_Column;
+  current_Column.reserve(idx.size());
+  //this->get_Column(position);
+  for(int i : idx)
+    current_Column.push_back(this->get_Column(position)[i]);
+
   double len = current_Column.size();
 
   // To prevent dividing by 0

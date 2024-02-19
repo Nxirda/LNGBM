@@ -121,8 +121,8 @@ public:
    *
    * @return The values contained at the feature position for the samples in idx
    */
-  std::vector<double> get_Column(int position,
-                                  const std::vector<int> &idx) const;
+  const std::vector<double> &get_Column(int position) const; 
+  //const std::vector<int> &idx) const;
 
   // Methods
 

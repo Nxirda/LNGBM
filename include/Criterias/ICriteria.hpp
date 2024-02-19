@@ -33,7 +33,7 @@ public:
    * @return Type: vector<double>, A vector of values contained in the
    * distribution.
    */
-  virtual std::vector<double> compute(const std::vector<double> &list) const = 0;
+  virtual std::vector<double> compute(const std::vector<double> &list, const std::vector<int> &idx) const = 0;
 
   /**
    * @brief Should print the name of the class on standard output.

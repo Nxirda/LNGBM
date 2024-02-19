@@ -85,8 +85,8 @@ Parameters : Element distribution
 Inputs     : const vector<double>
 Outputs    : vector<double>
 */
-std::vector<double>
-RandomValues::compute(const std::vector<double> &list) const {
+std::vector<double> RandomValues::compute(const std::vector<double> &list,
+                                          const std::vector<int> &idx) const {
 
   auto min = std::min_element(std::execution::par, list.begin(), list.end());
   auto max = std::max_element(std::execution::par, list.begin(), list.end());

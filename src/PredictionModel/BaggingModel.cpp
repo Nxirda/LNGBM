@@ -14,8 +14,9 @@ Parameters : split metric, split criteria, max depth
 Inputs     : string, string, int
 Outputs    : Object of BaggingModel class
 */
-BaggingModel::BaggingModel(const std::string &split_Metric, const std::string &split_Criteria,
-                           int max_Depth) {
+BaggingModel::BaggingModel(const std::string &split_Operator,
+                           const std::string &split_Criteria, int max_Depth,
+                           int number_Of_Trees) {
 
   // Here we just prepare the infos for the model
 
@@ -23,9 +24,9 @@ BaggingModel::BaggingModel(const std::string &split_Metric, const std::string &s
     std::cerr << "Depth parameter should be at least 1\n";
     abort();
   }
-
+  this->number_Of_Trees = number_Of_Trees;
   this->max_Depth = max_Depth;
-  set_Metric(split_Metric);
+  set_Operator(split_Operator);
   set_Criteria(split_Criteria);
 }
 
@@ -36,7 +37,7 @@ Inputs     :
 Outputs    :
 */
 BaggingModel::~BaggingModel() {
-  delete (this->split_Metric);
+  delete (this->split_Operator);
   delete (this->split_Criteria);
 };
 
@@ -46,7 +47,7 @@ Parameters : split metric
 Inputs     : string
 Outputs    :
 */
-void BaggingModel::set_Metric(const std::string &metric) {
+void BaggingModel::set_Operator(const std::string &metric) {
 
   std::map<std::string, operators::type>::iterator it;
 
@@ -59,16 +60,16 @@ void BaggingModel::set_Metric(const std::string &metric) {
 
   switch (it->second) {
   case (operators::type::MAE):
-    this->split_Metric = new MAE();
+    this->split_Operator = new MAE();
     break;
   case (operators::type::MAPE):
-    this->split_Metric = new MAPE();
+    this->split_Operator = new MAPE();
     break;
   case (operators::type::RMSE):
-    this->split_Metric = new RMSE();
+    this->split_Operator = new RMSE();
     break;
   case (operators::type::RIV):
-    this->split_Metric = new RIV();
+    this->split_Operator = new RIV();
     break;
   default:
     std::cerr << "Chosen metric is invalid\n";
@@ -115,23 +116,15 @@ void BaggingModel::set_Criteria(const std::string &criteria) {
   }
 }
 
-/*
- */
+//
 int BaggingModel::get_Depth() { return this->max_Depth; }
 
-/*
- */
+//
 int BaggingModel::get_Trees_Number() { return this->forest.get_size(); };
 
-/**/
-const std::map<int, DecisionTree> &BaggingModel::get_Forest() {
+//
+const std::unordered_map<int, DecisionTree> &BaggingModel::get_Forest() {
   return this->forest.get_Trees();
-}
-
-/*
- */
-void BaggingModel::aggregate_Forest(const std::map<int, DecisionTree> &forest) {
-  this->forest.aggregate_Trees(forest);
 }
 
 /*
@@ -141,30 +134,10 @@ Inputs     : const DataSet
 Outputs    :
 */
 void BaggingModel::train(const DataSet &data) {
-  this->train(data, this->forest.get_size());
-}
+  this->forest = RandomForest(this->split_Operator, this->split_Criteria,
+                              this->number_Of_Trees, this->max_Depth);
 
-/*
-train the model on the DataSet with the operator and depth fixed
-Parameters : Dataset for training, number of trees to train
-Inputs     : const DataSet, int
-Outputs    :
-*/
-void BaggingModel::train(const DataSet &data, int n) {
-
-  if (n < 1) {
-    /* errno = EINVAL;
-    perror("Number of Trees should be at least 1");
-    abort(); */
-    std::cerr << "Number of Trees should be at least 1\n";
-    abort();
-    
-  }
-
-  this->forest = RandomForest(this->split_Metric, this->split_Criteria, n,
-                              this->max_Depth);
-
-  this->forest.generate_Forest(data, n);
+  this->forest.train(data);
 }
 
 /*
@@ -173,6 +146,6 @@ Parameters : Dataset for prediction
 Inputs     : const DataSet
 Outputs    : vector<double>
 */
-std::vector<double> BaggingModel::predict(const DataSet &data) {
-  return this->forest.predict_Results(data);
+std::vector<double> BaggingModel::predict(const DataSet &data) const {
+  return this->forest.predict(data);
 }

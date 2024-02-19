@@ -34,10 +34,9 @@ struct TrainingElement {
   std::vector<int> get_Index();
 
   // Setters
-
+  void set_depth(int depth);
   void set_Node(TreeNode *node);
   void set_Index(const std::vector<int> &index);
-  void set_depth(int depth);
 
   // Methods
 

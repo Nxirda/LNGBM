@@ -53,14 +53,15 @@ Parameters : Element distribution
 Inputs     : const vector<double>
 Outputs    : vector<double>
 */
-std::vector<double> UniqueValues::compute(const std::vector<double> &list) const {
+std::vector<double> UniqueValues::compute(const std::vector<double> &list,
+                                          const std::vector<int> &idx) const {
 
   // Cast in set to get unique values (unordered set of efficiency)
   std::unordered_set<double> unique(list.begin(), list.end());
 
   // Cast back in array for the result || move to avoid copy
   std::vector<double> res(std::make_move_iterator(unique.begin()),
-                         std::make_move_iterator(unique.end()));
+                          std::make_move_iterator(unique.end()));
 
   return res;
 }

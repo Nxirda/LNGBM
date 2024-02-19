@@ -93,14 +93,14 @@ void MPI_Main(int argc, char **argv) {
 
   int trees_For_Proc = balancer(number_Of_Trees, size, rank);
 
-  BaggingModel model{metric, criteria, depth};
+  BaggingModel model{metric, criteria, depth, trees_For_Proc};
 
   DataSet DS{dataset_Path};
 
   Timer t;
   t.start();
 
-  model.train(DS, trees_For_Proc);
+  model.train(DS);
 
   t.stop();
 

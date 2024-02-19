@@ -54,7 +54,8 @@ Parameters : Element distribution
 Inputs     : const vector<double>
 Outputs    : vector<double>
 */
-std::vector<double> Percentiles::compute(const std::vector<double> &list) const {
+std::vector<double> Percentiles::compute(const std::vector<double> &list,
+                                         const std::vector<int> &idx) const {
 
   std::vector<double> percentiles_Values(this->percentiles.size(), 0);
   // Sort the data

@@ -57,10 +57,11 @@ public:
    * This method implements the computation of an histogram based on the
    * provided list of data and the bin parameter.
    *
-   * @param vector<double> list: The distribution of data 
+   * @param vector<double> list: The distribution of data
    * @return Type: vector<double>, A vector of the values splitting the bins.
    */
-  std::vector<double> compute(const std::vector<double> &list) const override;
+  std::vector<double> compute(const std::vector<double> &list,
+                              const std::vector<int> &idx) const override;
 };
 
 #endif

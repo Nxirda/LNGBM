@@ -54,7 +54,8 @@ Parameters : Element distribution
 Inputs     : const vector<double>
 Outputs    : vector<double>
 */
-std::vector<double> Quartiles::compute(const std::vector<double> &list) const {
+std::vector<double> Quartiles::compute(const std::vector<double> &list,
+                                       const std::vector<int> &idx) const {
 
   std::vector<double> quartiles_Values(this->quartiles.size());
   // Sort the data
@@ -64,8 +65,7 @@ std::vector<double> Quartiles::compute(const std::vector<double> &list) const {
 
 #pragma omp parallel for
   for (size_t i = 0; i < this->quartiles.size(); ++i) {
-    quartiles_Values[i] =
-        sorted_Data[len * (this->quartiles[i] / 100)];
+    quartiles_Values[i] = sorted_Data[len * (this->quartiles[i] / 100)];
   }
   return quartiles_Values;
 }

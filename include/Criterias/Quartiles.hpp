@@ -14,8 +14,8 @@ private:
   // Parameters
   const std::string name =
       "Quartiles"; /**< A string variable to display the name. */
-  const std::vector<double> quartiles = {25.0, 50.0, 75.0}; /**< Array containing
-                                  the values in % of the quartiles*/
+  const std::vector<double> quartiles = {25.0, 50.0, 75.0}; /**< Array
+                                  containing the values in % of the quartiles*/
 
 public:
   /**
@@ -51,7 +51,8 @@ public:
    * @param vector<double> list: The distribution of data
    * @return Type: vector<double>, A vector of the values of the quartiles
    */
-  std::vector<double> compute(const std::vector<double> &list) const override;
+  std::vector<double> compute(const std::vector<double> &list,
+                              const std::vector<int> &idx) const override;
 };
 
 #endif

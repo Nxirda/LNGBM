@@ -16,8 +16,8 @@ Outputs    : Object of TrainingElement class
 */
 TrainingElement::TrainingElement() {
   this->depth = 0;
-  this->index = std::vector<int>();
   this->node = nullptr;
+  this->index = std::vector<int>();
 }
 
 /*
@@ -29,8 +29,8 @@ Outputs    : Object of TrainingElement class
 TrainingElement::TrainingElement(TreeNode *node, const std::vector<int> &index,
                                  int depth) {
   this->node = node;
-  this->index = std::move(index);
   this->depth = depth;
+  this->index = std::move(index);
 }
 
 /*
@@ -167,11 +167,13 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
   for (size_t i = 0; i < features.size(); ++i) {
 
     // parallel
+    // Index missing
     std::vector<double> criterias =
-        splitting_Criteria->compute(data.get_Column(i, index));
+        splitting_Criteria->compute(data.get_Column(i), elem->index);
 
-    int local_Best_Feature = 0;
-    double local_Criterion = 0;
+    //int local_Best_Feature = 0;
+    //double local_Criterion = 0;
+
     // We try to minimize the mean absolute error for a split
     double local_min = INT_MAX;
 

@@ -11,7 +11,8 @@
  */
 class UniqueValues : public ICriteria {
 private:
-  const std::string name = "Unique_Values";  /**< A string variable to display the name. */
+  const std::string name =
+      "Unique_Values"; /**< A string variable to display the name. */
 
 public:
   /**
@@ -44,7 +45,8 @@ public:
    * @param vector<double> list: The distribution of data
    * @return Type: vector<double>, A vector of the unique values
    */
-  std::vector<double> compute(const std::vector<double> &list) const override;
+  std::vector<double> compute(const std::vector<double> &list,
+                              const std::vector<int> &idx) const override;
 };
 
 #endif

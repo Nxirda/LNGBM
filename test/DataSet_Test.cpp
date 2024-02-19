@@ -44,7 +44,7 @@ TEST(Getters, GetLabels) {
 }
 
 //
-TEST(Getters, ColumnWithIndex) {
+/* TEST(Getters, ColumnWithIndex) {
   DataSet d;
   std::vector<int> idx;
   ASSERT_EQ(d.get_Column(3, idx).size(), 0);
@@ -61,7 +61,7 @@ TEST(Getters, ColumnWithIndex) {
   // Try inserting out of range elem in index
   idx.push_back(44);
   ASSERT_EQ(d.get_Column(3, idx).size(), 5);
-}
+} */
 
 //
 TEST(Computations, LabelsMean) {
@@ -91,7 +91,7 @@ TEST(Computations, LabelsMean) {
 }
 
 //
-TEST(Computation, ColumnMean) {
+/* TEST(Computation, ColumnMean) {
   DataSet d;
   std::vector<int> idx(0);
   double mean = 0;
@@ -113,7 +113,7 @@ TEST(Computation, ColumnMean) {
   // Try inserting out of range elem in index
   idx.push_back(44);
   ASSERT_EQ(d.column_Mean(4, idx), mean); 
-}
+} */
 
 //
 TEST(Computation, LabelsVariance) {

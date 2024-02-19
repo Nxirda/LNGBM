@@ -58,16 +58,17 @@ public:
    * @param vector<double> list: The distribution of data
    * @return Type: vector<double>, A vector of the random values
    */
-  std::vector<double> compute(const std::vector<double> &list) const override;
+  std::vector<double> compute(const std::vector<double> &list,
+                              const std::vector<int> &idx) const override;
 
   /**
    * @brief Computes a random double in given boundaries
-   * 
+   *
    * @param double min: minimal value we can return
    * @param double max: maximal value we can return
-   * 
+   *
    * @return Type: double, A random flaot
-  */
+   */
   double get_Random_double(double min, double max) const;
 };
 

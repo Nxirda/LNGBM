@@ -1,37 +1,36 @@
 #ifndef BAGGING_MODEL_H_
 #define BAGGING_MODEL_H_
 
-//#include "DataSet.hpp"
 #include "IModel.hpp"
-#include "ICriteria.hpp"
-#include "IOperator.hpp"
 #include "RandomForest.hpp"
 
 class BaggingModel : IModel {
 
 private:
   // Parameters
-  IOperator *split_Metric;
+  IOperator *split_Operator;
   ICriteria *split_Criteria;
   RandomForest forest;
   int max_Depth;
+  int number_Of_Trees;
 
 public:
   // Constructor
 
   BaggingModel() = delete;
-  BaggingModel(const std::string &split_Metric,
-               const std::string &split_Criteria, int max_Depth);
+  BaggingModel(const std::string &split_Operator,
+               const std::string &split_Criteria, int max_Depth,
+               int number_Of_Trees);
 
   // Getter
 
   int get_Depth();
   int get_Trees_Number();
-  const std::map<int, DecisionTree> &get_Forest();
+  const std::unordered_map<int, DecisionTree> &get_Forest();
 
   // Setters
 
-  void set_Metric(const std::string &metric);
+  void set_Operator(const std::string &op);
   void set_Criteria(const std::string &criteria);
 
   // Destructor
@@ -39,10 +38,8 @@ public:
   ~BaggingModel() override;
 
   // Methods
-  void aggregate_Forest(const std::map<int, DecisionTree> &forest);
   void train(const DataSet &data) override;
-  void train(const DataSet &data, int n);
-  std::vector<double> predict(const DataSet &datas);
+  std::vector<double> predict(const DataSet &datas) const override;
 };
 
 #endif

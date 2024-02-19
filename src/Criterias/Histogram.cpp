@@ -70,10 +70,12 @@ Parameters : Element distribution
 Inputs     : const vector<double>
 Outputs    : vector<double>
 */
-std::vector<double> Histogram::compute(const std::vector<double> &list) const {
+std::vector<double> Histogram::compute(const std::vector<double> &list,
+                                       const std::vector<int> &idx) const {
 
-  /* auto min = std::min_element(std::execution::par_unseq, list.begin(), list.end());
-  auto max = std::max_element(std::execution::par_unseq, list.begin(), list.end()); */
+  /* auto min = std::min_element(std::execution::par_unseq, list.begin(),
+  list.end()); auto max = std::max_element(std::execution::par_unseq,
+  list.begin(), list.end()); */
 
   auto min = std::min_element(list.begin(), list.end());
   auto max = std::max_element(list.begin(), list.end());
