@@ -99,7 +99,7 @@ void DecisionTree::train(const DataSet &data) {
   elem.train(data, this->splitting_Operator, this->splitting_Criteria,
              this->max_Depth, treshold);
 
-  this->set_Root(std::make_unique<TreeNode>(*elem.node));
+  this->set_Root(std::make_unique<TreeNode>(std::move(*elem.node)));
 }
 
 //
@@ -109,7 +109,7 @@ void tree_Prediction(const DataSet &data, std::vector<double> &result,
   // Update the values of the result
   double pred_Val = node->get_Predicted_Value();
 
-#pragma omp parallel for
+//#pragma omp parallel for
   for (int idx : index) {
     result[idx] = pred_Val;
   }

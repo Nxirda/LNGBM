@@ -72,7 +72,7 @@ Parameters :
 Inputs     :
 Outputs    : vector<int>
 */
-std::vector<int> TrainingElement::get_Index() { return this->index; }
+const std::vector<int> &TrainingElement::get_Index() { return this->index; }
 
 /*
 Sets the node pointer to a given node
@@ -106,19 +106,20 @@ Parameters : DataSet size, TreeNode, predicted value
 Inputs     : int, TreeNode*, double
 Outputs    :
 */
-void TrainingElement::set_Root(int dataset_Size, TreeNode *node, double value) {
+void TrainingElement::set_Root(int dataset_Size, TreeNode *node/*, double value*/) {
   this->depth = 0;
 
   // Computes the index for the given DataSet
-  std::vector<int> idx(dataset_Size);
-#pragma omp parallel for
-  for (int i = 0; i < dataset_Size; ++i) {
+  //std::vector<int> idx(dataset_Size);
+  //#pragma omp parallel for
+  /*for (int i = 0; i < dataset_Size; ++i) {
     idx[i] = i;
   }
 
-  this->set_Index(idx);
+  this->set_Index(idx);*/
+  bootstrap_Index(dataset_Size);
   this->node = node;
-  this->node->set_Predicted_Value(value);
+  //this->node->set_Predicted_Value(value);
 }
 
 /*
@@ -130,18 +131,19 @@ Outputs    :
 void TrainingElement::bootstrap_Index(int dataset_Size) {
 
   // Generate a unique seed using the current time and the process ID
-  size_t seed =
-      static_cast<size_t>(std::time(nullptr)) + static_cast<size_t>(getpid());
+  //size_t seed =
+  //    static_cast<size_t>(std::time(nullptr)) + static_cast<size_t>(getpid());
 
   // Set the seed for the random number generator
-  std::srand(seed);
+  //std::srand(seed);
 
   std::vector<int> idx(dataset_Size);
-#pragma omp parallel for
+  //#pragma omp parallel for
   for (int i = 0; i < dataset_Size; ++i) {
-    idx[i] = rand() % (dataset_Size - 1);
+    idx[i] = rand() % (dataset_Size -1);
   }
   this->set_Index(idx);
+  //this->node->set_Predicted_Value()
 }
 
 /*
@@ -151,28 +153,27 @@ Parameters : Dataset, Element, Splitting operator, Splitting Criteria
 Inputs     : const DataSet, TrainingElem*, IOperator*, ICriteria*
 Ouputs     : tuple<int, double>
 */
-std::tuple<int, double>
-TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
-                                 const IOperator *splitting_Operator,
-                                 const ICriteria *splitting_Criteria) {
+std::tuple<int, double> TrainingElement::find_Best_Split(
+    const DataSet &data,
+    const IOperator *splitting_Operator, const ICriteria *splitting_Criteria) {
 
   int best_Feature = 0;
   double criterion = 0;
   // We try to minimize the mean absolute error for a split
   double min = INT_MAX;
 
-  std::vector<std::string> features = data.get_Features();
+  // std::vector<std::string> features = data.get_Features();
 
   // Minimize the error by trying multiple splits on features
-  for (size_t i = 0; i < features.size(); ++i) {
+  for (size_t i = 0; i < data.get_Features().size(); ++i) {
 
     // parallel
     // Index missing
     std::vector<double> criterias =
-        splitting_Criteria->compute(data.get_Column(i), elem->index);
+        splitting_Criteria->compute(data.get_Column(i), this->index);
 
-    //int local_Best_Feature = 0;
-    //double local_Criterion = 0;
+    // int local_Best_Feature = 0;
+    // double local_Criterion = 0;
 
     // We try to minimize the mean absolute error for a split
     double local_min = INT_MAX;
@@ -182,7 +183,7 @@ TrainingElement::find_Best_Split(const DataSet &data, TrainingElement *elem,
 
       // Needs to be parallelized
       double tmp_var =
-          splitting_Operator->compute(i, data, elem->index, criterias[j]);
+          splitting_Operator->compute(i, data, this->index, criterias[j]);
 
       if (tmp_var < min) {
         min = tmp_var;
@@ -203,11 +204,10 @@ Inputs     : const DataSet, int, int, TrainingElement*
 Outputs    : tuple<optional<vector<int>>, optional<vector<int>>>
 */
 std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
-TrainingElement::split_Index(const DataSet &data, int criterion, int position,
-                             TrainingElement *elem) {
+TrainingElement::split_Index(const DataSet &data, int criterion, int position) {
 
   if (position < data.features_Length() && criterion > 0) {
-    return data.split(position, criterion, elem->get_Index());
+    return data.split(position, criterion, this->get_Index());
   } else {
     return {std::nullopt, std::nullopt};
   }
@@ -220,7 +220,7 @@ Inputs     : const DataSet, TrainingElement*, IOperator*, ICriteria*
 Outputs    : tuple<optional<TrainingElement>, <optional<TrainingElement>>
 */
 std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
-TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
+TrainingElement::split_Node(const DataSet &data, /*, TrainingElement *elem,*/
                             const IOperator *splitting_Operator,
                             const ICriteria *splitting_Criteria) {
 
@@ -233,38 +233,39 @@ TrainingElement::split_Node(const DataSet &data, TrainingElement *elem,
   std::optional<TrainingElement> train_Right = std::nullopt;
 
   // Compute split attributes || parallel
-  auto [column, criterion] =
-      find_Best_Split(data, elem, splitting_Operator, splitting_Criteria);
+  auto [column, criterion] = this->find_Best_Split(
+      data, /*elem,*/ splitting_Operator, splitting_Criteria);
 
   // Compute new indexes || parallel
-  auto [left_index, right_index] = split_Index(data, criterion, column, elem);
+  auto [left_index, right_index] =
+      split_Index(data, criterion, column /* elem*/);
 
   if (!left_index && !right_index) {
     return {train_Left, train_Right};
   }
 
-  int next_Depth = elem->depth + 1;
+  int next_Depth = this->depth + 1;
 
   // Set the datas for the current node
-  elem->node->set_Split_Column(column);
-  elem->node->set_Split_Criterion(criterion);
+  this->node->set_Split_Column(column);
+  this->node->set_Split_Criterion(criterion);
 
   // Case 1 : Build Right Node (if information gained)
   if (right_index.has_value()) {
     double predic_Right = data.labels_Mean(*right_index);
-    elem->node->add_Right(std::make_unique<TreeNode>(right));
-    elem->node->get_Right_Node()->set_Predicted_Value(predic_Right);
+    this->node->add_Right(std::make_unique<TreeNode>(right));
+    this->node->get_Right_Node()->set_Predicted_Value(predic_Right);
     train_Right =
-        TrainingElement(elem->node->get_Right_Node(), *right_index, next_Depth);
+        TrainingElement(this->node->get_Right_Node(), *right_index, next_Depth);
   }
 
   // Case 2 : Build Left Node (if information gained)
   if (left_index.has_value()) {
     double predic_Left = data.labels_Mean(*left_index);
-    elem->node->add_Left(std::make_unique<TreeNode>(left));
-    elem->node->get_Left_Node()->set_Predicted_Value(predic_Left);
+    this->node->add_Left(std::make_unique<TreeNode>(left));
+    this->node->get_Left_Node()->set_Predicted_Value(predic_Left);
     train_Left =
-        TrainingElement(elem->node->get_Left_Node(), *left_index, next_Depth);
+        TrainingElement(this->node->get_Left_Node(), *left_index, next_Depth);
   }
 
   return {train_Left, train_Right};
@@ -280,14 +281,18 @@ Outputs    :
 void TrainingElement::train(const DataSet &data,
                             const IOperator *splitting_Operator,
                             const ICriteria *splitting_Criteria, int max_Depth,
-                            long unsigned int treshold) {
+                            size_t treshold) {
 
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
 
   // Initialize the current Node
-  this->set_Root(data.labels_Number(), this->node, data.whole_Labels_Mean());
-  this->bootstrap_Index(data.labels_Number());
+  this->set_Root(data.labels_Number(), this->node/*, data.whole_Labels_Mean()*/);
+  this->node->set_Predicted_Value(data.labels_Mean(this->index));
+  //this->bootstrap_Index(data.labels_Number());
+  //this->bootstrap_Index(data.labels_Number());
+  //this->set_Root(data.labels_Number(), this->node,
+  //              data.labels_Mean(this->index));
 
   remaining.push(*this);
 
@@ -300,15 +305,15 @@ void TrainingElement::train(const DataSet &data,
       continue;
     }
 
-    auto [left, right] =
-        split_Node(data, &elem, splitting_Operator, splitting_Criteria);
+    auto [left, right] = elem.split_Node(data, /*&elem,*/ splitting_Operator,
+                                         splitting_Criteria);
 
     if (left) {
       // Verify we gained information
       if (left.value().index.size() != elem.index.size() &&
           left.value().index.size() > treshold) {
 
-        remaining.push(*left);
+        remaining.push(std::move(*left));
       }
     }
 
@@ -317,7 +322,7 @@ void TrainingElement::train(const DataSet &data,
       if (right.value().index.size() != elem.index.size() &&
           right.value().index.size() > treshold) {
 
-        remaining.push(*right);
+        remaining.push(std::move(*right));
       }
     }
   }

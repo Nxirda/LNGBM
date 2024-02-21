@@ -1,6 +1,5 @@
 #include <algorithm>
-#include <cmath>     //for std lerp in percentiles function
-#include <execution> // for parallel execution policies
+#include <cmath> //for std lerp in percentiles function
 #include <fstream>
 #include <iostream>
 #include <numeric>
@@ -9,7 +8,6 @@
 #include <vector>
 
 #include <cblas.h>
-#include <omp.h>
 
 #include "DataSet.hpp"
 
@@ -172,13 +170,13 @@ Ouputs     :
 */
 void DataSet::print() const {
   // Logical but prints the features
-  for (long unsigned int i = 0; i < this->features.size(); ++i) {
+  for (size_t i = 0; i < this->features.size(); ++i) {
     std::cout << features[i] << "\t";
   }
   std::cout << "\n";
   // Logical but Prints the samples
-  for (int i = 0; i < int(this->samples.size()); ++i) {
-    for (long unsigned int j = 0; j < this->samples[0].size(); ++j) {
+  for (size_t i = 0; i < this->samples.size(); ++i) {
+    for (size_t j = 0; j < this->samples[0].size(); ++j) {
       std::cout << samples[i][j] << "|\t";
     }
     std::cout << labels[i] << "|\t";
@@ -197,13 +195,13 @@ Ouputs     :
 */
 void DataSet::print_With_Index(const std::vector<int> &idx) const {
   // Logical but prints the features
-  for (long unsigned int i = 0; i < this->features.size(); ++i) {
+  for (size_t i = 0; i < this->features.size(); ++i) {
     std::cout << features[i] << "\t";
   }
   std::cout << "\n";
   // Logical but Prints the samples
   for (int i : idx) {
-    for (long unsigned int j = 0; j < this->samples[i].size(); ++j) {
+    for (size_t j = 0; j < this->samples[i].size(); ++j) {
       std::cout << samples[i][j] << "|\t";
     }
     std::cout << labels[i] << "|\t";
@@ -218,7 +216,7 @@ Parameters :
 Inputs     :
 Ouputs     : vector<string>
 */
-std::vector<std::string> DataSet::get_Features() const {
+const std::vector<std::string> &DataSet::get_Features() const {
   return this->features;
 }
 
@@ -228,7 +226,7 @@ Parameters :
 Inputs     :
 Ouputs     : vector<vector<double>>
 */
-std::vector<std::vector<double>> DataSet::get_Samples() const {
+const std::vector<std::vector<double>> &DataSet::get_Samples() const {
   return this->samples;
 }
 
@@ -268,14 +266,17 @@ Parameters :
 Inputs     :
 Outputs    : vector<double>
 */
-std::vector<double> DataSet::get_Labels() const { return this->labels; }
-
+/* std::vector<double> DataSet::get_Labels() const { return this->labels; }
+ */
 /*
 Return the labels of the DataSet at a given index
 Parameters : index
 Inputs     : const vector<int>
 Outputs    : vector<double>
 */
+const std::vector<double> &DataSet::get_Labels() const { return this->labels; }
+
+//
 std::vector<double> DataSet::get_Labels(const std::vector<int> &idx) const {
   // No idx
   if (idx.empty()) {
@@ -293,6 +294,7 @@ std::vector<double> DataSet::get_Labels(const std::vector<int> &idx) const {
       column.push_back(this->labels[row]);
   }
   return column;
+  // return this->labels;
 }
 
 /*
@@ -325,7 +327,7 @@ int DataSet::samples_Number() const {
   if (this->empty())
     return 0;
 
-  return this->samples[0].size(); 
+  return this->samples[0].size();
 }
 
 /*
@@ -342,25 +344,14 @@ Parameters : column, index
 Inputs     : int, const vector<int>
 Ouputs     : vector<double>
 */
-const std::vector<double> &DataSet::get_Column(int position) const{
-                                        //const std::vector<int> &idx) const {
+const std::vector<double> &DataSet::get_Column(int position) const {
+  // const std::vector<int> &idx) const {
 
-  // Check olumn in bounds
-  if (/*idx.empty() || */position >= this->features_Length() || position < 0) {
-    return {};
+  // Check column in bounds
+  if (position >= this->features_Length() || position < 0) {
+    std::cerr << "Position specified is out of the matrix\n";
+    exit(1);
   }
-
-  //std::vector<double> column;
-  //column.reserve(idx.size());
-
-//#pragma omp parallel for shared(column)
-  /* for (int row : idx) {
-    // Check row in bounds
-    if (row < this->samples_Number() && row >= 0) {   
-      column.push_back(this->samples[position][row]);
-    }
-  } */
-
   return this->samples[position];
 }
 
@@ -379,18 +370,21 @@ DataSet::split(int position, double criterion,
     return {};
   }
 
+  int samples_Number = this->samples_Number();
+
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
 
   sub_Index_Right.reserve(idx.size() >> 1);
   sub_Index_Left.reserve(idx.size() >> 1);
 
-#pragma omp parallel for
   for (int row : idx) {
-    //  Row in bounds
-    //  Push back sucks
-    if (row < this->samples_Number() && row >= 0) {
-      if (this->samples[position][row] < criterion) {
+    //  Row in bounds (matrix is transposed)
+    if (row >= samples_Number && row < 0) {
+      std::cerr << "row index is out of the matrix\n";
+    } else {
+      if (this->get_Column(position)[row] <
+          criterion) { // this->samples[position][row] < criterion) {
         sub_Index_Left.push_back(row);
       } else {
         sub_Index_Right.push_back(row);
@@ -408,30 +402,31 @@ Outputs    : double
 */
 double DataSet::column_Mean(int position, const std::vector<int> &idx) const {
 
-  double mean = -1.0;
+  double mean = 0.0;
 
   // Check column in bounds
   if (idx.empty() || position >= this->features_Length() || position < 0) {
     return mean;
   }
 
-  // Missing index handling
-  std::vector<double> current_Column;
-  current_Column.reserve(idx.size());
-  //this->get_Column(position);
-  for(int i : idx)
-    current_Column.push_back(this->get_Column(position)[i]);
+  double len = 0.0;
 
-  double len = current_Column.size();
+  int col_Size = this->get_Column(position).size();
+
+  for (int i : idx) {
+    if (i > col_Size || i < 0) {
+      std::cerr << "Index of column is outside matrix dimensions\n";
+    } else {
+      len += 1.0;
+      mean += this->get_Column(position)[i];
+    }
+  }
 
   // To prevent dividing by 0
-  if (len == 0) {
+  if (len == 0.0) {
     return mean;
   }
 
-  mean = cblas_dasum(len, current_Column.data(), 1.0);
-  /* mean = std::reduce(std::execution::par_unseq, current_Column.begin(),
-                     current_Column.end(), 0.0f); */
   mean *= (1.0 / len);
   return mean;
 }
@@ -443,24 +438,29 @@ Inputs     : const vector<int>
 Outputs    : double
 */
 double DataSet::labels_Mean(const std::vector<int> &idx) const {
-  double mean = -1.0;
+  double mean = 0.0;
   // No index
   if (idx.empty()) {
-    return mean;        
-  }
-
-  std::vector<double> current_Labels = this->get_Labels(idx);
-  double len = current_Labels.size();
-
-  // To prevent dividing by 0
-  if (len == 0) {
     return mean;
   }
 
-  mean = cblas_dasum(len, current_Labels.data(), 1.0);
-  /* mean = std::reduce(std::execution::par_unseq, current_Labels.begin(),
-                     current_Labels.end(), 0.0f) *
-         (1.0 / len); */
+  double len = 0.0;
+  int labels_Size = this->labels_Number();
+
+  for (int i : idx) {
+    if (i > labels_Size || i < 0) {
+      std::cerr << "Index of column is outside matrix dimensions\n";
+    } else {
+      len += 1.0;
+      mean += this->get_Labels()[i];
+    }
+  }
+
+  // To prevent dividing by 0
+  if (len == 0.0) {
+    return mean;
+  }
+
   mean *= (1.0 / len);
   return (mean);
 }
@@ -472,21 +472,18 @@ Inputs     :
 Outputs    : double
 */
 double DataSet::whole_Labels_Mean() const {
-  double mean = -1.0;
+  double mean = 0.0;
 
-  std::vector<double> current_Labels = this->get_Labels();
-  int len = current_Labels.size();
+  int len = this->labels_Number();
 
   // To prevent dividing by 0
   if (len == 0) {
     return mean;
   }
 
-  mean = cblas_dasum(len, current_Labels.data(), 1.0);
+  mean = cblas_dasum(len, this->get_Labels().data(), 1.0);
   mean *= (1.0 / len);
-  /* mean = std::reduce(std::execution::par_unseq, current_Labels.begin(),
-                     current_Labels.end(), 0.0f) *
-         (1.0 / len); */
+
   return (mean);
 }
 
@@ -500,28 +497,29 @@ Outputs    : double
 double DataSet::labels_Variance(const std::vector<int> &idx) const {
   // No index
   if (idx.empty()) {
-    return -1.0;
+    return 0.0;
   }
 
-  std::vector<double> current_Labels = this->get_Labels(idx);
-
-  int len = current_Labels.size();
-
-  // To prevent dividing by 0
-  if (len == 0) {
-    return -1.0;
-  }
+  int labels_Size = this->labels_Number();
+  double len = 0.0;
 
   double mean = this->labels_Mean(idx);
 
-  std::vector<double> tmp_res(len);
-
   double sum = 0.0;
 
-#pragma omp parallel for reduction(+ : sum)
-  for (int i = 0; i < len; ++i) {
-    double difference = current_Labels[i] - mean;
-    sum += difference * difference;
+  for (int i : idx) {
+    if (i > labels_Size || i < 0) {
+      std::cerr << "Index of column is outside matrix dimensions\n";
+    } else {
+      double difference = this->get_Labels()[i] - mean;
+      sum += difference * difference;
+      len += 1.0;
+    }
+  }
+
+  // To prevent dividing by 0
+  if (len == 0) {
+    return 0.0;
   }
 
   double variance = sum * (1.0 / len);

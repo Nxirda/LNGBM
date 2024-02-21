@@ -72,7 +72,7 @@ double MAE::compute(int position, const DataSet &data,
   TreeNode right_Child{};
 
   // Get the labels
-  std::vector<double> labels = data.get_Labels();
+  //std::vector<double> labels = data.get_Labels();
 
   // Computes the Mean Absolute Error for left child
   double left_Prediction = data.labels_Mean(left_index.value());
@@ -81,16 +81,16 @@ double MAE::compute(int position, const DataSet &data,
   // Computes the Mean Absolute Error for right child
   double right_Prediction = data.labels_Mean(right_index.value());
   double right_Population = right_index.value().size();
-
-#pragma omp parallel for reduction(+ : left_MAE)
+  
+//#pragma omp parallel for reduction(+ : left_MAE)
   for (int idx : left_index.value()) {
-    left_MAE += std::abs(labels[idx] - left_Prediction);
+    left_MAE += std::abs(data.get_Labels()[idx] - left_Prediction);
   }
   left_MAE *= (1.0 / left_Population);
 
-#pragma omp parallel for reduction(+ : right_MAE)
+//#pragma omp parallel for reduction(+ : right_MAE)
   for (int idx : right_index.value()) {
-    right_MAE += std::abs(labels[idx] - right_Prediction);
+    right_MAE += std::abs(data.get_Labels()[idx] - right_Prediction);
   }
   right_MAE *= (1.0 / right_Population);
 
@@ -112,13 +112,13 @@ double MAE::apply(const std::vector<double> &exact,
 
   double res = 0.0;
   int size = prediction.size();
-#pragma omp parallel for reduction(+ : res)
+//#pragma omp parallel for reduction(+ : res)
   for (int i = 0; i < size; ++i) {
     res += std::abs(exact[i] - prediction[i]);
   }
 
   // Compute the MAE
-  res *= (1.0 / size);
+  res *= (1.0 / (double)size);
 
   return res;
 }

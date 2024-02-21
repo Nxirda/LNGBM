@@ -96,12 +96,12 @@ double RIV::apply(const std::vector<double> &exact,
   double res = 0.0;
   int size = prediction.size();
 
-#pragma omp parallel for reduction(+ : res)
+//#pragma omp parallel for reduction(+ : res)
   for (int i = 0; i < size; ++i) {
     res += std::pow((exact[i] - prediction[i]), 2);
   }
 
   // Compute the Variance
-  res *= (1.0 / size);
+  res *= (1.0 / (double)size);
   return res;
 }

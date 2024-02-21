@@ -1,7 +1,4 @@
 #include <algorithm>
-#include <execution>
-#include <omp.h>
-#include <tbb/parallel_sort.h>
 
 #include "Quartiles.hpp"
 #include "TrainingElement.hpp"
@@ -61,9 +58,11 @@ std::vector<double> Quartiles::compute(const std::vector<double> &list,
   // Sort the data
   int len = list.size();
   std::vector<double> sorted_Data = list;
-  std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
+  //std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
+  std::sort(sorted_Data.begin(), sorted_Data.end());
 
-#pragma omp parallel for
+
+//#pragma omp parallel for
   for (size_t i = 0; i < this->quartiles.size(); ++i) {
     quartiles_Values[i] = sorted_Data[len * (this->quartiles[i] / 100)];
   }

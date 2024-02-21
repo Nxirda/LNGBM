@@ -1,6 +1,4 @@
 #include <algorithm>
-#include <execution>
-#include <omp.h>
 
 #include "Histogram.hpp"
 #include "TrainingElement.hpp"
@@ -76,15 +74,20 @@ std::vector<double> Histogram::compute(const std::vector<double> &list,
   /* auto min = std::min_element(std::execution::par_unseq, list.begin(),
   list.end()); auto max = std::max_element(std::execution::par_unseq,
   list.begin(), list.end()); */
+  std::vector<double> test;
+  test.reserve(idx.size());
 
-  auto min = std::min_element(list.begin(), list.end());
-  auto max = std::max_element(list.begin(), list.end());
+  for(int i : idx)
+    test.push_back(list[i]);
+
+  auto min = std::min_element(test.begin(), test.end());
+  auto max = std::max_element(test.begin(), test.end());
 
   std::vector<double> res(this->number_Of_Bins, 0.0);
 
   int bin_size = (*max - *min) * (1.0 / this->number_Of_Bins);
 
-#pragma omp parallel for
+//#pragma omp parallel for
   for (int i = 0; i < this->number_Of_Bins; ++i) {
     // Returns the values that separates two bins
     res[i] = *min + bin_size * i;

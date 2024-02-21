@@ -72,34 +72,35 @@ double RMSE::compute(int position, const DataSet &data,
   TreeNode right_Child{};
 
   // Get the labels
-  std::vector<double> labels = data.get_Labels();
+  // std::vector<double> labels = data.get_Labels();
 
   // Computes the Root Mean Square Error for left child
   double left_Prediction = data.labels_Mean(left_index.value());
   double left_Population = left_index.value().size();
 
-#pragma omp parallel for reduction(+ : left_RMSE)
-  for (int idx : left_index.value()) {
-    left_RMSE += pow((std::abs(labels[idx] - left_Prediction)), 2) *
-                 (1.0 / left_Population);
-    ;
-  }
-  left_RMSE = sqrt(left_RMSE);
-
   // Computes the Root Mean Square Error for left child
   double right_Prediction = data.labels_Mean(right_index.value());
   double right_Population = right_index.value().size();
 
-#pragma omp parallel for reduction(+ : right_RMSE)
+  //#pragma omp parallel for reduction(+ : left_RMSE)
+  for (int idx : left_index.value()) {
+    left_RMSE += pow((std::abs(data.get_Labels()[idx] - left_Prediction)), 2) *
+                 (1.0 / left_Population);
+  }
+  left_RMSE = sqrt(left_RMSE);
+
+  //#pragma omp parallel for reduction(+ : right_RMSE)
   for (int idx : right_index.value()) {
-    right_RMSE += pow((std::abs(labels[idx] - right_Prediction)), 2) *
-                  (1.0 / right_Population);
+    right_RMSE +=
+        pow((std::abs(data.get_Labels()[idx] - right_Prediction)), 2) *
+        (1.0 / right_Population);
   }
   right_RMSE = sqrt(right_RMSE);
 
   // Compute the result of RMSE for the split at position
   double res =
-      ((left_RMSE * left_Population) + (right_RMSE * right_Population)) *
-      (1.0 / base_Population);
+      ((left_RMSE * left_Population) + (right_RMSE * right_Population)); // *
+
+  res *= (1.0 / base_Population);
   return res;
 }

@@ -24,10 +24,10 @@ int main(int argc, char **argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  if ((argc != 6 || std::atoi(argv[5]) < size) && rank == 0) {
+  if (((argc != 8 && argc != 6) || std::atoi(argv[5]) < size) && rank == 0) {
     std::cout << "Usage is : mpiexec -np [Process] " << argv[0]
               << " [Path to DataSet] [Split Metric] [Split Criteria] [Depth] "
-                 "[Number of Trees]\n";
+                 "[Number of Trees] [Cross_Val] [Folds]\n";
 
     std::cout << "\n- Where process should be <= Number of Trees\n";
 
@@ -36,6 +36,8 @@ int main(int argc, char **argv) {
 
     std::cout << "\n== Split Criterias are ==\n";
     criterias::print();
+
+    std::cout << "\nCross Val shall be 'CV' for activation\n";
 
     MPI_Abort(MPI_COMM_WORLD, 1);
 

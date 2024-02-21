@@ -16,7 +16,7 @@ private:
   const std::string name =
       "Histogram"; /**< A string variable to display the name. */
   int number_Of_Bins =
-      10; /**< An integer variable to store the number of bins to generate. */
+      32; /**< An integer variable to store the number of bins to generate. */
 
 public:
   /**

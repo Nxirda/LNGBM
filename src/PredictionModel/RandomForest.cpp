@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <execution>
 #include <stack>
 
 #include "RandomForest.hpp"
@@ -68,7 +67,9 @@ void RandomForest::train(const DataSet &data) {
     DecisionTree tree{this->max_Depth, this->splitting_Criteria,
                       this->splitting_Operator};
     tree.train(data);
-    this->trees.insert({i, tree});
+    //this->trees.insert({i, tree});
+    this->trees.emplace(i, std::move(tree));
+    //this->trees[i] = std::move(tree);
   }
 }
 
@@ -90,14 +91,14 @@ std::vector<double> RandomForest::predict(const DataSet &data) const {
     tree_Result = this->trees.at(i).predict(data);
 
     // Adds two vectors
-    std::transform(std::execution::unseq, result.begin(), result.end(),
+    std::transform(/*std::execution::unseq,*/ result.begin(), result.end(),
                    tree_Result.begin(), result.begin(), std::plus<double>());
   }
 
   // Divides to have the mean of the answers
-#pragma omp parallel for
+//#pragma omp parallel for
   for (int j = 0; j < size; ++j) {
-    result.at(j) *= (1.0 / this->trees.size());
+    result[j] *= (1.0 / this->trees.size());
   }
 
   return result;

@@ -41,7 +41,7 @@ TEST(Getters, GetLabels) {
   // Try inserting out of range elem in index
   idx.push_back(44);
   ASSERT_EQ(d.get_Labels(idx).size(), 5);
-}
+} 
 
 //
 /* TEST(Getters, ColumnWithIndex) {
@@ -69,10 +69,10 @@ TEST(Computations, LabelsMean) {
   std::vector<int> idx(0);
   double mean = 0;
 
-  ASSERT_EQ(d.labels_Mean(idx), -1.0);
+  ASSERT_EQ(d.labels_Mean(idx), 0.0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.labels_Mean(idx), -1.0);
+  ASSERT_EQ(d.labels_Mean(idx), 0.0);
 
   for (size_t i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
@@ -87,8 +87,8 @@ TEST(Computations, LabelsMean) {
 
   // Try inserting out of range elem in index
   idx.push_back(44);
-  ASSERT_EQ(d.labels_Mean(idx), mean);   
-}
+  ASSERT_EQ(d.labels_Mean(idx), mean);  
+} 
 
 //
 /* TEST(Computation, ColumnMean) {
@@ -122,10 +122,10 @@ TEST(Computation, LabelsVariance) {
   double mean = 0.0;
   double variance = 0.0;
 
-  ASSERT_EQ(d.labels_Variance(idx), -1.0);
+  ASSERT_EQ(d.labels_Variance(idx), 0.0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.labels_Variance(idx), -1.0);
+  ASSERT_EQ(d.labels_Variance(idx), 0.0);
 
   for (size_t i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
@@ -144,7 +144,7 @@ TEST(Computation, LabelsVariance) {
   // Try inserting out of range elem in index
   idx.push_back(44);
   ASSERT_NE(d.labels_Variance(idx), variance); 
-}
+} 
 
 TEST(Computation, Split) {
   DataSet d;

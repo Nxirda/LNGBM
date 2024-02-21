@@ -16,7 +16,7 @@ std::vector<int> compute_Train(const std::vector<int> &global_Index,
   // To track where we are in res index
   int cpt = 0;
 
-  for (unsigned long int i = 0; i < global_Index.size(); ++i) {
+  for (size_t i = 0; i < global_Index.size(); ++i) {
     if (global_Index[i] == test_Index[0]) {
       i += (test_Index.size() - 1);
     }
@@ -66,7 +66,7 @@ compute_Folds(const DataSet &data, const std::vector<int> &global_Index,
  */
 Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
   if (K <= 1) {
-    perror("K-Folds methods needs at least K=2");
+    std::cerr << "K-Folds methods needs at least K=2\n";
     return {};
   }
 

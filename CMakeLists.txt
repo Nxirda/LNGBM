@@ -48,7 +48,7 @@ target_link_libraries(main PRIVATE BLAS::BLAS)
 target_link_libraries(main PRIVATE Source_Lib)
 
 #For parallel execution policies
-target_link_libraries(main PRIVATE TBB::tbb)
+#target_link_libraries(main PRIVATE TBB::tbb)
 
 #Add compilation options    
 add_compile_options(-std=c++23 -fopenmp -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
@@ -61,26 +61,25 @@ find_package(GTest REQUIRED)
 #To be able to launch tests with ctest
 enable_testing()
 
-add_executable(Tests test/DataSet_Test.cpp 
-                    test/DecisionTree_Test.cpp 
-                    test/TreeNode_Test.cpp 
-                    src/
-)
-
-add_test(myTest Tests)
-
 add_subdirectory(test)
 
-target_include_directories(Tests PUBLIC include/ )
+add_executable(tests   test/main_Test.cpp) #test/Dataset/DataSet_Test.cpp
+                        #test/PredictionModel/Trees/TreeNode_Test.cpp
+                        #test/PredictionModel/Trees/DecisionTree_Test.cpp)
+#)
 
-target_link_libraries(Tests PRIVATE Test_Lib)
-target_link_libraries(Tests PRIVATE GTest::GTest GTest::Main)
-target_link_libraries(Tests PRIVATE Source_Lib)
-target_link_libraries(Tests PRIVATE TBB::tbb)
-target_link_libraries(Tests PRIVATE BLAS::BLAS)
+add_test(myTest tests)
+
+target_include_directories(tests PUBLIC include/ )
+
+target_link_libraries(tests PRIVATE Test_Lib)
+target_link_libraries(tests PRIVATE GTest::GTest GTest::Main)
+target_link_libraries(tests PRIVATE Source_Lib)
+#target_link_libraries(tests PRIVATE TBB::tbb)
+target_link_libraries(tests PRIVATE BLAS::BLAS)
 
 
-gtest_discover_tests(Tests)
+gtest_discover_tests(tests)
 
 # ===== Benchmark Part =====
 

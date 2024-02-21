@@ -34,10 +34,11 @@ Answers &Answers::operator=(const Answers &ans) {
  */
 void Answers::add_And_Mean_Values(const Answers &ans) {
   assert(this->numeric_Values.size() == ans.get_Numeric_Values().size());
+  
   for (size_t i = 0; i < this->numeric_Values.size(); ++i) {
     for (size_t j = 0; j < this->numeric_Values[i].size(); ++j) {
       this->numeric_Values[i][j] += ans.get_Numeric_Values()[i][j];
-      this->numeric_Values[i][j] /= 2;
+      this->numeric_Values[i][j] /= 2.0;
     }
   }
 }

@@ -72,7 +72,7 @@ double MAPE::compute(int position, const DataSet &data,
   TreeNode right_Child{};
 
   // Get the labels
-  std::vector<double> labels = data.get_Labels();
+  //std::vector<double> labels = data.get_Labels();
 
   // Computes the Mean Absolute Percentage Error for left child
   double left_Prediction = data.labels_Mean(left_index.value());
@@ -82,16 +82,16 @@ double MAPE::compute(int position, const DataSet &data,
   double right_Prediction = data.labels_Mean(right_index.value());
   double right_Population = right_index.value().size();
 
-#pragma omp parallel for reduction(+ : left_MAPE)
+//#pragma omp parallel for reduction(+ : left_MAPE)
   for (int idx : left_index.value()) {
-    left_MAPE += (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
+    left_MAPE += (std::abs(data.get_Labels()[idx] - left_Prediction)) / left_Prediction;
   }
   left_MAPE *= 100.0;
   left_MAPE *= (1.0 / left_Population);
 
-#pragma omp parallel for reduction(+ : right_MAPE)
+//#pragma omp parallel for reduction(+ : right_MAPE)
   for (int idx : right_index.value()) {
-    right_MAPE += (std::abs(labels[idx] - right_Prediction)) / right_Prediction;
+    right_MAPE += (std::abs(data.get_Labels()[idx] - right_Prediction)) / right_Prediction;
   }
   right_MAPE *= 100.0;
   right_MAPE *= (1.0 / right_Population);
@@ -114,13 +114,13 @@ double MAPE::apply(const std::vector<double> &exact,
 
   double res = 0.0;
   int size = prediction.size();
-#pragma omp parallel for reduction(+ : res)
+//#pragma omp parallel for reduction(+ : res)
   for (int i = 0; i < size; ++i) {
     res += std::abs(exact[i] - prediction[i]) * (1.0 / exact[i]);
   }
 
   // Compute the MAPE
-  res = (res * 100.0) * (1.0 / size);
+  res = (res * 100.0) * (1.0 / (double)size);
 
   return res;
 }

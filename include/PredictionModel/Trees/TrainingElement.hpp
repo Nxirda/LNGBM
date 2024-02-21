@@ -31,7 +31,7 @@ struct TrainingElement {
 
   // Getters
 
-  std::vector<int> get_Index();
+  const std::vector<int> &get_Index();
 
   // Setters
   void set_depth(int depth);
@@ -41,23 +41,22 @@ struct TrainingElement {
   // Methods
 
   std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
-  split_Node(const DataSet &data, TrainingElement *elem,
-             const IOperator *splitting_Operator,
+  split_Node(const DataSet &data, const IOperator *splitting_Operator,
              const ICriteria *splitting_Criteria);
 
   std::tuple<int, double> find_Best_Split(const DataSet &data,
-                                         TrainingElement *elem,
-                                         const IOperator *splitting_Operator,
-                                         const ICriteria *splitting_Criteria);
+
+                                          const IOperator *splitting_Operator,
+                                          const ICriteria *splitting_Criteria);
 
   std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
-  split_Index(const DataSet &data, int criterion, int position,
-              TrainingElement *elem);
+  split_Index(const DataSet &data, int criterion, int position);
 
-  void train(const DataSet &data, const IOperator *splitting_Operator, const ICriteria *splitting_Criteria, int max_Depth,
-             long unsigned int treshold);
+  void train(const DataSet &data, const IOperator *splitting_Operator,
+             const ICriteria *splitting_Criteria, int max_Depth,
+             size_t treshold);
 
-  void set_Root(int dataset_Size, TreeNode *node, double value);
+  void set_Root(int dataset_Size, TreeNode *node/*, double value*/);
   void bootstrap_Index(int dataset_Size);
 };
 

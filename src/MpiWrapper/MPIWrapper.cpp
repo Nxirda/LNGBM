@@ -19,7 +19,8 @@ int balancer(int total_Elements, int num_Processes, int process_Rank) {
 
 /*
  */
-void MPI_Cross_Val(BaggingModel &model, const DataSet &data, int K) {
+void MPI_Cross_Val(BaggingModel &model,
+                   const DataSet &data, int K) {
 
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -85,6 +86,7 @@ void MPI_Main(int argc, char **argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  // For the model
   std::string dataset_Path = argv[1];
   std::string metric = argv[2];
   std::string criteria = argv[3];
@@ -104,11 +106,20 @@ void MPI_Main(int argc, char **argv) {
 
   t.stop();
 
-  std::cout << "Process infos : rank:= " << rank << " pid:= " << pid
-            << " trees:= " << trees_For_Proc
-            << " run time:= " << t.get_Duration() << "\n";
+  std::cout << "Process infos |rank:= " << rank << " |pid:= " << pid
+            << " |trees:= " << trees_For_Proc
+            << " |run time:= " << t.get_Duration() << "\n";
 
-  MPI_Cross_Val(model, DS, 5);   
+  if (argc == 8) {
+    // For the cross validation
+    std::string cross_Val = argv[6];
+    int folds = std::atoi(argv[7]);
+
+    if(cross_Val.compare("CV"))
+      return;
+
+    MPI_Cross_Val(model, DS, folds);
+  }
 }
 
 } // namespace MPI_Wrapper

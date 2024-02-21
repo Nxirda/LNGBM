@@ -48,7 +48,8 @@ public:
    * Initializes the class with filled parameters.
    */
   DataSet(const std::vector<std::string> &features,
-          const std::vector<std::vector<double>> &values, const std::vector<double> &labels);
+          const std::vector<std::vector<double>> &values,
+          const std::vector<double> &labels);
 
   /**
    * @brief Copy constructor for the DataSet class, needed for splitting the
@@ -68,7 +69,7 @@ public:
    *
    * Initializes a new DataSet
    */
-  //static DataSet load(std::string file_Path);
+  // static DataSet load(std::string file_Path);
 
   /**
    * @brief Destructor for the DataSet class.
@@ -80,14 +81,14 @@ public:
    *
    * @return The features of the current dataset as a vector of strings
    */
-  std::vector<std::string> get_Features() const;
+  const std::vector<std::string> &get_Features() const;
 
   /**
    * @brief Method to make a copy of the samples 2D Matrix
    *
    * @return The samples of the current dataset as a 2D vector of floats
    */
-  std::vector<std::vector<double>> get_Samples() const;
+  const std::vector<std::vector<double>> &get_Samples() const;
 
   /**
    * @brief Method to copy specified samples of the 2D Matrix (DataSet)
@@ -103,13 +104,15 @@ public:
    *
    * @return The  labels of the current dataset as a vector of floats
    */
-  std::vector<double> get_Labels() const;
+  // std::vector<double> get_Labels() const;
 
   /**
    * @brief Method to copy specified labels of the DataSet
    *
    * @return The specified labels of the current dataset as a vector of floats
    */
+  const std::vector<double> &get_Labels(/*const std::vector<int> &idx*/) const;
+
   std::vector<double> get_Labels(const std::vector<int> &idx) const;
 
   /**
@@ -121,8 +124,8 @@ public:
    *
    * @return The values contained at the feature position for the samples in idx
    */
-  const std::vector<double> &get_Column(int position) const; 
-  //const std::vector<int> &idx) const;
+  const std::vector<double> &get_Column(int position) const;
+  // const std::vector<int> &idx) const;
 
   // Methods
 
