@@ -16,10 +16,11 @@ add_subdirectory(src)
 add_executable(main main.cpp)
 
 #Required dependencies 
+#find_package(TBB REQUIRED)
+#find_package(OpenMP REQUIRED)
 find_package(MPI REQUIRED)
-find_package(TBB REQUIRED)
 find_package(BLAS REQUIRED)
-find_package(OpenMP REQUIRED)
+find_package(Threads REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization mpi)
 
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
@@ -29,17 +30,22 @@ set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
 target_link_libraries(main PRIVATE Boost::serialization Boost::mpi)
 
 # Set OpenMP 
-if(OpenMP_CXX_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+#if(OpenMP_CXX_FOUND)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+#endif()
+#For omp pragmas
+#target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
+
+#For parallel execution policies
+#target_link_libraries(main PRIVATE TBB::tbb)
 
 target_include_directories(main PRIVATE ${BLAS_INCLUDE_DIRS})
 
 #For MPI Distribution
 target_link_libraries(main PRIVATE ${MPI_C_LIBRARIES})
 
-#For omp pragmas
-target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
+#link lib
+target_link_libraries(main PUBLIC Threads::Threads)
 
 #Link with BLAS (CBLAS)
 target_link_libraries(main PRIVATE BLAS::BLAS)
@@ -47,11 +53,8 @@ target_link_libraries(main PRIVATE BLAS::BLAS)
 #Add our Libraries
 target_link_libraries(main PRIVATE Source_Lib)
 
-#For parallel execution policies
-#target_link_libraries(main PRIVATE TBB::tbb)
-
-#Add compilation options    
-add_compile_options(-std=c++23 -fopenmp -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
+#Add compilation options    -fopenmp
+add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
 
 # ===== Testing Part =====
 

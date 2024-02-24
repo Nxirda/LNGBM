@@ -69,7 +69,6 @@ public:
   // Methods
 
   void node_Print();
-  //void node_Print_Criterion();
 };
 
 #endif

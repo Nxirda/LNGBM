@@ -39,7 +39,8 @@ int main(int argc, char **argv) {
 
     std::cout << "\nCross Val shall be 'CV' for activation\n";
 
-    MPI_Abort(MPI_COMM_WORLD, 1);
+    if(size > 1)
+      MPI_Abort(MPI_COMM_WORLD, 1);
 
     return 1;
   }

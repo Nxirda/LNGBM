@@ -92,14 +92,10 @@ void DecisionTree::print_Tree() { this->root->node_Print(); }
 
 //
 void DecisionTree::train(const DataSet &data) {
-  int treshold = 5;
-  TrainingElement elem{};
+  int threshold = 5;
 
-  elem.set_Node(this->get_Root());
-  elem.train(data, this->splitting_Operator, this->splitting_Criteria,
-             this->max_Depth, treshold);
-
-  this->set_Root(std::make_unique<TreeNode>(std::move(*elem.node)));
+  TrainingElement::train(data, this->get_Root(), this->splitting_Operator,
+                         this->splitting_Criteria, this->max_Depth, threshold);
 }
 
 //
@@ -109,7 +105,7 @@ void tree_Prediction(const DataSet &data, std::vector<double> &result,
   // Update the values of the result
   double pred_Val = node->get_Predicted_Value();
 
-//#pragma omp parallel for
+  //#pragma omp parallel for
   for (int idx : index) {
     result[idx] = pred_Val;
   }

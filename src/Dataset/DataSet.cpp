@@ -367,10 +367,11 @@ DataSet::split(int position, double criterion,
                const std::vector<int> &idx) const {
   // Check column in bounds
   if (idx.empty() || position >= this->features_Length() || position < 0) {
-    return {};
+    return {std::nullopt, std::nullopt};
   }
 
   int samples_Number = this->samples_Number();
+  const std::vector<double> &samples = this->get_Column(position);
 
   std::vector<int> sub_Index_Right;
   std::vector<int> sub_Index_Left;
@@ -383,15 +384,15 @@ DataSet::split(int position, double criterion,
     if (row >= samples_Number && row < 0) {
       std::cerr << "row index is out of the matrix\n";
     } else {
-      if (this->get_Column(position)[row] <
-          criterion) { // this->samples[position][row] < criterion) {
+      if (samples[row] < criterion) {
         sub_Index_Left.push_back(row);
       } else {
         sub_Index_Right.push_back(row);
       }
     }
   }
-  return std::make_tuple(sub_Index_Left, sub_Index_Right);
+
+  return {std::move(sub_Index_Left), std::move(sub_Index_Right)};
 }
 
 /*

@@ -5,11 +5,13 @@ add_library(Source_Lib
             #Dataset part
             Dataset/DataSet.cpp
             #Operator part
+            Operators/EnumOperator.cpp
             Operators/RIV.cpp
             Operators/MAE.cpp
             Operators/MAPE.cpp
             Operators/RMSE.cpp
             #Criteria part
+            Criterias/EnumCriteria.cpp
             Criterias/Histogram.cpp
             Criterias/Quartiles.cpp
             Criterias/Percentiles.cpp

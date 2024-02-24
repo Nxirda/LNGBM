@@ -67,9 +67,7 @@ void RandomForest::train(const DataSet &data) {
     DecisionTree tree{this->max_Depth, this->splitting_Criteria,
                       this->splitting_Operator};
     tree.train(data);
-    //this->trees.insert({i, tree});
     this->trees.emplace(i, std::move(tree));
-    //this->trees[i] = std::move(tree);
   }
 }
 

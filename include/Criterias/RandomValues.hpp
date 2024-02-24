@@ -2,6 +2,7 @@
 #define RANDOM_VALUES_H_
 
 #include "ICriteria.hpp"
+#include <random>
 #include <string>
 
 /** @class RandomValues
@@ -16,6 +17,8 @@ private:
       "Random_Values"; /**< A string variable to display the name. */
   int number_Of_Elements =
       10; /**< Integer representing the number of values to compute */
+      
+  mutable std::mt19937 gen;
 
 public:
   /**

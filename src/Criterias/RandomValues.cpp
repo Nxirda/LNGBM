@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <random>
 
 #include "RandomValues.hpp"
 #include "TrainingElement.hpp"
@@ -16,7 +15,11 @@ Parameters :
 Inputs     :
 Outputs    : Object of Random_Values class
 */
-RandomValues::RandomValues() {}
+RandomValues::RandomValues()  {
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  this->gen = generator; 
+}
 
 /*
 Constructor with argument for the number of values to compute
@@ -32,6 +35,10 @@ RandomValues::RandomValues(int x) {
   } else {
     this->number_Of_Elements = x;
   }
+
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  this->gen = generator; 
 }
 
 /*
@@ -50,11 +57,11 @@ Outputs    : double
  */
 double RandomValues::get_Random_double(double min, double max) const {
   // Hardware based entropy
-  std::random_device rd;
-  std::mt19937 gen(rd());
+  // std::random_device rd;
+  // std::mt19937 gen(rd());
 
   std::uniform_real_distribution<double> dist(min, max);
-  return dist(gen);
+  return dist(this->gen);
 }
 
 /*
@@ -86,8 +93,8 @@ Outputs    : vector<double>
 std::vector<double> RandomValues::compute(const std::vector<double> &list,
                                           const std::vector<int> &idx) const {
 
-  //auto min = std::min_element(std::execution::par, list.begin(), list.end());
-  //auto max = std::max_element(std::execution::par, list.begin(), list.end());
+  // auto min = std::min_element(std::execution::par, list.begin(), list.end());
+  // auto max = std::max_element(std::execution::par, list.begin(), list.end());
   auto min = std::min_element(list.begin(), list.end());
   auto max = std::max_element(list.begin(), list.end());
 
@@ -98,7 +105,7 @@ std::vector<double> RandomValues::compute(const std::vector<double> &list,
   res[0] = *min;
   res[this->number_Of_Elements - 1] = *max;
 
-//#pragma omp parallel for
+  //#pragma omp parallel for
   for (int i = 1; i < this->number_Of_Elements - 1; ++i) {
     res[i] = get_Random_double(*min, *max);
   }

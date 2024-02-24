@@ -1,8 +1,8 @@
 #ifndef ENUM_CRITERIA_H_
 #define ENUM_CRITERIA_H_
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <map>
 
 #include "ICriteria.hpp"
@@ -36,11 +36,7 @@ enum class type {
  * This map associates string representations with the corresponding enum
  * values from the 'type' enumeration.
  */
-inline std::map<std::string, type> dictionary = {{"H", type::Histogram},
-                                                 {"P", type::Percentiles},
-                                                 {"Q", type::Quartiles},
-                                                 {"RV", type::RandomValues},
-                                                 {"UV", type::UniqueValues}};
+extern std::map<std::string, type> dictionary;
 
 /**
  * @brief Prints the names associated with each enum value.
@@ -48,33 +44,8 @@ inline std::map<std::string, type> dictionary = {{"H", type::Histogram},
  * This function iterates through the 'dictionary' map and prints the names
  * associated with each 'type' enum value.
  */
-inline void print() {
+void print();
 
-  for (auto const &pair : dictionary) {
-    std::cout << "{" << pair.first << "} : ";
-    switch (pair.second) {
-    case type::Histogram:
-      std::cout << Histogram::get_Name();
-      break;
-    case type::Percentiles:
-      std::cout << Percentiles::get_Name();
-      break;
-    case type::Quartiles:
-      std::cout << Quartiles::get_Name();
-      break;
-    case type::RandomValues:
-      std::cout << RandomValues::get_Name();
-      break;
-    case type::UniqueValues:
-      std::cout << UniqueValues::get_Name();
-      break;
-    default:
-      std::cout << " Unknown Type";
-    }
-    std::cout << "\n";
-  }
-  return;
-}
 } // namespace criterias
 
 #endif
