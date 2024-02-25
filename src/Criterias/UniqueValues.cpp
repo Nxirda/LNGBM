@@ -11,50 +11,27 @@
 /*                        */
 /**************************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Unique Values class
-*/
+//
 UniqueValues::UniqueValues() {}
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 UniqueValues::~UniqueValues() {}
 
-/*
-Print function to see the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-void UniqueValues::print() {
+//
+void UniqueValues::print() const {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
+size_t UniqueValues::get_Criteria_Number() const { return this->size; };
+
+//
 std::string UniqueValues::get_Name() { return "Unique Values"; }
 
-/*
-Compute the Uniques Values of the given vector
-Parameters : Element distribution
-Inputs     : const vector<double>
-Outputs    : vector<double>
-*/
-std::vector<double> UniqueValues::compute(const std::vector<double> &list,
-                                          const std::vector<int> &idx) const {
+//
+std::vector<double>
+UniqueValues::compute(const std::vector<double> &list,
+                      const std::vector<size_t> &idx) const {
 
   // Cast in set to get unique values (unordered set of efficiency)
   std::unordered_set<double> unique(list.begin(), list.end());

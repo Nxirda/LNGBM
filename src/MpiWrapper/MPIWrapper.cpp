@@ -8,17 +8,15 @@
 
 namespace MPI_Wrapper {
 
-/*
- */
-int balancer(int total_Elements, int num_Processes, int process_Rank) {
-  int res = total_Elements / num_Processes;
-  int remainder = total_Elements % num_Processes;
+//
+uint16_t balancer(uint16_t total_Elements, uint16_t num_Processes, int process_Rank) {
+  uint16_t res = total_Elements / num_Processes;
+  uint16_t remainder = total_Elements % num_Processes;
 
   return res + (process_Rank < remainder ? 1 : 0);
 }
 
-/*
- */
+//
 void MPI_Cross_Val(BaggingModel &model,
                    const DataSet &data, int K) {
 
@@ -90,10 +88,10 @@ void MPI_Main(int argc, char **argv) {
   std::string dataset_Path = argv[1];
   std::string metric = argv[2];
   std::string criteria = argv[3];
-  int depth = std::stoi(argv[4]);
-  int number_Of_Trees = std::atoi(argv[5]);
+  uint16_t depth = std::stoi(argv[4]);
+  uint16_t number_Of_Trees = std::atoi(argv[5]);
 
-  int trees_For_Proc = balancer(number_Of_Trees, size, rank);
+  uint16_t trees_For_Proc = balancer(number_Of_Trees, size, rank);
 
   BaggingModel model{metric, criteria, depth, trees_For_Proc};
 

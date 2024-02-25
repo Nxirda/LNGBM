@@ -9,86 +9,53 @@
 /*                        */
 /**************************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Histogram class
-*/
+//
 Histogram::Histogram() {}
 
-/*
-Constructor with argument for the number of bins
-Parameters : number of bins
-Inputs     : int
-Outputs    : Object of Histogram class
-*/
-Histogram::Histogram(int x) {
+//
+Histogram::Histogram(size_t x) {
   if (x <= 0) {
     /* errno = EINVAL;
     perror("Can't compute split criterias with x <= 0\n x is set to 5"); */
-    std::cerr << "Can't compute split criterias with x <= 0\n x is set to 10\n";
-    this->number_Of_Bins = 10;
+    std::cerr << "Can't compute Histogram with x(bins) <= 0\n x is set to default (32)\n";
   } else {
-    this->number_Of_Bins = x;
+    this->size = x;
   }
 }
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 Histogram::~Histogram() {}
 
-/*
-Print function to see the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-void Histogram::print() {
+//
+void Histogram::print() const {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
+size_t Histogram::get_Criteria_Number() const { return this->size; }
+
+//
 std::string Histogram::get_Name() { return "Histogram"; }
 
-/*
-Compute the historgam of the given vector
-Parameters : Element distribution
-Inputs     : const vector<double>
-Outputs    : vector<double>
-*/
+//
 std::vector<double> Histogram::compute(const std::vector<double> &list,
-                                       const std::vector<int> &idx) const {
+                                       const std::vector<size_t> &idx) const {
 
-  /* auto min = std::min_element(std::execution::par_unseq, list.begin(),
-  list.end()); auto max = std::max_element(std::execution::par_unseq,
-  list.begin(), list.end()); */
-  std::vector<double> test;
-  test.reserve(idx.size());
+  std::vector<double> curr_Vector;
+  curr_Vector.reserve(idx.size());
 
-  for(int i : idx)
-    test.push_back(list[i]);
+  // Copy of the current vector might just compute the min here too
+  for (size_t i : idx)
+    curr_Vector.push_back(list[i]);
 
-  auto min = std::min_element(test.begin(), test.end());
-  auto max = std::max_element(test.begin(), test.end());
+  auto min = std::min_element(curr_Vector.begin(), curr_Vector.end());
+  auto max = std::max_element(curr_Vector.begin(), curr_Vector.end());
 
-  std::vector<double> res(this->number_Of_Bins, 0.0);
+  std::vector<double> res(this->size, 0.0);
 
-  int bin_size = (*max - *min) * (1.0 / this->number_Of_Bins);
+  size_t bin_size = (*max - *min) * (1.0 / this->size);
 
-//#pragma omp parallel for
-  for (int i = 0; i < this->number_Of_Bins; ++i) {
+  for (size_t i = 0; i < this->size; ++i) {
     // Returns the values that separates two bins
     res[i] = *min + bin_size * i;
   }

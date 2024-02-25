@@ -8,13 +8,12 @@
 
 namespace CrossValidation {
 
-/*
- */
-std::vector<int> compute_Train(const std::vector<int> &global_Index,
-                               const std::vector<int> &test_Index) {
-  std::vector<int> res(global_Index.size() - test_Index.size());
+//
+std::vector<size_t> compute_Train(const std::vector<size_t> &global_Index,
+                               const std::vector<size_t> &test_Index) {
+  std::vector<size_t> res(global_Index.size() - test_Index.size());
   // To track where we are in res index
-  int cpt = 0;
+  size_t cpt = 0;
 
   for (size_t i = 0; i < global_Index.size(); ++i) {
     if (global_Index[i] == test_Index[0]) {
@@ -27,27 +26,27 @@ std::vector<int> compute_Train(const std::vector<int> &global_Index,
   return res;
 }
 
-/*
- */
+//
 std::tuple<std::vector<DataSet>, std::vector<DataSet>>
-compute_Folds(const DataSet &data, const std::vector<int> &global_Index,
-              int total_Size, int K) {
-  int foldSize = total_Size / K;
+compute_Folds(const DataSet &data, const std::vector<size_t> &global_Index,
+              size_t total_Size, uint8_t K) {
+  
+  size_t foldSize = total_Size / K;
 
   std::vector<DataSet> test_Folds(K);
   std::vector<DataSet> train_Folds(K);
 
-  for (int j = 0; j < K; ++j) {
+  for (uint8_t j = 0; j < K; ++j) {
 
-    std::vector<int> test_Folds_Construct(foldSize, 0);
-    int test_Curr_Index = 0;
+    std::vector<size_t> test_Folds_Construct(foldSize, 0);
+    size_t test_Curr_Index = 0;
 
-    std::vector<int> train_Folds_Construct(total_Size - foldSize + 1, 0);
-    int train_Curr_Index = 0;
+    std::vector<size_t> train_Folds_Construct(total_Size - foldSize + 1, 0);
+    size_t train_Curr_Index = 0;
 
-    int upper_Bound = (j + 1) * foldSize;
-    int lower_Bound = j * foldSize;
-    for (int i = 0; i < total_Size; ++i) {
+    size_t upper_Bound = (j + 1) * foldSize;
+    size_t lower_Bound = j * foldSize;
+    for (size_t i = 0; i < total_Size; ++i) {
       if ((i > lower_Bound) && (i < upper_Bound)) {
         test_Folds_Construct[test_Curr_Index] = global_Index[i];
         test_Curr_Index++;
@@ -62,9 +61,8 @@ compute_Folds(const DataSet &data, const std::vector<int> &global_Index,
   return std::make_tuple(test_Folds, train_Folds);
 }
 
-/*
- */
-Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
+//
+Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
   if (K <= 1) {
     std::cerr << "K-Folds methods needs at least K=2\n";
     return {};
@@ -74,10 +72,10 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
 
   // Getting infos on the model
   int precision = 5;
-  int depth = model.get_Depth();
-  int height = data.samples_Number();
-  int width = data.features_Length();
-  int trees = model.get_Trees_Number();
+  uint16_t depth = model.get_Depth();
+  size_t height = data.samples_Number();
+  size_t width = data.features_Length();
+  uint16_t trees = model.get_Trees_Number();
   int element_Size = data.element_Size();
 
   //
@@ -108,11 +106,11 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
   t_Global.start();
 
   // Actual infos for the function
-  int total_Size = data.samples_Number();
-  std::vector<int> global_Index(total_Size, 0);
+  size_t total_Size = data.samples_Number();
+  std::vector<size_t> global_Index(total_Size, 0);
 
   // Computes the index for the given DataSet
-  for (int i = 0; i < total_Size; ++i) {
+  for (size_t i = 0; i < total_Size; ++i) {
     global_Index[i] = i;
   }
 
@@ -120,7 +118,7 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, int K) {
   auto [test_Folds, train_Folds] =
       compute_Folds(data, global_Index, total_Size, K);
 
-  for (int i = 0; i < K; ++i) {
+  for (uint8_t i = 0; i < K; ++i) {
 
     // Creating Test Dataset for this iteration
     DataSet test_Set = test_Folds[i];

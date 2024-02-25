@@ -27,7 +27,7 @@ public:
 
   static std::string get_Name();
 
-  double compute(int position, const DataSet &data, const std::vector<int> &index,
+  double compute(size_t position, const DataSet &data, const std::vector<size_t> &index,
                 const double split_Criteria) const override;
 
   static double apply(const std::vector<double> &exact,

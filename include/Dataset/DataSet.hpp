@@ -60,7 +60,7 @@ public:
    *
    * Initializes the class with filled parameters.
    */
-  DataSet(const DataSet &data, const std::vector<int> &idx);
+  DataSet(const DataSet &data, const std::vector<size_t> &idx);
 
   /**
    * @brief static method to load a new dataset given by the path
@@ -97,7 +97,7 @@ public:
    * floats
    */
   std::vector<std::vector<double>>
-  get_Samples(const std::vector<int> &idx) const;
+  get_Samples(const std::vector<size_t> &idx) const;
 
   /**
    * @brief Method to make a copy of the labels of the DataSet
@@ -113,7 +113,7 @@ public:
    */
   const std::vector<double> &get_Labels(/*const std::vector<int> &idx*/) const;
 
-  std::vector<double> get_Labels(const std::vector<int> &idx) const;
+  std::vector<double> get_Labels(const std::vector<size_t> &idx) const;
 
   /**
    * @brief Method to copy a column of the DataSet (samples value on one
@@ -124,28 +124,27 @@ public:
    *
    * @return The values contained at the feature position for the samples in idx
    */
-  const std::vector<double> &get_Column(int position) const;
-  // const std::vector<int> &idx) const;
+  const std::vector<double> &get_Column(size_t position) const;
 
   // Methods
 
   void print() const;
   bool empty() const;
 
-  void print_With_Index(const std::vector<int> &idx) const;
+  void print_With_Index(const std::vector<size_t> &idx) const;
 
-  int labels_Number() const;
-  int samples_Number() const;
-  int features_Length() const;
+  size_t labels_Number() const;
+  size_t samples_Number() const;
+  size_t features_Length() const;
   int element_Size() const;
 
   double whole_Labels_Mean() const;
-  double labels_Mean(const std::vector<int> &idx) const;
-  double labels_Variance(const std::vector<int> &idx) const;
-  double column_Mean(int position, const std::vector<int> &idx) const;
+  double labels_Mean(const std::vector<size_t> &idx) const;
+  double labels_Variance(const std::vector<size_t> &idx) const;
+  double column_Mean(size_t position, const std::vector<size_t> &idx) const;
 
-  std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
-  split(int position, double criterion, const std::vector<int> &idx) const;
+  std::tuple<std::optional<std::vector<size_t>>, std::optional<std::vector<size_t>>>
+  split(size_t position, double criterion, const std::vector<size_t> &idx) const;
 };
 
 #endif

@@ -8,15 +8,10 @@
 /*                  */
 /********************/
 
-/*
-Constructor with operator and depth fixed
-Parameters : split metric, split criteria, max depth
-Inputs     : string, string, int
-Outputs    : Object of BaggingModel class
-*/
+//
 BaggingModel::BaggingModel(const std::string &split_Operator,
-                           const std::string &split_Criteria, int max_Depth,
-                           int number_Of_Trees) {
+                           const std::string &split_Criteria, uint16_t max_Depth,
+                           uint16_t number_Of_Trees) {
 
   // Here we just prepare the infos for the model
 
@@ -30,23 +25,13 @@ BaggingModel::BaggingModel(const std::string &split_Operator,
   set_Criteria(split_Criteria);
 }
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 BaggingModel::~BaggingModel() {
   delete (this->split_Operator);
   delete (this->split_Criteria);
 };
 
-/*
-Sets the metric to split the nodes of the trees
-Parameters : split metric
-Inputs     : string
-Outputs    :
-*/
+//
 void BaggingModel::set_Operator(const std::string &metric) {
 
   std::map<std::string, operators::type>::iterator it;
@@ -77,12 +62,7 @@ void BaggingModel::set_Operator(const std::string &metric) {
   }
 }
 
-/*
-Sets the criteria to split the nodes of the trees
-Parameters : split criteria
-Inputs     : string
-Outputs    :
-*/
+//
 void BaggingModel::set_Criteria(const std::string &criteria) {
 
   std::map<std::string, criterias::type>::iterator it;
@@ -117,22 +97,17 @@ void BaggingModel::set_Criteria(const std::string &criteria) {
 }
 
 //
-int BaggingModel::get_Depth() { return this->max_Depth; }
+uint16_t BaggingModel::get_Depth() { return this->max_Depth; }
 
 //
-int BaggingModel::get_Trees_Number() { return this->forest.get_size(); };
+uint16_t BaggingModel::get_Trees_Number() { return this->forest.get_size(); };
 
 //
-const std::unordered_map<int, DecisionTree> &BaggingModel::get_Forest() {
+const std::unordered_map<uint16_t, DecisionTree> &BaggingModel::get_Forest() {
   return this->forest.get_Trees();
 }
 
-/*
-Train the trees on the given dataset on the configured max depth
-Parameters : Dataset for training
-Inputs     : const DataSet
-Outputs    :
-*/
+//
 void BaggingModel::train(const DataSet &data) {
   this->forest = RandomForest(this->split_Operator, this->split_Criteria,
                               this->number_Of_Trees, this->max_Depth);
@@ -140,12 +115,7 @@ void BaggingModel::train(const DataSet &data) {
   this->forest.train(data);
 }
 
-/*
-predict the labels for the given dataset with the operator and depth fixed
-Parameters : Dataset for prediction
-Inputs     : const DataSet
-Outputs    : vector<double>
-*/
+//
 std::vector<double> BaggingModel::predict(const DataSet &data) const {
   return this->forest.predict(data);
 }

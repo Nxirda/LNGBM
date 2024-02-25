@@ -10,57 +10,29 @@
 /*                  */
 /********************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 RIV::RIV() {}
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 RIV::~RIV() {}
 
-/*
-Print function to see the name of the operator
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 void RIV::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the operator
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 std::string RIV::get_Name() { return "Reduction In Variance"; }
 
-/*
-Computes the Variance of a split on a given column
-Index is used to get the column of the dataset that can be accessed
-Parameters : position, DataSet, index
-Inputs     : int, DataSet, vector<int>
-Outputs    : double
-*/
-double RIV::compute(int position, const DataSet &data,
-                    const std::vector<int> &index,
+//
+double RIV::compute(size_t position, const DataSet &data,
+                    const std::vector<size_t> &index,
                     const double split_Criteria) const {
 
   // Computes the DataSet Row Indexes that child nodes can access
   auto [left_index, right_index] = data.split(position, split_Criteria, index);
 
-  double base_Population = index.size();
+  size_t base_Population = index.size();
 
   // Creating a left child
   TreeNode left_Child{};
@@ -85,23 +57,17 @@ double RIV::compute(int position, const DataSet &data,
   return weighted_Average_Var;
 }
 
-/*
-Computes the Variance of two vectors
-Parameters : exact results, prediction results
-Inputs     : const vector<double>, const vector<double>
-Outputs    : double
-*/
+//
 double RIV::apply(const std::vector<double> &exact,
                   const std::vector<double> &prediction) {
   double res = 0.0;
-  int size = prediction.size();
+  size_t size = prediction.size();
 
-//#pragma omp parallel for reduction(+ : res)
-  for (int i = 0; i < size; ++i) {
+  for (size_t i = 0; i < size; ++i) {
     res += std::pow((exact[i] - prediction[i]), 2);
   }
 
   // Compute the Variance
-  res *= (1.0 / (double)size);
+  res *= (1.0 / size);
   return res;
 }

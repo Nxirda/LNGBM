@@ -18,7 +18,7 @@ private:
   std::unique_ptr<TreeNode> left;
 
   // Values used to parse the test dataset
-  int split_Column = -1;
+  size_t split_Column = 0;
   double split_Criterion = -1.0;
   double predicted_Value = -1.0;
 
@@ -39,7 +39,7 @@ public:
   // Constructor
 
   TreeNode();
-  TreeNode(int split_Column, double split_Criterion, double predicted_Value);
+  TreeNode(size_t split_Column, double split_Criterion, double predicted_Value);
 
   TreeNode(const TreeNode &node);
   TreeNode &operator=(const TreeNode &tn); // copy assignment
@@ -50,7 +50,7 @@ public:
 
   // Setter
 
-  void set_Split_Column(int col);
+  void set_Split_Column(size_t col);
   void set_Predicted_Value(double value);
   void set_Split_Criterion(double criterion);
 
@@ -62,7 +62,7 @@ public:
   TreeNode *get_Left_Node() const;
   TreeNode *get_Right_Node() const;
 
-  int get_Split_Column() const;
+  size_t get_Split_Column() const;
   double get_Split_Criterion() const;
   double get_Predicted_Value() const;
 

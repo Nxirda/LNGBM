@@ -1,7 +1,7 @@
 #ifndef DECISION_TREE_H_
 #define DECISION_TREE_H_
 
-#include <iostream>
+//#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,7 +15,7 @@ class DecisionTree : IModel {
 private:
   // Parameters
 
-  int max_Depth;
+  uint16_t max_Depth;
   std::unique_ptr<TreeNode> root;
   IOperator *splitting_Operator;
   ICriteria *splitting_Criteria;
@@ -33,7 +33,7 @@ public:
   // Constructor
 
   DecisionTree();
-  DecisionTree(int max_Depth, ICriteria *crit, IOperator *op);
+  DecisionTree(uint16_t max_Depth, ICriteria *crit, IOperator *op);
   DecisionTree(const DecisionTree &dt);
   DecisionTree &operator=(const DecisionTree &tree);
 

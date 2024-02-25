@@ -9,60 +9,37 @@
 /*                      */
 /************************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Quartiles class
-*/
-Quartiles::Quartiles() {}
+//
+Quartiles::Quartiles() {
+  this->size = this->quartiles.size();
+}
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 Quartiles::~Quartiles() {}
 
-/*
-Print function to see the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-void Quartiles::print() {
+//
+void Quartiles::print() const {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
+size_t Quartiles::get_Criteria_Number() const {return this->size;};
+
+//
 std::string Quartiles::get_Name() { return "Quartiles"; }
 
-/*
-Compute the Quartiles of the given vector
-Parameters : Element distribution
-Inputs     : const vector<double>
-Outputs    : vector<double>
-*/
+//
 std::vector<double> Quartiles::compute(const std::vector<double> &list,
-                                       const std::vector<int> &idx) const {
+                                       const std::vector<size_t> &idx) const {
 
   std::vector<double> quartiles_Values(this->quartiles.size());
+
   // Sort the data
-  int len = list.size();
+  size_t len = list.size();
   std::vector<double> sorted_Data = list;
   //std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
   std::sort(sorted_Data.begin(), sorted_Data.end());
 
-
-//#pragma omp parallel for
   for (size_t i = 0; i < this->quartiles.size(); ++i) {
     quartiles_Values[i] = sorted_Data[len * (this->quartiles[i] / 100)];
   }

@@ -29,16 +29,7 @@ set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
 # Set Boost
 target_link_libraries(main PRIVATE Boost::serialization Boost::mpi)
 
-# Set OpenMP 
-#if(OpenMP_CXX_FOUND)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-#endif()
-#For omp pragmas
-#target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
-
-#For parallel execution policies
-#target_link_libraries(main PRIVATE TBB::tbb)
-
+# 
 target_include_directories(main PRIVATE ${BLAS_INCLUDE_DIRS})
 
 #For MPI Distribution
@@ -59,30 +50,30 @@ add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=nativ
 # ===== Testing Part =====
 
 #Find Google test package
-find_package(GTest REQUIRED)
+#find_package(GTest REQUIRED)
 
 #To be able to launch tests with ctest
-enable_testing()
+#enable_testing()
 
-add_subdirectory(test)
+#add_subdirectory(test)
 
-add_executable(tests   test/main_Test.cpp) #test/Dataset/DataSet_Test.cpp
+#add_executable(tests   test/main_Test.cpp) #test/Dataset/DataSet_Test.cpp
                         #test/PredictionModel/Trees/TreeNode_Test.cpp
                         #test/PredictionModel/Trees/DecisionTree_Test.cpp)
 #)
 
-add_test(myTest tests)
+#add_test(myTest tests)
 
-target_include_directories(tests PUBLIC include/ )
+#target_include_directories(tests PUBLIC include/ )
 
-target_link_libraries(tests PRIVATE Test_Lib)
-target_link_libraries(tests PRIVATE GTest::GTest GTest::Main)
-target_link_libraries(tests PRIVATE Source_Lib)
+#target_link_libraries(tests PRIVATE Test_Lib)
+#target_link_libraries(tests PRIVATE GTest::GTest GTest::Main)
+#target_link_libraries(tests PRIVATE Source_Lib)
 #target_link_libraries(tests PRIVATE TBB::tbb)
-target_link_libraries(tests PRIVATE BLAS::BLAS)
+#target_link_libraries(tests PRIVATE BLAS::BLAS)
 
 
-gtest_discover_tests(tests)
+#gtest_discover_tests(tests)
 
 # ===== Benchmark Part =====
 

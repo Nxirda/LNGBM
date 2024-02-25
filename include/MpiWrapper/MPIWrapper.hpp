@@ -13,7 +13,7 @@
 namespace MPI_Wrapper {
 
 //
-int balancer(int total_Elements, int num_Processes, int process_Rank);
+uint16_t balancer(uint16_t total_Elements, uint16_t num_Processes, int process_Rank);
 
 /*
  */

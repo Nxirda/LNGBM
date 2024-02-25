@@ -1,6 +1,7 @@
 #include "EnumCriteria.hpp"
 
 namespace criterias {
+
 //
 std::map<std::string, type> dictionary = {{"H", type::Histogram},
                                           {"P", type::Percentiles},

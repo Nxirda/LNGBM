@@ -15,12 +15,7 @@
 /*                  */
 /********************/
 
-/*
-Default Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Decision Tree Class
-*/
+//
 DecisionTree::DecisionTree() {
   this->root = std::make_unique<TreeNode>();
   this->splitting_Criteria = nullptr;
@@ -29,26 +24,21 @@ DecisionTree::DecisionTree() {
 }
 
 //
-DecisionTree::DecisionTree(int max_Depth, ICriteria *crit, IOperator *op) {
+DecisionTree::DecisionTree(uint16_t max_Depth, ICriteria *crit, IOperator *op) {
   this->root = std::make_unique<TreeNode>();
   this->splitting_Criteria = crit;
   this->splitting_Operator = op;
   this->max_Depth = max_Depth;
 }
 
-/*
-Constructor to copy a Tree
-Parameters : Decision Tree
-Inputs     : const DecisionTree
-Outputs    : Object of Decision Tree Class
-*/
+//
 DecisionTree::DecisionTree(const DecisionTree &dt) {
   this->root = std::make_unique<TreeNode>(*dt.get_Root());
   this->splitting_Criteria = dt.splitting_Criteria;
   this->splitting_Operator = dt.splitting_Operator;
 }
 
-/**/
+//
 DecisionTree &DecisionTree::operator=(const DecisionTree &tree) {
   this->root = std::make_unique<TreeNode>(*tree.get_Root());
   this->splitting_Criteria = tree.splitting_Criteria;
@@ -56,43 +46,23 @@ DecisionTree &DecisionTree::operator=(const DecisionTree &tree) {
   return *this;
 }
 
-/*
-Default Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 DecisionTree::~DecisionTree(){};
 
-/*
-Returns the Current Node of the Tree
-Parameters :
-Inputs     :
-Outputs    : pointer of Decision Tree Object
-*/
+//
 TreeNode *DecisionTree::get_Root() const { return this->root.get(); }
 
-/*
-Sets the root of the tree (First Node)
-Parameters : Tree Node
-Inputs     : unique_ptr<TreeNode>
-Outputs    :
-*/
+//
 void DecisionTree::set_Root(std::unique_ptr<TreeNode> node) {
   this->root = std::move(node);
 }
 
-/*
-Prints the tree
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 void DecisionTree::print_Tree() { this->root->node_Print(); }
 
 //
 void DecisionTree::train(const DataSet &data) {
-  int threshold = 5;
+  size_t threshold = 5;
 
   TrainingElement::train(data, this->get_Root(), this->splitting_Operator,
                          this->splitting_Criteria, this->max_Depth, threshold);
@@ -100,13 +70,12 @@ void DecisionTree::train(const DataSet &data) {
 
 //
 void tree_Prediction(const DataSet &data, std::vector<double> &result,
-                     const std::vector<int> &index, TreeNode *node) {
+                     const std::vector<size_t> &index, TreeNode *node) {
 
   // Update the values of the result
   double pred_Val = node->get_Predicted_Value();
 
-  //#pragma omp parallel for
-  for (int idx : index) {
+  for (size_t idx : index) {
     result[idx] = pred_Val;
   }
 
@@ -126,12 +95,12 @@ void tree_Prediction(const DataSet &data, std::vector<double> &result,
 //
 std::vector<double> DecisionTree::predict(const DataSet &data) const {
 
-  int size = data.samples_Number();
+  size_t size = data.samples_Number();
   std::vector<double> result(size, 0);
 
   // Computes the index
-  std::vector<int> index(size);
-  for (int i = 0; i < size; ++i) {
+  std::vector<size_t> index(size);
+  for (size_t i = 0; i < size; ++i) {
     index[i] = i;
   }
 

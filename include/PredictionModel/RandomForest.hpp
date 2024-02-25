@@ -12,17 +12,17 @@ class RandomForest : IModel {
 private:
   // Parameters
 
-  int size;
-  int max_Depth;
+  uint16_t size;
+  uint16_t max_Depth;
   IOperator *splitting_Operator;
   ICriteria *splitting_Criteria;
-  std::unordered_map<int, DecisionTree> trees;
+  std::unordered_map<uint16_t, DecisionTree> trees;
 
 public:
   // Constructor
 
   RandomForest();
-  RandomForest(IOperator *op, ICriteria *crit, int n, int depth);
+  RandomForest(IOperator *op, ICriteria *crit, uint16_t n, uint16_t depth);
 
   // Destructor
 
@@ -30,8 +30,8 @@ public:
 
   // Getters
 
-  const std::unordered_map<int, DecisionTree> &get_Trees();
-  int get_size();
+  const std::unordered_map<uint16_t, DecisionTree> &get_Trees();
+  uint16_t get_size();
 
   // Methods
 

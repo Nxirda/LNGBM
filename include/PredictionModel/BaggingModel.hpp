@@ -11,22 +11,22 @@ private:
   IOperator *split_Operator;
   ICriteria *split_Criteria;
   RandomForest forest;
-  int max_Depth;
-  int number_Of_Trees;
+  uint16_t max_Depth;
+  uint16_t number_Of_Trees;
 
 public:
   // Constructor
 
   BaggingModel() = delete;
   BaggingModel(const std::string &split_Operator,
-               const std::string &split_Criteria, int max_Depth,
-               int number_Of_Trees);
+               const std::string &split_Criteria, uint16_t max_Depth,
+               uint16_t number_Of_Trees);
 
   // Getter
 
-  int get_Depth();
-  int get_Trees_Number();
-  const std::unordered_map<int, DecisionTree> &get_Forest();
+  uint16_t get_Depth();
+  uint16_t get_Trees_Number();
+  const std::unordered_map<uint16_t, DecisionTree> &get_Forest();
 
   // Setters
 

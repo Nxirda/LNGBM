@@ -14,6 +14,9 @@ private:
   const std::string name =
       "Unique_Values"; /**< A string variable to display the name. */
 
+  size_t size = 0; /**< A size_t variable that stores the number of elements to
+                      generate */
+
 public:
   /**
    * @brief Default constructor for the RandomValues class.
@@ -30,7 +33,14 @@ public:
   /**
    * @brief Prints the name of the class on standard output.
    */
-  void print() override;
+  void print() const override;
+
+  /**
+   * @brief Returns the number of element the Histogram will compute
+   *
+   * @return Type : size_t, the number of elements
+   */
+  size_t get_Criteria_Number() const override;
 
   /**
    * @brief Static method to get the name of the UniqueValues criteria.
@@ -43,10 +53,13 @@ public:
    * @brief Computes the unique values of a given data distribution.
    *
    * @param vector<double> list: The distribution of data
+   * @param vector<size_t> idx : The index we can access in the data
+   * distribution
+   * 
    * @return Type: vector<double>, A vector of the unique values
    */
   std::vector<double> compute(const std::vector<double> &list,
-                              const std::vector<int> &idx) const override;
+                              const std::vector<size_t> &idx) const override;
 };
 
 #endif

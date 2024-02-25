@@ -17,6 +17,8 @@ private:
   const std::vector<double> quartiles = {25.0, 50.0, 75.0}; /**< Array
                                   containing the values in % of the quartiles*/
 
+  size_t size;
+
 public:
   /**
    * @brief Default constructor for the Quartiles class.
@@ -33,7 +35,14 @@ public:
   /**
    * @brief Prints the name of the class on standard output.
    */
-  void print() override;
+  void print() const override;
+
+  /**
+   * @brief Returns the number of element the Histogram will compute
+   *
+   * @return Type : size_t, the number of elements
+   */
+  size_t get_Criteria_Number() const override;
 
   /**
    * @brief Static method to get the name of the Quartiles criteria.
@@ -49,10 +58,13 @@ public:
    * of the provided list of data and the bin parameter.
    *
    * @param vector<double> list: The distribution of data
+   * @param vector<size_t> idx : The index we can access in the data
+   * distribution
+   *
    * @return Type: vector<double>, A vector of the values of the quartiles
    */
   std::vector<double> compute(const std::vector<double> &list,
-                              const std::vector<int> &idx) const override;
+                              const std::vector<size_t> &idx) const override;
 };
 
 #endif

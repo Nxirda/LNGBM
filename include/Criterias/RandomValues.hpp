@@ -15,10 +15,10 @@ private:
   // Parameters
   const std::string name =
       "Random_Values"; /**< A string variable to display the name. */
-  int number_Of_Elements =
-      10; /**< Integer representing the number of values to compute */
-      
-  mutable std::mt19937 gen;
+  size_t size = 32; /**< Integer representing the number of values to compute. (default : 32)*/
+
+  mutable std::mt19937 gen; /**< A mutable random value generator variable to
+                               store the randomness */
 
 public:
   /**
@@ -31,9 +31,9 @@ public:
   /**
    * @brief Parameterized constructor for the RandomValues class.
    *
-   * @param int x: The number of values to compute.
+   * @param size_t x: The number of values to compute.
    */
-  RandomValues(int x);
+  RandomValues(size_t x);
 
   /**
    * @brief Destructor for the RandomValues class.
@@ -43,7 +43,14 @@ public:
   /**
    * @brief Prints the name of the class on standard output.
    */
-  void print() override;
+  void print() const override;
+
+  /**
+   * @brief Returns the number of element the Histogram will compute
+   *
+   * @return Type : size_t, the number of elements
+   */
+  size_t get_Criteria_Number() const override;
 
   /**
    * @brief Static method to get the name of the RandomValues criteria.
@@ -59,10 +66,13 @@ public:
    * values in the provided list of data.
    *
    * @param vector<double> list: The distribution of data
+   * @param vector<size_t> idx : The index we can access in the data
+   * distribution
+   *
    * @return Type: vector<double>, A vector of the random values
    */
   std::vector<double> compute(const std::vector<double> &list,
-                              const std::vector<int> &idx) const override;
+                              const std::vector<size_t> &idx) const override;
 
   /**
    * @brief Computes a random double in given boundaries
