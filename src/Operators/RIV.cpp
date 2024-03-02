@@ -34,12 +34,6 @@ double RIV::compute(size_t position, const DataSet &data,
 
   size_t base_Population = index.size();
 
-  // Creating a left child
-  TreeNode left_Child{};
-
-  // Creating a right child
-  TreeNode right_Child{};
-
   // Computes Weighted Variance for left child
   double left_Variance = data.labels_Variance(*left_index);
   double left_Weighted_Average =

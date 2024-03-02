@@ -7,7 +7,6 @@
 #include "boost/mpi.hpp"
 #include <omp.h>
 
-
 #include "BaggingModel.hpp"
 
 namespace MPI_Wrapper {
@@ -15,8 +14,7 @@ namespace MPI_Wrapper {
 //
 uint16_t balancer(uint16_t total_Elements, uint16_t num_Processes, int process_Rank);
 
-/*
- */
+//
 void MPI_Cross_Val(BaggingModel &model, const DataSet &data, int K);
 
 //

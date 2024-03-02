@@ -74,7 +74,7 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
   int precision = 5;
   uint16_t depth = model.get_Depth();
   size_t height = data.samples_Number();
-  size_t width = data.features_Length();
+  size_t width = data.features_Number();
   uint16_t trees = model.get_Trees_Number();
   int element_Size = data.element_Size();
 
@@ -86,9 +86,9 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
   validation_Result.set_Header({"Folds", "Depth", "Trees", "File_size",
                                 "Train_time", "MAE", "MAPE", "Std_dev"});
 
-  double global_MAE = 0;
-  double global_MAPE = 0;
-  double global_Std_Dev = 0;
+  double global_MAE = 0.0;
+  double global_MAPE = 0.0;
+  double global_Std_Dev = 0.0;
 
   std::vector<std::string> inner_Values;
   std::vector<double> inner_Numerical_Values;

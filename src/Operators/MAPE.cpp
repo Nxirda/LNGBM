@@ -35,24 +35,24 @@ double MAPE::compute(size_t position, const DataSet &data,
   size_t base_Population = index.size();
 
   double left_MAPE = 0.0;
-  TreeNode left_Child{};
   double left_Prediction = data.labels_Mean(left_index.value());
   size_t left_Population = left_index.value().size();
 
   double right_MAPE = 0.0;
-  TreeNode right_Child{};
   double right_Prediction = data.labels_Mean(right_index.value());
   size_t right_Population = right_index.value().size();
 
+  const std::vector<double> &labels = data.get_Labels();
+
   for (size_t idx : left_index.value()) {
     left_MAPE +=
-        (std::abs(data.get_Labels()[idx] - left_Prediction)) / left_Prediction;
+        (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
   left_MAPE *= 100.0;
   left_MAPE *= (1.0 / left_Population);
 
   for (size_t idx : right_index.value()) {
-    right_MAPE += (std::abs(data.get_Labels()[idx] - right_Prediction)) /
+    right_MAPE += (std::abs(labels[idx] - right_Prediction)) /
                   right_Prediction;
   }
   right_MAPE *= 100.0;

@@ -4,14 +4,14 @@
 
 
 #include "boost/mpi.hpp"
-#include <omp.h>
+//#include <omp.h>
 
 #include <cstdio>
 #include <stdio.h>
 
 /*********************/
 /*                   */
-/*    TEMPORARY      */
+/*      MAIN         */
 /*                   */
 /*********************/
 
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     std::cout << "\n== Split Criterias are ==\n";
     criterias::print();
 
-    std::cout << "\nCross Val shall be 'CV' for activation\n";
+    std::cout << "\nCross Val shall be 'CV' followed by the number of folds for activation\n";
 
     if(size > 1)
       MPI_Abort(MPI_COMM_WORLD, 1);

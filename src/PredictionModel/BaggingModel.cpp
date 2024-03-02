@@ -14,7 +14,6 @@ BaggingModel::BaggingModel(const std::string &split_Operator,
                            uint16_t number_Of_Trees) {
 
   // Here we just prepare the infos for the model
-
   if (max_Depth < 1) {
     std::cerr << "Depth parameter should be at least 1\n";
     abort();
@@ -109,8 +108,8 @@ const std::unordered_map<uint16_t, DecisionTree> &BaggingModel::get_Forest() {
 
 //
 void BaggingModel::train(const DataSet &data) {
-  this->forest = RandomForest(this->split_Operator, this->split_Criteria,
-                              this->number_Of_Trees, this->max_Depth);
+  this->forest = std::move(RandomForest(this->split_Operator, this->split_Criteria,
+                              this->number_Of_Trees, this->max_Depth));
 
   this->forest.train(data);
 }

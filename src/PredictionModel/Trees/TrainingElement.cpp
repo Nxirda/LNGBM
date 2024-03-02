@@ -1,7 +1,6 @@
 #include "TrainingElement.hpp"
 
 #include <functional>
-#include <omp.h>
 #include <random>
 #include <stack>
 #include <thread>
@@ -21,7 +20,8 @@ TrainingElement::TrainingElement() {
 }
 
 //
-TrainingElement::TrainingElement(TreeNode *node, const std::vector<size_t> &index,
+TrainingElement::TrainingElement(TreeNode *node,
+                                 const std::vector<size_t> &index,
                                  uint16_t depth) {
   this->node = node;
   this->depth = depth;
@@ -80,7 +80,7 @@ void TrainingElement::bootstrap_Index(size_t dataset_Size) {
   for (size_t i = 0; i < dataset_Size; ++i) {
     idx[i] = dist(gen);
   }
-  this->set_Index(std::move(idx));
+  this->index = std::move(idx);
 }
 
 //
@@ -94,16 +94,18 @@ TrainingElement::find_Best_Split(const DataSet &data,
   // We try to minimize the mean absolute error for a split
   double min = INT_MAX;
 
+  size_t i, j;
+  double tmp_var;
   // Minimize the error by trying multiple splits on features
-  for (size_t i = 0; i < data.get_Features().size(); ++i) {
+  for (i = 0; i < data.get_Features().size(); ++i) {
 
     std::vector<double> criterias =
         splitting_Criteria->compute(data.get_Column(i), this->index);
 
     // Test multiple split criteria
-    for (size_t j = 0; j < criterias.size(); ++j) {
+    for (j = 0; j < criterias.size(); ++j) {
 
-      double tmp_var =
+      tmp_var =
           splitting_Operator->compute(i, data, this->index, criterias[j]);
 
       if (tmp_var < min) {
@@ -117,8 +119,10 @@ TrainingElement::find_Best_Split(const DataSet &data,
 }
 
 //
-std::tuple<std::optional<std::vector<size_t>>, std::optional<std::vector<size_t>>>
-TrainingElement::split_Index(const DataSet &data, double criterion, size_t position) {
+std::tuple<std::optional<std::vector<size_t>>,
+           std::optional<std::vector<size_t>>>
+TrainingElement::split_Index(const DataSet &data, double criterion,
+                             size_t position) {
 
   return data.split(position, criterion, this->get_Index());
 }
@@ -160,8 +164,8 @@ TrainingElement::split_Node(const DataSet &data,
     double predic_Right = data.labels_Mean(*right_index);
     this->node->add_Right(std::make_unique<TreeNode>(std::move(right)));
     this->node->get_Right_Node()->set_Predicted_Value(predic_Right);
-    train_Right = TrainingElement(this->node->get_Right_Node(),
-                                  std::move(*right_index), next_Depth);
+    train_Right = std::move(TrainingElement(
+        this->node->get_Right_Node(), std::move(*right_index), next_Depth));
   }
 
   // Case 2 : Build Left Node (if information gained)
@@ -169,8 +173,8 @@ TrainingElement::split_Node(const DataSet &data,
     double predic_Left = data.labels_Mean(*left_index);
     this->node->add_Left(std::make_unique<TreeNode>(std::move(left)));
     this->node->get_Left_Node()->set_Predicted_Value(predic_Left);
-    train_Left = TrainingElement(this->node->get_Left_Node(),
-                                 std::move(*left_index), next_Depth);
+    train_Left = std::move(TrainingElement(this->node->get_Left_Node(),
+                                           std::move(*left_index), next_Depth));
   }
 
   return {train_Left, train_Right};
@@ -179,8 +183,8 @@ TrainingElement::split_Node(const DataSet &data,
 //
 void TrainingElement::train(const DataSet &data, TreeNode *Node,
                             const IOperator *splitting_Operator,
-                            const ICriteria *splitting_Criteria, uint16_t max_Depth,
-                            size_t threshold) {
+                            const ICriteria *splitting_Criteria,
+                            uint16_t max_Depth, size_t threshold) {
 
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
@@ -225,47 +229,39 @@ void TrainingElement::train(const DataSet &data, TreeNode *Node,
   }
 }
 
-/*******************************************************************/
-
-// NEED CLEANUP
-
-// Maybe do two versions :
-//  -> one if num_Features < nb Threads (in this case focus more on the second
-//  loop)
-//  -> one if num_Features > nb_Threads (in this case focus more on the first
-//  loop)
-// Of course compare it to the second loop range (to use full "thread power")
-
 // Outter loop parallelism
-auto thread_Task =
-    [](const IOperator *splitting_Operator, const ICriteria *splitting_Criteria,
-       const std::vector<size_t> &index,
-       std::vector<std::tuple<size_t, double, double>> &res,
-       const DataSet &data, size_t start, size_t end, size_t tid) {
-      // We try to minimize the result for a split
-      double local_min = INT_MAX;
-      size_t best_Feature = 0;
-      double best_Criterion = 0.0;
+auto thread_Task = [](const IOperator *splitting_Operator,
+                      const ICriteria *splitting_Criteria,
+                      const std::vector<size_t> &index, const DataSet &data,
+                      size_t start, size_t end, size_t tid,
+                      std::vector<std::tuple<size_t, double, double>> &res) {
+  // We try to minimize the result for a split
+  double local_min = INT_MAX;
+  size_t best_Feature = 0;
+  double best_Criterion = 0.0;
 
-      for (size_t i = start; i < end; ++i) {
-        std::vector<double> criterias =
-            splitting_Criteria->compute(data.get_Column(i), index);
+  size_t i, j;
+  double tmp_var;
 
-        // Test multiple split criteria
-        for (size_t j = 0; j < criterias.size(); ++j) {
+  for (i = start; i < end; ++i) {
+    std::vector<double> criterias =
+        splitting_Criteria->compute(data.get_Column(i), index);
 
-          double tmp_var =
-              splitting_Operator->compute(i, data, index, criterias[j]);
+    // Test multiple split criteria
+    for (j = 0; j < splitting_Criteria->get_Criteria_Number(); ++j) {
 
-          if (tmp_var < local_min) {
-            local_min = tmp_var;
-            best_Feature = i;
-            best_Criterion = criterias[j];
-          }
-        }
+      tmp_var =
+          splitting_Operator->compute(i, data, index, criterias[j]);
+
+      if (tmp_var < local_min) {
+        local_min = tmp_var;
+        best_Feature = i;
+        best_Criterion = criterias[j];
       }
-      res[tid] = {best_Feature, best_Criterion, local_min};
-    };
+    }
+  }
+  res[tid] = {best_Feature, best_Criterion, local_min};
+};
 
 //
 std::tuple<size_t, double>
@@ -273,40 +269,47 @@ TrainingElement::find_Best_Split_Parallel(const DataSet &data,
                                           const IOperator *splitting_Operator,
                                           const ICriteria *splitting_Criteria) {
 
-  size_t best_Feature = 0;
-  double criterion = 0.0;
-
   // We try to minimize the mean absolute error for a split
   double min = INT_MAX;
+  double criterion = 0.0;
+  size_t best_Feature = 0;
   size_t size = data.get_Features().size();
 
-  //
-  size_t num_Threads =
-      std::min(size, (size_t)std::thread::hardware_concurrency());
+  uint16_t num_Threads =
+      std::min<uint16_t>(size, (size_t)std::thread::hardware_concurrency());
 
+  // Thread pool
   std::vector<std::thread> threads(num_Threads);
   std::vector<std::tuple<size_t, double, double>> res(num_Threads);
 
+  // For the threads
+  size_t end;
+  size_t start;
   size_t chunk_Size = size / num_Threads;
 
-  for (size_t tid = 0; tid < num_Threads; ++tid) {
+  uint16_t tid;
+  // Thread creation && task set
+  for (tid = 0; tid < num_Threads; ++tid) {
 
     // Chunks computing
-    size_t start = tid * chunk_Size;
-    size_t end = std::min(start + chunk_Size, size);
+    start = tid * chunk_Size;
+    end = std::min(start + chunk_Size, size);
 
+    // Maybe ensure thread creation here
     threads[tid] = std::thread(thread_Task, splitting_Operator,
                                splitting_Criteria, std::cref(this->index),
-                               std::ref(res), std::cref(data), start, end, tid);
+                               std::cref(data), start, end, tid, std::ref(res));
   }
 
-  for (size_t tid = 0; tid < num_Threads; ++tid) {
+  // Thread join && result aggregation
+  for (tid = 0; tid < num_Threads; ++tid) {
     threads[tid].join();
 
-    if (std::get<2>(res[tid]) < min) {
-      best_Feature = std::get<0>(res[tid]);
-      criterion = std::get<1>(res[tid]);
-      min = std::get<2>(res[tid]);
+    auto &result = res[tid];
+    if (std::get<2>(result) < min) {
+      best_Feature = std::get<0>(result);
+      criterion = std::get<1>(result);
+      min = std::get<2>(result);
     }
   }
 

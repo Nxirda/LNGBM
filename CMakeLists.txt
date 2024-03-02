@@ -28,7 +28,6 @@ set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
 
 # Set Boost
 target_link_libraries(main PRIVATE Boost::serialization Boost::mpi)
-
 # 
 target_include_directories(main PRIVATE ${BLAS_INCLUDE_DIRS})
 

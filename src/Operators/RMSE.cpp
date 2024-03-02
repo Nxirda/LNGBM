@@ -35,31 +35,31 @@ double RMSE::compute(size_t position, const DataSet &data,
   size_t base_Population = index.size();
 
   double left_RMSE = 0.0;
-  TreeNode left_Child{};
   double left_Prediction = data.labels_Mean(left_index.value());
   size_t left_Population = left_index.value().size();
 
   double right_RMSE = 0.0;
-  TreeNode right_Child{};
   double right_Prediction = data.labels_Mean(right_index.value());
   size_t right_Population = right_index.value().size();
 
+  const std::vector<double> &labels = data.get_Labels();
+
   for (size_t idx : left_index.value()) {
-    left_RMSE += pow((std::abs(data.get_Labels()[idx] - left_Prediction)), 2) *
+    left_RMSE += pow((std::abs(labels[idx] - left_Prediction)), 2) *
                  (1.0 / left_Population);
   }
   left_RMSE = sqrt(left_RMSE);
 
   for (size_t idx : right_index.value()) {
     right_RMSE +=
-        pow((std::abs(data.get_Labels()[idx] - right_Prediction)), 2) *
+        pow((std::abs(labels[idx] - right_Prediction)), 2) *
         (1.0 / right_Population);
   }
   right_RMSE = sqrt(right_RMSE);
 
   // Compute the result of RMSE for the split at position
   double res =
-      ((left_RMSE * left_Population) + (right_RMSE * right_Population)); // *
+      ((left_RMSE * left_Population) + (right_RMSE * right_Population));
 
   res *= (1.0 / base_Population);
   return res;

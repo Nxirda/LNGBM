@@ -195,7 +195,8 @@ DataSet::get_Samples(const std::vector<size_t> &idx) const {
   std::vector<std::vector<double>> res;
   res.reserve(this->samples.size());
 
-  for (size_t i = 0; i < this->samples.size(); ++i) {
+  size_t i;
+  for (i = 0; i < this->samples.size(); ++i) {
     std::vector<double> tmp;
     tmp.reserve(idx.size());
     for (size_t j : idx) {
@@ -238,7 +239,7 @@ int DataSet::element_Size() const { return sizeof(this->samples[0][0]); }
 bool DataSet::empty() const { return this->samples.empty(); }
 
 //
-size_t DataSet::features_Length() const { return this->features.size(); }
+size_t DataSet::features_Number() const { return this->features.size(); }
 
 //
 size_t DataSet::samples_Number() const {
@@ -254,7 +255,7 @@ size_t DataSet::labels_Number() const { return this->labels.size(); }
 //
 const std::vector<double> &DataSet::get_Column(size_t position) const {
   // Check column in bounds
-  if (position >= this->features_Length() || position < 0) {
+  if (position >= this->features_Number() || position < 0) {
     std::cerr << "Position specified is out of the matrix\n";
     exit(1);
   }
@@ -267,7 +268,7 @@ std::tuple<std::optional<std::vector<size_t>>,
 DataSet::split(size_t position, double criterion,
                const std::vector<size_t> &idx) const {
   // Check column in bounds
-  if (idx.empty() || position >= this->features_Length() || position < 0) {
+  if (idx.empty() || position >= this->features_Number() || position < 0) {
     return {std::nullopt, std::nullopt};
   }
 
@@ -301,10 +302,10 @@ double DataSet::column_Mean(size_t position,
                             const std::vector<size_t> &idx) const {
 
   // Check column in bounds
-  if (idx.empty() || position >= this->features_Length() || position < 0) {
+  if (idx.empty() || position >= this->features_Number() || position < 0) {
     return 0.0;
-  }              
-  
+  }
+
   double mean = 0.0;
   double len = 0.0;
   size_t col_Size = this->get_Column(position).size();
@@ -329,7 +330,7 @@ double DataSet::column_Mean(size_t position,
 
 //
 double DataSet::labels_Mean(const std::vector<size_t> &idx) const {
-  
+
   // No index
   if (idx.empty()) {
     return 0.0;
@@ -339,13 +340,14 @@ double DataSet::labels_Mean(const std::vector<size_t> &idx) const {
   double len = 0.0;
 
   size_t labels_Size = this->labels_Number();
+  const std::vector<double> &labels = this->get_Labels();
 
   for (size_t i : idx) {
     if (i > labels_Size || i < 0) {
       std::cerr << "Index of column is outside matrix dimensions\n";
     } else {
       len += 1.0;
-      mean += this->get_Labels()[i];
+      mean = labels[i];
     }
   }
 
@@ -360,7 +362,7 @@ double DataSet::labels_Mean(const std::vector<size_t> &idx) const {
 
 //
 double DataSet::whole_Labels_Mean() const {
-  
+
   double mean = 0.0;
   size_t len = this->labels_Number();
 
@@ -383,16 +385,17 @@ double DataSet::labels_Variance(const std::vector<size_t> &idx) const {
   }
 
   double len = 0.0;
-  double mean = this->labels_Mean(idx);
   double sum = 0.0;
+  double mean = this->labels_Mean(idx);
 
   size_t labels_Size = this->labels_Number();
+  const std::vector<double> &labels = this->get_Labels();
 
   for (size_t i : idx) {
     if (i > labels_Size || i < 0) {
       std::cerr << "Index of column is outside matrix dimensions\n";
     } else {
-      double difference = this->get_Labels()[i] - mean;
+      double difference = labels[i] - mean;
       sum += difference * difference;
       len += 1.0;
     }

@@ -31,27 +31,27 @@ double MAE::compute(size_t position, const DataSet &data,
 
 
   // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = data.split(position, split_Criteria, index);
+  auto [left_index, right_index] = std::move(data.split(position, split_Criteria, index));
 
   size_t base_Population = index.size();
 
   double left_MAE = 0.0;
-  TreeNode left_Child{};
-  double left_Prediction = data.labels_Mean(left_index.value());
+  double left_Prediction = data.labels_Mean(left_index.value());  
   size_t left_Population = left_index.value().size();
 
   double right_MAE = 0.0;
-  TreeNode right_Child{};
   double right_Prediction = data.labels_Mean(right_index.value());
   size_t right_Population = right_index.value().size();
   
+  const std::vector<double> &labels = data.get_Labels();
+
   for (size_t idx : left_index.value()) {
-    left_MAE += std::abs(data.get_Labels()[idx] - left_Prediction);
+    left_MAE += std::abs(labels[idx] - left_Prediction);
   }
   left_MAE *= (1.0 / left_Population);
 
   for (size_t idx : right_index.value()) {
-    right_MAE += std::abs(data.get_Labels()[idx] - right_Prediction);
+    right_MAE += std::abs(labels[idx] - right_Prediction);
   }
   right_MAE *= (1.0 / right_Population);
 
