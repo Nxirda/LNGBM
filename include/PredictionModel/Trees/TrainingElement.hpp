@@ -69,6 +69,11 @@ private:
   find_Best_Split_Parallel(const DataSet &data,
                            const IOperator *splitting_Operator,
                            const ICriteria *splitting_Criteria);
+
+  std::tuple<size_t, double>
+  find_Best_Split_Parallel_2(const DataSet &data,
+                             const IOperator *splitting_Operator,
+                             const ICriteria *splitting_Criteria);
 };
 
 #endif

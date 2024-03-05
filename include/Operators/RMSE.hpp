@@ -4,32 +4,59 @@
 #include "IOperator.hpp"
 #include <string>
 
+/**
+ * @class RMSE
+ * @brief A class used to compute the Root Mean Square Error on a
+ * dataset
+ *
+ * This class implements the IOperator interface
+ */
 class RMSE : public IOperator {
 
 private:
-  // Parameters
-
-  // double split_Criterion;
-  const std::string name = "MAPE";
+  const std::string name = "MAPE"; /**< A string variable representing the name
+                               of the class */
 
 public:
-  // Constructor
-
+  /**
+   * @brief Default constructor for the RMSE class.
+   *
+   * Initializes the class with default parameters.
+   */
   RMSE();
 
-  // Destructor
-
+  /**
+   * @brief Destructor for the RMSE class
+   */
   ~RMSE() override;
 
-  // Methods
-
+  /**
+   * @brief Prints the name of the class on standard output.
+   */
   void print() override;
 
+  /**
+   * @brief Static methods that returns the name of the class (RMSE)
+   */
   static std::string get_Name();
 
-  double compute(size_t position, const DataSet &data, const std::vector<size_t> &index,
-                const double split_Criteria) const override;
-
+  /**
+   * @brief Computes the result of the RMSE on the column at position folowwing
+   * a split defined by the split criteria
+   *
+   * @param size_t position: the feature of the dataset on which to compute
+   * @param const DataSet & data : The dataset
+   * @param const std::vector<size_t> &index : a vector of the index of the
+   * element we can access
+   * @param const double criteria : the splitting criteria on which to split the
+   * datas
+   *
+   * @return Type: double, A value representing the result of the metric on the
+   * parameters.
+   */
+  double compute(size_t position, const DataSet &data,
+                 const std::vector<size_t> &index,
+                 const double split_Criteria) const override;
 };
 
 #endif

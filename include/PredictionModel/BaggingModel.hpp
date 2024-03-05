@@ -8,11 +8,11 @@ class BaggingModel : IModel {
 
 private:
   // Parameters
-  IOperator *split_Operator;
-  ICriteria *split_Criteria;
   RandomForest forest;
   uint16_t max_Depth;
   uint16_t number_Of_Trees;
+  std::unique_ptr<ICriteria> split_Criteria;
+  std::unique_ptr<IOperator> split_Operator;
 
 public:
   // Constructor
@@ -22,7 +22,10 @@ public:
                const std::string &split_Criteria, uint16_t max_Depth,
                uint16_t number_Of_Trees);
 
-  // Getter
+  // Getters
+
+  ICriteria *get_Criteria();
+  IOperator *get_Operator();
 
   uint16_t get_Depth();
   uint16_t get_Trees_Number();
@@ -38,7 +41,9 @@ public:
   ~BaggingModel() override;
 
   // Methods
-  void train(const DataSet &data) override;
+
+  void train(const DataSet &data);
+  void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
   std::vector<double> predict(const DataSet &datas) const override;
 };
 

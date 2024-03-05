@@ -1,7 +1,8 @@
 #include <DataSet.hpp>
 #include <gtest/gtest.h>
 
-std::string PATH = "../data/matrix.csv";
+//Has to be the relative path from the build dir 
+std::string PATH = "../test/matrix.csv";
 
 //
 TEST(Getters, GetFeatures) {
@@ -26,7 +27,7 @@ TEST(Getters, GetSamples) {
 //
 TEST(Getters, GetLabels) {
   DataSet d;
-  std::vector<int> idx(0);
+  std::vector<size_t> idx(0);
   ASSERT_EQ(d.get_Labels(idx).size(), 0);
 
   d = DataSet(PATH);
@@ -66,7 +67,7 @@ TEST(Getters, GetLabels) {
 //
 TEST(Computations, LabelsMean) {
   DataSet d;
-  std::vector<int> idx(0);
+  std::vector<size_t> idx(0);
   double mean = 0;
 
   ASSERT_EQ(d.labels_Mean(idx), 0.0);
@@ -77,11 +78,12 @@ TEST(Computations, LabelsMean) {
   for (size_t i = 0; i < d.get_Samples().size(); ++i) {
     idx.push_back(i);
   }
-
+  size_t size = 0;
   for (double i : d.get_Labels(idx)) {
     mean += i;
+    size += 1;
   }
-  mean *= (1.0 / d.get_Labels(idx).size());
+  mean *= (1.0 /size);
 
   ASSERT_EQ(d.labels_Mean(idx), mean);
 
@@ -118,7 +120,7 @@ TEST(Computations, LabelsMean) {
 //
 TEST(Computation, LabelsVariance) {
   DataSet d;
-  std::vector<int> idx(0);
+  std::vector<size_t> idx(0);
   double mean = 0.0;
   double variance = 0.0;
 
@@ -181,8 +183,8 @@ TEST(Size, SamplesNumber) {
 //
 TEST(Size, FeaturesLength) {
   DataSet d;
-  ASSERT_EQ(d.features_Length(), 0);
+  ASSERT_EQ(d.features_Number(), 0);
 
   d = DataSet(PATH);
-  ASSERT_EQ(d.features_Length(), 5);
+  ASSERT_EQ(d.features_Number(), 5);
 }

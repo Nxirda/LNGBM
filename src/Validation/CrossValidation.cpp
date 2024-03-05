@@ -10,7 +10,7 @@ namespace CrossValidation {
 
 //
 std::vector<size_t> compute_Train(const std::vector<size_t> &global_Index,
-                               const std::vector<size_t> &test_Index) {
+                                  const std::vector<size_t> &test_Index) {
   std::vector<size_t> res(global_Index.size() - test_Index.size());
   // To track where we are in res index
   size_t cpt = 0;
@@ -30,7 +30,7 @@ std::vector<size_t> compute_Train(const std::vector<size_t> &global_Index,
 std::tuple<std::vector<DataSet>, std::vector<DataSet>>
 compute_Folds(const DataSet &data, const std::vector<size_t> &global_Index,
               size_t total_Size, uint8_t K) {
-  
+
   size_t foldSize = total_Size / K;
 
   std::vector<DataSet> test_Folds(K);
@@ -72,15 +72,11 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
 
   // Getting infos on the model
   int precision = 5;
-  uint16_t depth = model.get_Depth();
-  size_t height = data.samples_Number();
-  size_t width = data.features_Number();
-  uint16_t trees = model.get_Trees_Number();
-  int element_Size = data.element_Size();
 
   //
   std::string formatted_File_Size =
-      Tools::matrix_Memory_Size(height, width, element_Size, precision);
+      Tools::matrix_Memory_Size(data.samples_Number(), data.features_Number(),
+                                data.element_Size(), precision);
 
   // Initialize header for the metrics we want
   validation_Result.set_Header({"Folds", "Depth", "Trees", "File_size",
@@ -138,7 +134,7 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
         metric::compute_accuracy(model, test_Set);
 
     std::string inner_Formatted_File_Size = Tools::matrix_Memory_Size(
-        train_Set.samples_Number(), width, element_Size, precision);
+        train_Set.samples_Number(), data.features_Number(), data.element_Size(), precision);
 
     inner_Values = {"Folds n*" + std::to_string(i),
                     std::to_string(model.get_Depth()),

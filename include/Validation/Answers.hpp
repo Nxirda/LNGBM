@@ -18,6 +18,8 @@ private:
   friend class boost::serialization::access;
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version) {
+    // Unused param but necessary for boost
+    static_cast<void>(version);
     ar &header;
     ar &values;
     ar &numeric_Values;

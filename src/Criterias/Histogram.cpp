@@ -43,8 +43,8 @@ std::vector<double> Histogram::compute(const std::vector<double> &list,
   double min = INT_MAX;
   double max = 0;
 
-  for (size_t i : idx) {
-    const double &elem = list[i];
+  for (const auto &i : idx) {
+    const auto &elem = list[i];
     if(elem < min)
       min = elem;
     else if(elem > max)

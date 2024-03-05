@@ -9,7 +9,6 @@
 #include "IModel.hpp"
 #include "TreeNode.hpp"
 
-
 // Binary Search Tree Class
 class DecisionTree : IModel {
 private:
@@ -17,8 +16,6 @@ private:
 
   uint16_t max_Depth;
   std::unique_ptr<TreeNode> root;
-  IOperator *splitting_Operator;
-  ICriteria *splitting_Criteria;
 
   // Boost part to serialize the trees so we can send them to other MPIs Process
   // Might need to build some sort of verif for MPI/Boost install at some point
@@ -26,6 +23,8 @@ private:
   friend class boost::serialization::access;
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version) {
+    // Unused param but necessary for boost
+    static_cast<void>(version);
     ar &root;
   }
 
@@ -33,7 +32,7 @@ public:
   // Constructor
 
   DecisionTree();
-  DecisionTree(uint16_t max_Depth, ICriteria *crit, IOperator *op);
+  DecisionTree(uint16_t max_Depth);
   DecisionTree(const DecisionTree &dt);
   DecisionTree &operator=(const DecisionTree &tree);
 
@@ -50,7 +49,7 @@ public:
 
   // Methods
 
-  void train(const DataSet &data) override;
+  void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
   std::vector<double> predict(const DataSet &data) const override;
 
   void print_Tree();

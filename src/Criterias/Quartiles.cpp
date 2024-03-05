@@ -34,10 +34,16 @@ std::vector<double> Quartiles::compute(const std::vector<double> &list,
 
   std::vector<double> quartiles_Values(this->quartiles.size());
 
+  std::vector<double> sorted_Data;
+  sorted_Data.reserve(idx.size());
+
+  for(const auto &i : idx)
+  {
+    sorted_Data.push_back(list[i]);
+  }
+
   // Sort the data
-  size_t len = list.size();
-  std::vector<double> sorted_Data = list;
-  //std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
+  size_t len = sorted_Data.size();
   std::sort(sorted_Data.begin(), sorted_Data.end());
 
   for (size_t i = 0; i < this->quartiles.size(); ++i) {

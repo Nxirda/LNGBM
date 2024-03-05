@@ -2,9 +2,7 @@
 #include "EnumOperator.hpp"
 #include "MPIWrapper.hpp"
 
-
 #include "boost/mpi.hpp"
-//#include <omp.h>
 
 #include <cstdio>
 #include <stdio.h>

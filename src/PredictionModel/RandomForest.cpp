@@ -18,12 +18,9 @@ RandomForest::RandomForest() {
 }
 
 //
-RandomForest::RandomForest(IOperator *split_Operator, ICriteria *split_Criteria,
-                           uint16_t n, uint16_t depth) {
+RandomForest::RandomForest(uint16_t n, uint16_t depth) {
   this->size = n;
   this->max_Depth = depth;
-  this->splitting_Operator = split_Operator;
-  this->splitting_Criteria = split_Criteria;
   this->trees = std::unordered_map<uint16_t, DecisionTree>(n);
 }
 
@@ -39,13 +36,13 @@ const std::unordered_map<uint16_t, DecisionTree> &RandomForest::get_Trees() {
 }
 
 //
-void RandomForest::train(const DataSet &data) {
+void RandomForest::train(const DataSet &data, ICriteria *crit, IOperator *op) {
 
   for (uint16_t i = 0; i < size; ++i) {
 
-    DecisionTree tree{this->max_Depth, this->splitting_Criteria,
-                      this->splitting_Operator};
-    tree.train(data);
+    DecisionTree tree{this->max_Depth};
+
+    tree.train(data, crit, op);
     this->trees.emplace(i, std::move(tree));
   }
 }
@@ -68,8 +65,8 @@ std::vector<double> RandomForest::predict(const DataSet &data) const {
     tree_Result = this->trees.at(i).predict(data);
 
     // Adds two vectors
-    std::transform(result.begin(), result.end(),
-                   tree_Result.begin(), result.begin(), std::plus<double>());
+    std::transform(result.begin(), result.end(), tree_Result.begin(),
+                   result.begin(), std::plus<double>());
   }
 
   // Divides to have the mean of the answers

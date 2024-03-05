@@ -18,31 +18,23 @@
 //
 DecisionTree::DecisionTree() {
   this->root = std::make_unique<TreeNode>();
-  this->splitting_Criteria = nullptr;
-  this->splitting_Operator = nullptr;
   this->max_Depth = 0;
 }
 
 //
-DecisionTree::DecisionTree(uint16_t max_Depth, ICriteria *crit, IOperator *op) {
+DecisionTree::DecisionTree(uint16_t max_Depth) {
   this->root = std::make_unique<TreeNode>();
-  this->splitting_Criteria = crit;
-  this->splitting_Operator = op;
   this->max_Depth = max_Depth;
 }
 
 //
 DecisionTree::DecisionTree(const DecisionTree &dt) {
   this->root = std::make_unique<TreeNode>(*dt.get_Root());
-  this->splitting_Criteria = dt.splitting_Criteria;
-  this->splitting_Operator = dt.splitting_Operator;
 }
 
 //
 DecisionTree &DecisionTree::operator=(const DecisionTree &tree) {
   this->root = std::make_unique<TreeNode>(*tree.get_Root());
-  this->splitting_Criteria = tree.splitting_Criteria;
-  this->splitting_Operator = tree.splitting_Operator;
   return *this;
 }
 
@@ -61,11 +53,11 @@ void DecisionTree::set_Root(std::unique_ptr<TreeNode> node) {
 void DecisionTree::print_Tree() { this->root->node_Print(); }
 
 //
-void DecisionTree::train(const DataSet &data) {
+void DecisionTree::train(const DataSet &data, ICriteria *crit, IOperator *op) {
   size_t threshold = 5;
 
-  TrainingElement::train(data, this->get_Root(), this->splitting_Operator,
-                         this->splitting_Criteria, this->max_Depth, threshold);
+  TrainingElement::train(data, this->get_Root(), op,
+                         crit, this->max_Depth, threshold);
 }
 
 //

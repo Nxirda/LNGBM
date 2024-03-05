@@ -19,6 +19,7 @@ namespace criterias {
  * @brief Enumeration representing the different types of splitting criteria.
  *
  * This enumeration should contain the implemented types of criteria:
+ *
  * Histogram, Percentiles, Quartiles, RandomValues, UniqueValues.
  */
 enum class type {

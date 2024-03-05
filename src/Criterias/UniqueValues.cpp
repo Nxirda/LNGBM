@@ -33,8 +33,15 @@ std::vector<double>
 UniqueValues::compute(const std::vector<double> &list,
                       const std::vector<size_t> &idx) const {
 
-  // Cast in set to get unique values (unordered set of efficiency)
-  std::unordered_set<double> unique(list.begin(), list.end());
+  std::vector<double> list_To_Compute;
+  list_To_Compute.reserve(idx.size());
+
+  for (const auto &i : idx) {
+    list_To_Compute.push_back(list[i]);
+  }
+  
+  // Cast in set to get unique values (unordered set for efficiency)
+  std::unordered_set<double> unique(list_To_Compute.begin(), list_To_Compute.end());
 
   // Cast back in array for the result || move to avoid copy
   std::vector<double> res(std::make_move_iterator(unique.begin()),
