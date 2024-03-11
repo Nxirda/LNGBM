@@ -50,11 +50,18 @@ public:
   size_t get_Criteria_Number() const override;
 
   /**
+   * @brief Method to get the name of the Percentiles criteria.
+   *
+   * @return The name of the Percentiles criteria.
+   */
+  std::string get_Name() const override;
+
+  /**
    * @brief Static method to get the name of the Percentiles criteria.
    *
    * @return The name of the Percentiles criteria.
    */
-  static std::string get_Name();
+  static std::string get_Name_Static();
 
   /**
    * @brief Computes percentiles values for a given data distribution.

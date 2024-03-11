@@ -9,7 +9,8 @@
 namespace MPI_Wrapper {
 
 //
-uint16_t balancer(uint16_t total_Elements, uint16_t num_Processes, int process_Rank) {
+uint16_t balancer(uint16_t total_Elements, uint16_t num_Processes,
+                  int process_Rank) {
   uint16_t res = total_Elements / num_Processes;
   uint16_t remainder = total_Elements % num_Processes;
 
@@ -17,16 +18,17 @@ uint16_t balancer(uint16_t total_Elements, uint16_t num_Processes, int process_R
 }
 
 //
-void MPI_Cross_Val(BaggingModel &model,
-                   const DataSet &data, int K) {
+void MPI_Cross_Val(const BaggingModel &model, const DataSet &data, int K) {
 
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  Answers cross_Val_Res = CrossValidation::K_Folds(model, data, K);
+  BaggingModel model_To_Validate(model.get_Operator()->get_Name(), model.get_Criteria()->get_Name(),
+                                 model.get_Depth(), model.get_Trees_Number());
 
-  // local_Res.set_Values(cross_Val_Res);
+  Answers cross_Val_Res = CrossValidation::K_Folds(model_To_Validate, data, K);
+
   //  Send && receive values from MPI Process to print in proc 0
   //  Only print once it has ended ppbly
   //  Serialize the values to display
@@ -48,12 +50,12 @@ void MPI_Cross_Val(BaggingModel &model,
         MPI_Get_count(&status, MPI_CHAR, &recv_Size);
 
         std::vector<char> recv_Buffer(recv_Size);
-        // Get message and handle infos
-        MPI_Recv(recv_Buffer.data(), recv_Size, MPI_CHAR,
-                 status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-        std::string recv_String(recv_Buffer.begin(),
-                                  recv_Buffer.end()); 
+        // Get message and handle infos
+        MPI_Recv(recv_Buffer.data(), recv_Size, MPI_CHAR, status.MPI_SOURCE, 0,
+                 MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        std::string recv_String(recv_Buffer.begin(), recv_Buffer.end());
 
         Answers recv_Answer = Serializer::deserialize_Answers(recv_String);
         cross_Val_Res.add_And_Mean_Values(recv_Answer);
@@ -85,7 +87,7 @@ void MPI_Main(int argc, char **argv) {
   std::string dataset_Path = argv[1];
   std::string metric = argv[2];
   std::string criteria = argv[3];
-  
+
   uint16_t depth = std::stoi(argv[4]);
   uint16_t number_Of_Trees = std::atoi(argv[5]);
   uint16_t trees_For_Proc = balancer(number_Of_Trees, size, rank);
@@ -110,7 +112,7 @@ void MPI_Main(int argc, char **argv) {
     std::string cross_Val = argv[6];
     int folds = std::atoi(argv[7]);
 
-    if(cross_Val.compare("CV"))
+    if (cross_Val.compare("CV"))
       return;
 
     MPI_Cross_Val(model, DS, folds);

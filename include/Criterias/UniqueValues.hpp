@@ -47,7 +47,14 @@ public:
    *
    * @return The name of the UniqueValues criteria.
    */
-  static std::string get_Name();
+  std::string get_Name() const override;
+
+  /**
+   * @brief Static method to get the name of the UniqueValues criteria.
+   *
+   * @return The name of the UniqueValues criteria.
+   */
+  static std::string get_Name_Static();
 
   /**
    * @brief Computes the unique values of a given data distribution.

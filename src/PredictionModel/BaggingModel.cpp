@@ -93,19 +93,26 @@ void BaggingModel::set_Criteria(const std::string &criteria) {
 }
 
 //
-ICriteria *BaggingModel::get_Criteria() { return this->split_Criteria.get(); }
+ICriteria *BaggingModel::get_Criteria() const {
+  return this->split_Criteria.get();
+}
 
 //
-IOperator *BaggingModel::get_Operator() { return this->split_Operator.get(); }
+IOperator *BaggingModel::get_Operator() const {
+  return this->split_Operator.get();
+}
 
 //
-uint16_t BaggingModel::get_Depth() { return this->max_Depth; }
+uint16_t BaggingModel::get_Depth() const { return this->max_Depth; }
 
 //
-uint16_t BaggingModel::get_Trees_Number() { return this->forest.get_size(); };
+uint16_t BaggingModel::get_Trees_Number() const {
+  return this->forest.get_size();
+};
 
 //
-const std::unordered_map<uint16_t, DecisionTree> &BaggingModel::get_Forest() {
+const std::unordered_map<uint16_t, DecisionTree> &
+BaggingModel::get_Forest() const {
   return this->forest.get_Trees();
 }
 

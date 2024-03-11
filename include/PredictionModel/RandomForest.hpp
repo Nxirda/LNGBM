@@ -27,8 +27,8 @@ public:
   ~RandomForest() override;
 
   // Getters
-  const std::unordered_map<uint16_t, DecisionTree> &get_Trees();
-  uint16_t get_size();
+  const std::unordered_map<uint16_t, DecisionTree> &get_Trees() const;
+  uint16_t get_size() const;
 
   // Methods
 

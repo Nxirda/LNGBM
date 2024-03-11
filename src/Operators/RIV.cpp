@@ -22,7 +22,11 @@ void RIV::print() {
 }
 
 //
-std::string RIV::get_Name() { return "Reduction In Variance"; }
+std::string RIV::get_Name() const { return this->name; }
+
+
+//
+std::string RIV::get_Name_Static() { return "Reduction In Variance"; }
 
 //
 double RIV::compute(size_t position, const DataSet &data,

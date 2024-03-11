@@ -22,7 +22,10 @@ void MAE::print() {
 }
 
 //
-std::string MAE::get_Name() { return "Mean Absolute Value"; }
+std::string MAE::get_Name() const { return this->name; }
+
+//
+std::string MAE::get_Name_Static() { return "Mean Absolute Value"; }
 
 //
 double MAE::compute(size_t position, const DataSet &data,

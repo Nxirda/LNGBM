@@ -20,9 +20,11 @@ MAPE::~MAPE() {}
 void MAPE::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
 }
+//
+std::string MAPE::get_Name() const { return this->name; }
 
 //
-std::string MAPE::get_Name() { return "Mean Absolute Percentage Value"; }
+std::string MAPE::get_Name_Static() { return "Mean Absolute Percentage Value"; }
 
 //
 double MAPE::compute(size_t position, const DataSet &data,
@@ -45,15 +47,13 @@ double MAPE::compute(size_t position, const DataSet &data,
   const std::vector<double> &labels = data.get_Labels();
 
   for (size_t idx : left_index.value()) {
-    left_MAPE +=
-        (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
+    left_MAPE += (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
   }
   left_MAPE *= 100.0;
   left_MAPE *= (1.0 / left_Population);
 
   for (size_t idx : right_index.value()) {
-    right_MAPE += (std::abs(labels[idx] - right_Prediction)) /
-                  right_Prediction;
+    right_MAPE += (std::abs(labels[idx] - right_Prediction)) / right_Prediction;
   }
   right_MAPE *= 100.0;
   right_MAPE *= (1.0 / right_Population);

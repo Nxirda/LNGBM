@@ -48,7 +48,10 @@ void RandomValues::print() const {
 size_t RandomValues::get_Criteria_Number() const { return this->size; }
 
 //
-std::string RandomValues::get_Name() { return "Random Values"; }
+std::string RandomValues::get_Name() const { return "RV"; }
+
+//
+std::string RandomValues::get_Name_Static() { return "Random Values"; }
 
 //
 std::vector<double>

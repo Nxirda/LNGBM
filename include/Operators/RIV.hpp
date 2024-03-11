@@ -36,9 +36,14 @@ public:
   void print() override;
 
   /**
+   * @brief Methods that returns the name of the class (RIV)
+   */
+  std::string get_Name() const override;
+
+  /**
    * @brief Static methods that returns the name of the class (RIV)
    */
-  static std::string get_Name();
+  static std::string get_Name_Static();
 
   /**
    * @brief Computes the result of the RIV on the column at position folowwing

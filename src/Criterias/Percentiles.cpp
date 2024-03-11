@@ -24,7 +24,10 @@ void Percentiles::print() const {
 size_t Percentiles::get_Criteria_Number() const { return this->size; }
 
 //
-std::string Percentiles::get_Name() { return "Percentiles"; }
+std::string Percentiles::get_Name() const { return "P"; }
+
+//
+std::string Percentiles::get_Name_Static() { return "Percentiles"; }
 
 //
 std::vector<double> Percentiles::compute(const std::vector<double> &list,

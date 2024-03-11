@@ -16,19 +16,19 @@ void print() {
     std::cout << "{" << pair.first << "} : ";
     switch (pair.second) {
     case type::Histogram:
-      std::cout << Histogram::get_Name();
+      std::cout << Histogram::get_Name_Static();
       break;
     case type::Percentiles:
-      std::cout << Percentiles::get_Name();
+      std::cout << Percentiles::get_Name_Static();
       break;
     case type::Quartiles:
-      std::cout << Quartiles::get_Name();
+      std::cout << Quartiles::get_Name_Static();
       break;
     case type::RandomValues:
-      std::cout << RandomValues::get_Name();
+      std::cout << RandomValues::get_Name_Static();
       break;
     case type::UniqueValues:
-      std::cout << UniqueValues::get_Name();
+      std::cout << UniqueValues::get_Name_Static();
       break;
     default:
       std::cout << " Unknown Type";

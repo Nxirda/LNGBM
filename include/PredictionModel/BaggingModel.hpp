@@ -24,12 +24,12 @@ public:
 
   // Getters
 
-  ICriteria *get_Criteria();
-  IOperator *get_Operator();
+  ICriteria *get_Criteria() const;
+  IOperator *get_Operator() const;
 
-  uint16_t get_Depth();
-  uint16_t get_Trees_Number();
-  const std::unordered_map<uint16_t, DecisionTree> &get_Forest();
+  uint16_t get_Depth() const;
+  uint16_t get_Trees_Number() const;
+  const std::unordered_map<uint16_t, DecisionTree> &get_Forest() const;
 
   // Setters
 

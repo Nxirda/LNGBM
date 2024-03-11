@@ -10,9 +10,7 @@
 /************************/
 
 //
-Quartiles::Quartiles() {
-  this->size = this->quartiles.size();
-}
+Quartiles::Quartiles() { this->size = this->quartiles.size(); }
 
 //
 Quartiles::~Quartiles() {}
@@ -23,10 +21,13 @@ void Quartiles::print() const {
 }
 
 //
-size_t Quartiles::get_Criteria_Number() const {return this->size;};
+size_t Quartiles::get_Criteria_Number() const { return this->size; };
 
 //
-std::string Quartiles::get_Name() { return "Quartiles"; }
+std::string Quartiles::get_Name() const { return "Q"; }
+
+//
+std::string Quartiles::get_Name_Static() { return "Quartiles"; }
 
 //
 std::vector<double> Quartiles::compute(const std::vector<double> &list,
@@ -37,8 +38,7 @@ std::vector<double> Quartiles::compute(const std::vector<double> &list,
   std::vector<double> sorted_Data;
   sorted_Data.reserve(idx.size());
 
-  for(const auto &i : idx)
-  {
+  for (const auto &i : idx) {
     sorted_Data.push_back(list[i]);
   }
 

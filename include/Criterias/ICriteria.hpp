@@ -17,8 +17,8 @@ private:
   const std::string name; /**< A string variable representing the name of the
                              class : shall be initialized by default. */
 
-  size_t size; /**< A float variable containing the number of values to get
-                       : it shall be initialized by default*/
+  size_t size; /**< A float variable containing the number of values to get : it
+                  shall be initialized by default*/
 
 public:
   /**
@@ -32,8 +32,13 @@ public:
   virtual void print() const = 0;
 
   /**
+   * @brief Should return the name of the Criteria
+   */
+  virtual std::string get_Name() const = 0;
+
+  /**
    * @brief Returns the number of element the criteria will compute
-   * 
+   *
    * @return Type : size_t, the number of elements
    */
   virtual size_t get_Criteria_Number() const = 0;
@@ -42,8 +47,9 @@ public:
    * @brief Computes a vector of values defined by the criteria implementing it.
    *
    * @param vector<double> list: The distribution of data
-   * @param vector<size_t> idx : The index we can access in the data distribution
-   * 
+   * @param vector<size_t> idx : The index we can access in the data
+   * distribution
+   *
    * @return Type: vector<double>, A vector of values contained in the
    * distribution.
    */

@@ -34,7 +34,10 @@ void Histogram::print() const {
 size_t Histogram::get_Criteria_Number() const { return this->size; }
 
 //
-std::string Histogram::get_Name() { return "Histogram"; }
+std::string Histogram::get_Name() const { return "H"; }
+
+//
+std::string Histogram::get_Name_Static() { return "Histogram"; }
 
 //
 std::vector<double> Histogram::compute(const std::vector<double> &list,
@@ -45,9 +48,9 @@ std::vector<double> Histogram::compute(const std::vector<double> &list,
 
   for (const auto &i : idx) {
     const auto &elem = list[i];
-    if(elem < min)
+    if (elem < min)
       min = elem;
-    else if(elem > max)
+    else if (elem > max)
       max = elem;
   }
 

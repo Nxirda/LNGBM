@@ -31,6 +31,11 @@ public:
   virtual void print() = 0;
 
   /**
+   * @brief Should return the name of the operator 
+   */
+  virtual std::string get_Name() const = 0;
+
+  /**
    * @brief Computes a value defined by the operator implementing it.
    *
    * @param size_t position: the feature of the dataset on which to compute

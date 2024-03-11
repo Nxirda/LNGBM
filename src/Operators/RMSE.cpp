@@ -22,7 +22,10 @@ void RMSE::print() {
 }
 
 //
-std::string RMSE::get_Name() { return "Root Mean Square Error"; }
+std::string RMSE::get_Name() const { return this->name; }
+
+//
+std::string RMSE::get_Name_Static() { return "Root Mean Square Error"; }
 
 //
 double RMSE::compute(size_t position, const DataSet &data,
@@ -51,9 +54,8 @@ double RMSE::compute(size_t position, const DataSet &data,
   left_RMSE = sqrt(left_RMSE);
 
   for (size_t idx : right_index.value()) {
-    right_RMSE +=
-        pow((std::abs(labels[idx] - right_Prediction)), 2) *
-        (1.0 / right_Population);
+    right_RMSE += pow((std::abs(labels[idx] - right_Prediction)), 2) *
+                  (1.0 / right_Population);
   }
   right_RMSE = sqrt(right_RMSE);
 

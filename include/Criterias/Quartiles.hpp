@@ -45,11 +45,18 @@ public:
   size_t get_Criteria_Number() const override;
 
   /**
+   * @brief Method to get the name of the Quartiles criteria.
+   *
+   * @return The name of the Quartiles criteria.
+   */
+  std::string get_Name() const override;
+  
+  /**
    * @brief Static method to get the name of the Quartiles criteria.
    *
    * @return The name of the Quartiles criteria.
    */
-  static std::string get_Name();
+  static std::string get_Name_Static();
 
   /**
    * @brief Computes quartiles values for a given data distribution.

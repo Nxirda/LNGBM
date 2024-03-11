@@ -28,10 +28,11 @@ RandomForest::RandomForest(uint16_t n, uint16_t depth) {
 RandomForest::~RandomForest(){};
 
 //
-uint16_t RandomForest::get_size() { return this->size; }
+uint16_t RandomForest::get_size() const { return this->size; }
 
 //
-const std::unordered_map<uint16_t, DecisionTree> &RandomForest::get_Trees() {
+const std::unordered_map<uint16_t, DecisionTree> &
+RandomForest::get_Trees() const {
   return this->trees;
 }
 

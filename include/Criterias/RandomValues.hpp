@@ -53,11 +53,18 @@ public:
   size_t get_Criteria_Number() const override;
 
   /**
+   * @brief Method to get the name of the RandomValues criteria.
+   *
+   * @return The name of the RandomValues criteria.
+   */
+  std::string get_Name() const override;
+
+  /**
    * @brief Static method to get the name of the RandomValues criteria.
    *
    * @return The name of the RandomValues criteria.
    */
-  static std::string get_Name();
+  static std::string get_Name_Static();
 
   /**
    * @brief Computes random values in given data distribution.
