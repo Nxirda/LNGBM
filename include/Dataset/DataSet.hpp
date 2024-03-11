@@ -222,6 +222,16 @@ public:
              std::optional<std::vector<size_t>>>
   split(size_t position, double criterion,
         const std::vector<size_t> &idx) const;
+
+private:
+  /**
+   * @brief Transpose the dataset matrix so the column access are aligned (only used for storage)
+   *
+   * @param const vector<vector<double>> &: the current matrix 
+   *
+   * @return void : updates the given matrix
+   */
+  void transpose_Matrix(std::vector<std::vector<double>> &matrix);
 };
 
 #endif

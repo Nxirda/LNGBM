@@ -23,13 +23,13 @@ find_package(Boost REQUIRED COMPONENTS serialization mpi)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
 
-#Add compilation options 
-add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
-
 #Add the subdirectory for the source files
 add_subdirectory(src)
 
 target_link_libraries(main PRIVATE Source_Lib)
+
+#Add compilation options 
+add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
 
 # ===== Testing Part =====
 

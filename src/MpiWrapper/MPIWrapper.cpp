@@ -40,35 +40,32 @@ void MPI_Cross_Val(BaggingModel &model,
       MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &flag, MPI_STATUS_IGNORE);
 
       if (flag) {
-        int filename_Size;
+        int recv_Size;
         MPI_Status status;
 
         // Get infos
         MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
-        MPI_Get_count(&status, MPI_CHAR, &filename_Size);
+        MPI_Get_count(&status, MPI_CHAR, &recv_Size);
 
-        std::vector<char> filename_Buffer(filename_Size);
-
+        std::vector<char> recv_Buffer(recv_Size);
         // Get message and handle infos
-        MPI_Recv(filename_Buffer.data(), filename_Size, MPI_CHAR,
+        MPI_Recv(recv_Buffer.data(), recv_Size, MPI_CHAR,
                  status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-        std::string filename_Recv(filename_Buffer.begin(),
-                                  filename_Buffer.end());
+        std::string recv_String(recv_Buffer.begin(),
+                                  recv_Buffer.end()); 
 
-        Answers answer_Recv = Serializer::deserialize_Answers(filename_Recv);
-        std::remove(filename_Recv.c_str());
-        cross_Val_Res.add_And_Mean_Values(answer_Recv);
+        Answers recv_Answer = Serializer::deserialize_Answers(recv_String);
+        cross_Val_Res.add_And_Mean_Values(recv_Answer);
 
         ++counter;
       }
     }
     cross_Val_Res.print();
   } else {
-    std::string filename = std::to_string(rank) + "_serialized_answers.bin";
-    Serializer::serialize_Answers(cross_Val_Res, filename);
+    std::string local_Answer = Serializer::serialize_Answers(cross_Val_Res);
 
-    MPI_Send(filename.c_str(), filename.size() + 1, MPI_CHAR, 0, 0,
+    MPI_Send(local_Answer.c_str(), local_Answer.size(), MPI_CHAR, 0, 0,
              MPI_COMM_WORLD);
   }
 }

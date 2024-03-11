@@ -22,10 +22,10 @@ void serialize_Tree(const DecisionTree &tree, const std::string &filename);
 DecisionTree deserialize_Tree(const std::string &filename);
 
 //
-void serialize_Answers(const Answers &ans, const std::string &filename);
+std::string serialize_Answers(const Answers &ans);
 
 //
-Answers deserialize_Answers(const std::string &filename);
+Answers deserialize_Answers(const std::string &serialized_Datas);
 
 //
 template <typename Key, typename Value>

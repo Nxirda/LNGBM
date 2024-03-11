@@ -5,7 +5,6 @@
 #include <sstream>   // std::stringstream
 #include <stdexcept> // std::runtime_error
 #include <vector>
-
 #include <cblas.h>
 
 #include "DataSet.hpp"
@@ -17,7 +16,7 @@
 /********************/
 
 //
-void transpose_Matrix(std::vector<std::vector<double>> &matrix) {
+void DataSet::transpose_Matrix(std::vector<std::vector<double>> &matrix) {
 
   if (matrix.empty() || matrix[0].empty()) {
     // Matrix is empty or has no elements
@@ -100,7 +99,7 @@ DataSet::DataSet(std::string file_Path) {
     this->samples.push_back(tmp);
   }
 
-  // Transpose matrix (might change that) to have fast column accees instead of
+  // Transpose matrix (might change that) to have fast column access instead of
   // lines as we use columns more often
 
   transpose_Matrix(this->samples);
@@ -275,7 +274,7 @@ DataSet::split(size_t position, double criterion,
   }
 
   size_t samples_Number = this->samples_Number();
-  const std::vector<double> &samples = this->get_Column(position);
+  const std::vector<double> &column = this->get_Column(position);
 
   std::vector<size_t> sub_Index_Right;
   std::vector<size_t> sub_Index_Left;
@@ -288,7 +287,7 @@ DataSet::split(size_t position, double criterion,
     if (row >= samples_Number) {
       std::cerr << "row index is out of the matrix\n";
     } else {
-      if (samples[row] < criterion) {
+      if (column[row] < criterion) {
         sub_Index_Left.push_back(row);
       } else {
         sub_Index_Right.push_back(row);
@@ -346,7 +345,7 @@ double DataSet::labels_Mean(const std::vector<size_t> &idx) const {
 
   for (const auto &i : idx) {
     if (i > labels_Size) {
-      std::cerr << "Index of column is outside matrix dimensions\n";
+      std::cerr << "Index of label is outside matrix dimensions\n";
     } else {
       len += 1.0;
       mean += labels[i];
@@ -355,6 +354,7 @@ double DataSet::labels_Mean(const std::vector<size_t> &idx) const {
 
   // To prevent dividing by 0
   if (len == 0.0) {
+    std::cerr << "Index is empty/invalid in the mean computation\n";
     return len;
   }
 
@@ -370,6 +370,7 @@ double DataSet::whole_Labels_Mean() const {
 
   // To prevent dividing by 0
   if (len == 0) {
+    std::cerr << "Index is empty/invalid in the mean computation\n";
     return mean;
   }
 
@@ -396,7 +397,7 @@ double DataSet::labels_Variance(const std::vector<size_t> &idx) const {
 
   for (const auto &i : idx) {
     if (i > labels_Size) {
-      std::cerr << "Index of column is outside matrix dimensions\n";
+      std::cerr << "Index of label is outside matrix dimensions\n";
     } else {
       difference = labels[i] - mean;
       sum += difference * difference;
@@ -406,6 +407,7 @@ double DataSet::labels_Variance(const std::vector<size_t> &idx) const {
 
   // To prevent dividing by 0
   if (len == 0) {
+    std::cerr << "Index is empty/invalid in the variance computation\n";
     return len;
   }
 

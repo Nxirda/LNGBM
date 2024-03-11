@@ -30,7 +30,7 @@ double MAE::compute(size_t position, const DataSet &data,
                     const double split_Criteria) const {
 
   // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = std::move(data.split(position, split_Criteria, index));
+  auto [left_index, right_index] = data.split(position, split_Criteria, index);
 
   size_t base_Population = index.size();
 
