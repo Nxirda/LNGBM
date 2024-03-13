@@ -56,8 +56,8 @@ void DecisionTree::print_Tree() { this->root->node_Print(); }
 void DecisionTree::train(const DataSet &data, ICriteria *crit, IOperator *op) {
   size_t threshold = 5;
 
-  TrainingElement::train(data, this->get_Root(), op,
-                         crit, this->max_Depth, threshold);
+  TrainingElement::train(data, this->get_Root(), op, crit, this->max_Depth,
+                         threshold);
 }
 
 //
@@ -66,14 +66,15 @@ void tree_Prediction(const DataSet &data, std::vector<double> &result,
 
   // Update the values of the result
   double pred_Val = node->get_Predicted_Value();
-
+  
   for (size_t idx : index) {
     result[idx] = pred_Val;
   }
 
   // Put the correct indexes
   auto [left_Index, right_Index] =
-      data.split_Index(node->get_Split_Column(), node->get_Split_Criterion(), index);
+      TrainingElement::split_Index(data.get_Column(node->get_Split_Column()),
+                                   index, node->get_Split_Criterion());
 
   if (node->get_Left_Node() && left_Index) {
     tree_Prediction(data, result, *left_Index, node->get_Left_Node());

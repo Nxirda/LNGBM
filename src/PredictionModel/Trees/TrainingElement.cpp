@@ -52,7 +52,9 @@ TrainingElement &TrainingElement::operator=(const TrainingElement &TE) {
 TrainingElement::~TrainingElement(){};
 
 //
-const std::vector<size_t> &TrainingElement::get_Index() { return this->index; }
+const std::vector<size_t> &TrainingElement::get_Index() const {
+  return this->index;
+}
 
 //
 void TrainingElement::set_Node(TreeNode *node) { this->node = node; }
@@ -88,12 +90,46 @@ void TrainingElement::bootstrap_Index(size_t dataset_Size) {
 }
 
 //
-double compute_Split_Value(const std::vector<size_t> &index,
-                           const DataSet &data, size_t feature, double criteria,
-                           const IOperator *op) {
+double
+TrainingElement::mean_Vector_At_Index(const std::vector<double> &vector,
+                                      const std::vector<size_t> &idx) const {
+  if (idx.empty()) {
+    return 0.0;
+  }
 
-  auto [left_Labels, right_Labels] =
-      data.split_Labels(feature, criteria, index);
+  double mean = 0.0;
+  double len = 0.0;
+
+  size_t size = vector.size();
+  // const std::vector<double> &labels = this->get_Labels();
+
+  for (const auto &i : idx) {
+    if (i < size) {
+      len += 1.0;
+      mean += vector[i];
+    } else {
+      std::cerr << "Index points outside the vector\n";
+    }
+  }
+
+  // To prevent dividing by 0
+  if (len == 0.0) {
+    std::cerr << "Index is empty/invalid in the mean computation\n";
+    return len;
+  }
+
+  mean *= (1.0 / len);
+  return (mean);
+}
+
+//
+double TrainingElement::compute_Split_Value(const std::vector<size_t> &index,
+                                            const DataSet &data, size_t feature,
+                                            double criteria,
+                                            const IOperator *op) const {
+
+  auto [left_Labels, right_Labels] = split_Labels(
+      data.get_Column(feature), data.get_Labels(), criteria, index);
 
   size_t base_Population = index.size();
 
@@ -124,51 +160,79 @@ double compute_Split_Value(const std::vector<size_t> &index,
 }
 
 //
-/* std::tuple<size_t, double>
-TrainingElement::find_Best_Split(const DataSet &data,
-                                 const IOperator *splitting_Operator,
-                                 const ICriteria *splitting_Criteria) {
+std::tuple<std::optional<std::vector<size_t>>,
+           std::optional<std::vector<size_t>>>
+TrainingElement::split_Index(const std::vector<double> &column,
+                             const std::vector<size_t> &index,
+                             double criterion) {
 
-  // We try to minimize the mean absolute error for a split
-  double min = INT_MAX;
-  size_t best_Feature = 0;
-  double best_Criterion = 0.0;
+  // Check column in bounds
+  if (index.empty()) {
+    return {std::nullopt, std::nullopt};
+  }
 
-  size_t feature, j;
-  double tmp_var;
-  // Minimize the error by trying multiple splits on features
-  for (feature = 0; feature < data.get_Features().size(); ++feature) {
+  size_t size = column.size();
+  // const std::vector<double> &column = this->get_Column(position);
 
-    std::vector<double> criterias =
-        splitting_Criteria->compute(data.get_Column(feature), this->index);
+  std::vector<size_t> sub_Index_Right;
+  std::vector<size_t> sub_Index_Left;
 
-    // Test multiple split criteria
-    for (j = 0; j < criterias.size(); ++j) {
+  sub_Index_Right.reserve(index.size());
+  sub_Index_Left.reserve(index.size());
 
-      tmp_var =
-          splitting_Operator->compute(feature, data, this->index, criterias[j]);
-
-      splitting_Operator->get_Name();
-      tmp_var = compute_Split_Value(this->index, data, feature, criterias[j],
-                                    splitting_Operator);
-
-      if (tmp_var < min) {
-        min = tmp_var;
-        best_Feature = feature;
-        best_Criterion = criterias[j];
+  for (const auto &row : index) {
+    //  Row in bounds (matrix is transposed)
+    if (row >= size) {
+      std::cerr << "row index is out of the matrix\n";
+    } else {
+      if (column[row] < criterion) {
+        sub_Index_Left.push_back(row);
+      } else {
+        sub_Index_Right.push_back(row);
       }
     }
   }
-  return {best_Feature, best_Criterion};
-} */
+
+  return {sub_Index_Left, sub_Index_Right};
+}
 
 //
-std::tuple<std::optional<std::vector<size_t>>,
-           std::optional<std::vector<size_t>>>
-TrainingElement::split_Index(const DataSet &data, double criterion,
-                             size_t position) {
+std::tuple<std::optional<std::vector<double>>,
+           std::optional<std::vector<double>>>
+TrainingElement::split_Labels(const std::vector<double> &column,
+                              const std::vector<double> &labels,
+                              double criterion,
+                              const std::vector<size_t> &idx) const {
+  // Check column in bounds
+  if (idx.empty()) {
+    return {std::nullopt, std::nullopt};
+  }
 
-  return data.split_Index(position, criterion, this->get_Index());
+  // size_t samples_Number = this->samples_Number();
+  size_t size = column.size();
+  // const std::vector<double> &column = this->get_Column(position);
+  // const std::vector<double> &labels = this->get_Labels();
+
+  std::vector<double> sub_Labels_Right;
+  std::vector<double> sub_Labels_Left;
+
+  sub_Labels_Right.reserve(idx.size());
+  sub_Labels_Left.reserve(idx.size());
+
+  for (const auto &row : idx) {
+    //  Row in bounds (matrix is transposed)
+    if (row >= size) {
+      std::cerr << "row index is out of the matrix\n";
+    } else {
+      if (column[row] < criterion) {
+        sub_Labels_Left.push_back(labels[row]);
+      } else {
+        sub_Labels_Right.push_back(labels[row]);
+      }
+    }
+  }
+
+  return {std::move(sub_Labels_Left), std::move(sub_Labels_Right)};
 }
 
 //
@@ -176,7 +240,6 @@ std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
 TrainingElement::split_Node(const DataSet &data,
                             const IOperator *splitting_Operator,
                             const ICriteria *splitting_Criteria) {
-
   // Left node
   TreeNode left{};
   std::optional<TrainingElement> train_Left = std::nullopt;
@@ -193,7 +256,8 @@ TrainingElement::split_Node(const DataSet &data,
   //  this->find_Best_Split(data, splitting_Operator, splitting_Criteria);
 
   // Compute new indexes
-  auto [left_index, right_index] = split_Index(data, criterion, column);
+  auto [left_index, right_index] =
+      split_Index(data.get_Column(column), this->get_Index(), criterion);
 
   if (!left_index && !right_index) {
     return {train_Left, train_Right};
@@ -207,7 +271,8 @@ TrainingElement::split_Node(const DataSet &data,
 
   // Case 1 : Build Right Node (if information gained)
   if (right_index.has_value()) {
-    double predic_Right = data.labels_Mean(*right_index);
+    // double predic_Right = data.labels_Mean(*right_index);
+    double predic_Right = mean_Vector_At_Index(data.get_Labels(), *right_index);
     this->node->add_Right(std::make_unique<TreeNode>(std::move(right)));
     this->node->get_Right_Node()->set_Predicted_Value(predic_Right);
     train_Right = std::move(TrainingElement(
@@ -216,7 +281,8 @@ TrainingElement::split_Node(const DataSet &data,
 
   // Case 2 : Build Left Node (if information gained)
   if (left_index.has_value()) {
-    double predic_Left = data.labels_Mean(*left_index);
+    // double predic_Left = data.labels_Mean(*left_index);
+    double predic_Left = mean_Vector_At_Index(data.get_Labels(), *left_index);
     this->node->add_Left(std::make_unique<TreeNode>(std::move(left)));
     this->node->get_Left_Node()->set_Predicted_Value(predic_Left);
     train_Left = std::move(TrainingElement(this->node->get_Left_Node(),
@@ -231,7 +297,6 @@ void TrainingElement::train(const DataSet &data, TreeNode *Node,
                             const IOperator *splitting_Operator,
                             const ICriteria *splitting_Criteria,
                             uint16_t max_Depth, size_t threshold) {
-
   // Initialize the stack of Node that will be splitted
   std::stack<TrainingElement> remaining;
 
@@ -239,8 +304,9 @@ void TrainingElement::train(const DataSet &data, TreeNode *Node,
 
   // Initialize the current Node
   base_Node.set_Root(data.labels_Number(), Node);
-  base_Node.node->set_Predicted_Value(data.labels_Mean(base_Node.index));
-
+  double base_Prediction =
+      base_Node.mean_Vector_At_Index(data.get_Labels(), base_Node.index);
+  base_Node.node->set_Predicted_Value(base_Prediction);
   remaining.push(base_Node);
 
   // Build iteratively the tree frame
@@ -274,6 +340,58 @@ void TrainingElement::train(const DataSet &data, TreeNode *Node,
     }
   }
 }
+
+/******************************* OPEN MP THREADS*******************************/
+
+std::tuple<size_t, double> TrainingElement::find_Best_Split_Parallel_2(
+    const DataSet &data, const IOperator *splitting_Operator,
+    const ICriteria *splitting_Criteria) const {
+  std::vector<std::tuple<double, double, size_t>> candidates;
+
+  std::vector<std::vector<double>> splitting_Thresholds;
+  splitting_Thresholds.resize(data.features_Number());
+
+  size_t column;
+#pragma omp parallel
+  {
+#pragma omp for schedule(static)
+    for (column = 0; column < data.features_Number(); ++column) {
+      splitting_Thresholds[column] =
+          splitting_Criteria->compute(data.get_Column(column), this->index);
+    }
+#pragma omp single
+    {
+      candidates.resize(omp_get_num_threads(),
+                        {std::numeric_limits<double>::max(), 0.0, 0});
+    }
+    int thread_Id = omp_get_thread_num();
+#pragma omp for schedule(static)
+    for (column = 0; column < data.features_Number(); ++column) {
+      double split_Score;
+      for (const auto spliting_Threshold : splitting_Thresholds[column]) {
+        /* double split_Score = splitting_Operator->compute(
+            column, data, this->index, spliting_Threshold); */
+        split_Score = compute_Split_Value(
+            this->index, data, column, spliting_Threshold, splitting_Operator);
+
+        if (split_Score < std::get<0>(candidates[thread_Id])) {
+          candidates[thread_Id] = {split_Score, spliting_Threshold, column};
+        }
+      }
+    }
+  }
+
+  std::tuple<double, double, size_t> best_Split = {-1.0, -1.0, 0};
+  for (const auto &candidate : candidates) {
+    const auto &best = std::get<0>(best_Split);
+    if (best > std::get<0>(candidate) || best == -1.0) {
+      best_Split = candidate;
+    }
+  }
+
+  return {std::get<2>(best_Split), std::get<1>(best_Split)};
+}
+
 /******************************* HAND WRITTEN THREADS **********************/
 // Outter loop parallelism
 /* auto thread_Task = [](const IOperator *splitting_Operator,
@@ -361,54 +479,43 @@ TrainingElement::find_Best_Split_Parallel(const DataSet &data,
   return {best_Feature, criterion};
 } */
 
-/******************************* OPEN MP THREADS*******************************/
+/******************************* INITIAL FUNCTION **********************/
 
-std::tuple<size_t, double> TrainingElement::find_Best_Split_Parallel_2(
-    const DataSet &data, const IOperator *splitting_Operator,
-    const ICriteria *splitting_Criteria) {
+//
+/* std::tuple<size_t, double>
+TrainingElement::find_Best_Split(const DataSet &data,
+                                 const IOperator *splitting_Operator,
+                                 const ICriteria *splitting_Criteria) {
 
-  std::vector<std::tuple<double, double, size_t>> candidates;
+  // We try to minimize the mean absolute error for a split
+  double min = INT_MAX;
+  size_t best_Feature = 0;
+  double best_Criterion = 0.0;
 
-  std::vector<std::vector<double>> splitting_Thresholds;
-  splitting_Thresholds.resize(data.features_Number());
+  size_t feature, j;
+  double tmp_var;
+  // Minimize the error by trying multiple splits on features
+  for (feature = 0; feature < data.get_Features().size(); ++feature) {
 
-  size_t column;
-#pragma omp parallel
-  {
-#pragma omp for schedule(static)
-    for (column = 0; column < data.features_Number(); ++column) {
-      splitting_Thresholds[column] =
-          splitting_Criteria->compute(data.get_Column(column), this->index);
-    }
-#pragma omp single
-    {
-      candidates.resize(omp_get_num_threads(),
-                        {std::numeric_limits<double>::max(), 0.0, 0});
-    }
-    int thread_Id = omp_get_thread_num();
-#pragma omp for schedule(static)
-    for (column = 0; column < data.features_Number(); ++column) {
-      double split_Score;
-      for (const auto spliting_Threshold : splitting_Thresholds[column]) {
-        /* double split_Score = splitting_Operator->compute(
-            column, data, this->index, spliting_Threshold); */
-        split_Score = compute_Split_Value(
-            this->index, data, column, spliting_Threshold, splitting_Operator);
+    std::vector<double> criterias =
+        splitting_Criteria->compute(data.get_Column(feature), this->index);
 
-        if (split_Score < std::get<0>(candidates[thread_Id])) {
-          candidates[thread_Id] = {split_Score, spliting_Threshold, column};
-        }
+    // Test multiple split criteria
+    for (j = 0; j < criterias.size(); ++j) {
+
+      tmp_var =
+          splitting_Operator->compute(feature, data, this->index, criterias[j]);
+
+      splitting_Operator->get_Name();
+      tmp_var = compute_Split_Value(this->index, data, feature, criterias[j],
+                                    splitting_Operator);
+
+      if (tmp_var < min) {
+        min = tmp_var;
+        best_Feature = feature;
+        best_Criterion = criterias[j];
       }
     }
   }
-
-  std::tuple<double, double, size_t> best_Split = {-1.0, -1.0, 0};
-  for (const auto &candidate : candidates) {
-    const auto &best = std::get<0>(best_Split);
-    if (best > std::get<0>(candidate) || best == -1.0) {
-      best_Split = candidate;
-    }
-  }
-
-  return {std::get<2>(best_Split), std::get<1>(best_Split)};
-}
+  return {best_Feature, best_Criterion};
+} */
