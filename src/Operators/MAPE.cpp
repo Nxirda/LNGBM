@@ -1,8 +1,8 @@
+#include <cblas.h>
 #include <cmath>
 #include <omp.h>
 
 #include "MAPE.hpp"
-#include "TreeNode.hpp"
 
 /********************/
 /*                  */
@@ -26,42 +26,29 @@ std::string MAPE::get_Name() const { return this->name; }
 //
 std::string MAPE::get_Name_Static() { return "Mean Absolute Percentage Value"; }
 
-//
-double MAPE::compute(size_t position, const DataSet &data,
-                     const std::vector<size_t> &index,
-                     const double split_Criteria) const {
+double MAPE::compute(const std::vector<double> &exact,
+                     double prediction) const {
 
-  // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = data.split(position, split_Criteria, index);
+  double res = 0.0;
+  size_t size = exact.size();
 
-  size_t base_Population = index.size();
+  std::vector<double> prediction_Vector(size, (prediction));
 
-  double left_MAPE = 0.0;
-  double left_Prediction = data.labels_Mean(left_index.value());
-  size_t left_Population = left_index.value().size();
+  std::vector<double> absoluteDifferences(size);
+  // Copy necessary for daxpy
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
 
-  double right_MAPE = 0.0;
-  double right_Prediction = data.labels_Mean(right_index.value());
-  size_t right_Population = right_index.value().size();
+  // Computes the yi - ŷi part of the MAPE
+  cblas_daxpy(size, -1.0, prediction_Vector.data(), 1,
+              absoluteDifferences.data(), 1);
 
-  const std::vector<double> &labels = data.get_Labels();
+  // Computes the yi / N part of the MAPE
+  cblas_dscal(size, 1.0 / prediction, absoluteDifferences.data(), 1);
 
-  for (size_t idx : left_index.value()) {
-    left_MAPE += (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
-  }
-  left_MAPE *= 100.0;
-  left_MAPE *= (1.0 / left_Population);
+  // Computes the final reduction of the MAPE (dasum takes the absolute values)
+  res = cblas_dasum(static_cast<int>(size), absoluteDifferences.data(), 1);
 
-  for (size_t idx : right_index.value()) {
-    right_MAPE += (std::abs(labels[idx] - right_Prediction)) / right_Prediction;
-  }
-  right_MAPE *= 100.0;
-  right_MAPE *= (1.0 / right_Population);
-
-  // Compute the result of MAPE for the split at position
-  double res =
-      ((left_MAPE * left_Population) + (right_MAPE * right_Population)) /
-      base_Population;
+  res = (res * 100.0) * (1.0 / size);
   return res;
 }
 
@@ -69,6 +56,7 @@ double MAPE::compute(size_t position, const DataSet &data,
 double MAPE::apply(const std::vector<double> &exact,
                    const std::vector<double> &prediction) {
 
+  // Figure out how to do the division part with blas when we have two vectors
   double res = 0.0;
   size_t size = prediction.size();
 
@@ -81,3 +69,24 @@ double MAPE::apply(const std::vector<double> &exact,
 
   return res;
 }
+
+/* double res = 0.0;
+  size_t size = exact.size();
+
+  //std::vector<double> prediction_Vector(size, (prediction));
+
+  std::vector<double> absoluteDifferences(size);
+  // Copy necessary for daxpy
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
+
+  // Computes the yi - ŷi part of the MAPE
+  cblas_daxpy(size, -1.0, prediction.data(), 1,
+              absoluteDifferences.data(), 1);
+
+  cblas_dscal(size, 1.0 / prediction, absoluteDifferences.data(), 1);
+
+  // MAE computing (dasum takes the absolute values)
+  res = cblas_dasum(static_cast<int>(size), absoluteDifferences.data(), 1);
+
+  res = (res * 100.0) * (1.0 / size);
+  return res; */

@@ -48,9 +48,20 @@ public:
    * @return Type: double, A value representing the result of the metric on the
    * parameters.
    */
-  virtual double compute(size_t position, const DataSet &data,
+  /* virtual double compute(size_t position, const DataSet &data,
                          const std::vector<size_t> &index,
-                         const double criteria) const = 0;
+                         const double criteria) const = 0; */
+
+  /**
+   * @brief Computes a value defined by the operator implementing it.
+   *
+   * @param const vector<double> &: the exact values 
+   * @param double : the value we predicted
+   *
+   * @return Type: double, A value representing the result of the metric on the
+   * parameters.
+   */
+  virtual double compute(const std::vector<double> &exact, double prediction) const = 0;
 };
 
 #endif

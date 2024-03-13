@@ -59,9 +59,10 @@ public:
    * @return Type: double, A value representing the result of the metric on the
    * parameters.
    */
-  double compute(size_t position, const DataSet &data,
+  /* double compute(size_t position, const DataSet &data,
                  const std::vector<size_t> &index,
-                 const double split_Criteria) const override;
+                 const double split_Criteria) const override; */
+  double compute(const std::vector<double> &exact, double prediction) const override;
 
   /**
    * @brief Computes the Variance for a given data distribution.

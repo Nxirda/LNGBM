@@ -14,6 +14,7 @@ add_executable(main main.cpp)
 
 #Required dependencies 
 find_package(MPI REQUIRED)
+find_package(TBB REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)

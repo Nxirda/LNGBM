@@ -1,11 +1,11 @@
 #include <algorithm>
+#include <cblas.h>
 #include <fstream>
 #include <iostream>
 #include <numeric>
 #include <sstream>   // std::stringstream
 #include <stdexcept> // std::runtime_error
 #include <vector>
-#include <cblas.h>
 
 #include "DataSet.hpp"
 
@@ -119,16 +119,16 @@ DataSet::DataSet() {
 DataSet::DataSet(const std::vector<std::string> &features,
                  const std::vector<std::vector<double>> &samples,
                  const std::vector<double> &labels) {
-  this->features = features;
-  this->samples = samples;
   this->labels = labels;
+  this->samples = samples;
+  this->features = features;
 }
 
 //
 DataSet::DataSet(const DataSet &data, const std::vector<size_t> &idx) {
+  this->labels = std::move(data.get_Labels(idx));
   this->features = std::move(data.get_Features());
   this->samples = std::move(data.get_Samples(idx));
-  this->labels = std::move(data.get_Labels(idx));
 }
 
 //
@@ -193,8 +193,8 @@ DataSet::get_Samples(const std::vector<size_t> &idx) const {
 
   // As we could have less elements due to condition
   // easier to just reserve the max size
-  std::vector<std::vector<double>> res;
-  res.reserve(this->samples.size());
+  std::vector<std::vector<double>> samples_At_Index;
+  samples_At_Index.reserve(this->samples.size());
 
   size_t i;
   for (i = 0; i < this->samples.size(); ++i) {
@@ -204,10 +204,10 @@ DataSet::get_Samples(const std::vector<size_t> &idx) const {
       if (j < this->samples[0].size())
         tmp.push_back(this->samples[i][j]);
     }
-    res.push_back(tmp);
+    samples_At_Index.push_back(tmp);
   }
 
-  return res;
+  return samples_At_Index;
 }
 
 //
@@ -266,8 +266,8 @@ const std::vector<double> &DataSet::get_Column(size_t position) const {
 //
 std::tuple<std::optional<std::vector<size_t>>,
            std::optional<std::vector<size_t>>>
-DataSet::split(size_t position, double criterion,
-               const std::vector<size_t> &idx) const {
+DataSet::split_Index(size_t position, double criterion,
+                     const std::vector<size_t> &idx) const {
   // Check column in bounds
   if (idx.empty() || position >= this->features_Number()) {
     return {std::nullopt, std::nullopt};
@@ -279,8 +279,8 @@ DataSet::split(size_t position, double criterion,
   std::vector<size_t> sub_Index_Right;
   std::vector<size_t> sub_Index_Left;
 
-  sub_Index_Right.reserve(idx.size() >> 1);
-  sub_Index_Left.reserve(idx.size() >> 1);
+  sub_Index_Right.reserve(idx.size());
+  sub_Index_Left.reserve(idx.size());
 
   for (const auto &row : idx) {
     //  Row in bounds (matrix is transposed)
@@ -296,6 +296,42 @@ DataSet::split(size_t position, double criterion,
   }
 
   return {std::move(sub_Index_Left), std::move(sub_Index_Right)};
+}
+
+//
+std::tuple<std::optional<std::vector<double>>,
+           std::optional<std::vector<double>>>
+DataSet::split_Labels(size_t position, double criterion,
+                      const std::vector<size_t> &idx) const {
+  // Check column in bounds
+  if (idx.empty() || position >= this->features_Number()) {
+    return {std::nullopt, std::nullopt};
+  }
+
+  size_t samples_Number = this->samples_Number();
+  const std::vector<double> &column = this->get_Column(position);
+  const std::vector<double> &labels = this->get_Labels();
+
+  std::vector<double> sub_Labels_Right;
+  std::vector<double> sub_Labels_Left;
+
+  sub_Labels_Right.reserve(idx.size()); 
+  sub_Labels_Left.reserve(idx.size());
+
+  for (const auto &row : idx) {
+    //  Row in bounds (matrix is transposed)
+    if (row >= samples_Number) {
+      std::cerr << "row index is out of the matrix\n";
+    } else {
+      if (column[row] < criterion) {
+        sub_Labels_Left.push_back(labels[row]);
+      } else {
+        sub_Labels_Right.push_back(labels[row]);
+      }
+    }
+  }
+
+  return {std::move(sub_Labels_Left), std::move(sub_Labels_Right)};
 }
 
 //

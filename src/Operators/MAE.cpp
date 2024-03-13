@@ -1,8 +1,8 @@
+#include <cblas.h>
 #include <cmath>
 #include <omp.h>
 
 #include "MAE.hpp"
-#include "TrainingElement.hpp"
 
 /********************/
 /*                  */
@@ -28,39 +28,24 @@ std::string MAE::get_Name() const { return this->name; }
 std::string MAE::get_Name_Static() { return "Mean Absolute Value"; }
 
 //
-double MAE::compute(size_t position, const DataSet &data,
-                    const std::vector<size_t> &index,
-                    const double split_Criteria) const {
+double MAE::compute(const std::vector<double> &exact, double prediction) const {
 
-  // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = data.split(position, split_Criteria, index);
+  double res = 0.0;
+  size_t size = exact.size();
 
-  size_t base_Population = index.size();
+  std::vector<double> prediction_Vector(size, (prediction));
 
-  double left_MAE = 0.0;
-  double left_Prediction = data.labels_Mean(left_index.value());  
-  size_t left_Population = left_index.value().size();
+  std::vector<double> absoluteDifferences(size);
+  // Copy necessary for daxpy
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
 
-  double right_MAE = 0.0;
-  double right_Prediction = data.labels_Mean(right_index.value());
-  size_t right_Population = right_index.value().size();
-  
-  const std::vector<double> &labels = data.get_Labels();
+  // Computes the yi - ŷi part of the MAE
+  cblas_daxpy(size, -1.0, prediction_Vector.data(), 1,
+              absoluteDifferences.data(), 1);
 
-  for (size_t idx : left_index.value()) {
-    left_MAE += std::abs(labels[idx] - left_Prediction);
-  }
-  left_MAE *= (1.0 / left_Population);
-
-  for (size_t idx : right_index.value()) {
-    right_MAE += std::abs(labels[idx] - right_Prediction);
-  }
-  right_MAE *= (1.0 / right_Population);
-
-  // Compute the result of MAE for the split at position
-  double res = ((left_MAE * left_Population) + (right_MAE * right_Population)) *
-               (1.0 / base_Population);
-
+  // MAE computing (dasum takes the absolute values)
+  res = cblas_dasum(static_cast<int>(size), absoluteDifferences.data(), 1);
+  res *= 1.0 / size;
   return res;
 }
 
@@ -69,14 +54,17 @@ double MAE::apply(const std::vector<double> &exact,
                   const std::vector<double> &prediction) {
 
   double res = 0.0;
-  size_t size = prediction.size();
+  size_t size = exact.size();
 
-  for (size_t i = 0; i < size; ++i) {
-    res += std::abs(exact[i] - prediction[i]);
-  }
+  std::vector<double> result_Vector(size);
+  cblas_dcopy(size, exact.data(), 1, result_Vector.data(), 1);
 
-  // Compute the MAE
+  // Computes the yi - ŷi part of the MAE
+  cblas_daxpy(size, -1.0, prediction.data(), 1, result_Vector.data(), 1);
+
+  // MAE computing
+  res = cblas_dasum(static_cast<int>(size), result_Vector.data(), 1);
+
   res *= (1.0 / size);
-
   return res;
 }

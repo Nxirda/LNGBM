@@ -220,7 +220,23 @@ public:
    */
   std::tuple<std::optional<std::vector<size_t>>,
              std::optional<std::vector<size_t>>>
-  split(size_t position, double criterion,
+  split_Index(size_t position, double criterion,
+        const std::vector<size_t> &idx) const;
+
+  /**
+   * @brief Splits the labels in two parts depending on the criterion and the
+   * position
+   *
+   * @param size_t : position of the column (feature) on which to split
+   * @param double : value on which to split the column
+   * @param const vector<size_t> &, index of the lines (samples) to consider
+   *
+   * @return tuple<optional<vector<size_t>>,optional<vector<size_t>>>, two
+   * vectors containing the labels of the samples each new dataset has
+   */
+  std::tuple<std::optional<std::vector<double>>,
+             std::optional<std::vector<double>>>
+  split_Labels(size_t position, double criterion,
         const std::vector<size_t> &idx) const;
 
 private:

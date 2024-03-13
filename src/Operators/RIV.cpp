@@ -1,8 +1,8 @@
+#include <cblas.h>
 #include <cmath>
 #include <omp.h>
 
 #include "RIV.hpp"
-#include "TreeNode.hpp"
 
 /********************/
 /*                  */
@@ -24,17 +24,17 @@ void RIV::print() {
 //
 std::string RIV::get_Name() const { return this->name; }
 
-
 //
 std::string RIV::get_Name_Static() { return "Reduction In Variance"; }
 
 //
-double RIV::compute(size_t position, const DataSet &data,
+/* double RIV::compute(size_t position, const DataSet &data,
                     const std::vector<size_t> &index,
                     const double split_Criteria) const {
 
   // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = data.split(position, split_Criteria, index);
+  auto [left_index, right_index] = data.split_Index(position, split_Criteria,
+index);
 
   size_t base_Population = index.size();
 
@@ -53,6 +53,30 @@ double RIV::compute(size_t position, const DataSet &data,
                                  right_Weighted_Average * right_Variance);
 
   return weighted_Average_Var;
+} */
+
+//
+double RIV::compute(const std::vector<double> &exact, double prediction) const {
+  double res = 0.0;
+  size_t size = exact.size();
+
+  std::vector<double> prediction_Vector(size, prediction);
+
+  std::vector<double> absoluteDifferences(size);
+  // Copy necessary for daxpy
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
+
+  // Computes the yi - ŷi part of the MAPE
+  cblas_daxpy(size, -1.0, prediction_Vector.data(), 1,
+              absoluteDifferences.data(), 1);
+
+  // Square the result
+  res = cblas_ddot(size, absoluteDifferences.data(), 1,
+                   absoluteDifferences.data(), 1);
+
+  // Compute the Variance
+  res *= (1.0 / size);
+  return res;
 }
 
 //

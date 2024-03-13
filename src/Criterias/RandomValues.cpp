@@ -68,12 +68,12 @@ RandomValues::compute(const std::vector<double> &list,
   auto min = std::min_element(list_To_Compute.begin(), list_To_Compute.end());
   auto max = std::max_element(list_To_Compute.begin(), list_To_Compute.end());
 
-  std::vector<double> res(this->size, 0);
-  res[0] = *min;
-  res[this->size - 1] = *max;
+  std::vector<double> random_Values(this->size, 0);
+  random_Values[0] = *min;
+  random_Values[this->size - 1] = *max;
 
   for (size_t i = 1; i < this->size - 1; ++i) {
-    res[i] = get_Random_double(*min, *max);
+    random_Values[i] = get_Random_double(*min, *max);
   }
-  return res;
+  return random_Values;
 }

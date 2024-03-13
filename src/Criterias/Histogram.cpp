@@ -54,13 +54,14 @@ std::vector<double> Histogram::compute(const std::vector<double> &list,
       max = elem;
   }
 
-  std::vector<double> res(this->size, 0.0);
+  std::vector<double> bins(this->size, 0.0);
 
   size_t bin_size = (max - min) * (1.0 / this->size);
 
   for (size_t i = 0; i < this->size; ++i) {
     // Returns the values that separates two bins
-    res[i] = min + bin_size * i;
+    bins[i] = min + bin_size * i;
   }
-  return res;
+
+  return bins;
 }

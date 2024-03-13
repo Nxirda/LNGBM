@@ -1,8 +1,8 @@
+#include <cblas.h>
 #include <cmath>
 #include <omp.h>
 
 #include "RMSE.hpp"
-#include "TreeNode.hpp"
 
 /********************/
 /*                  */
@@ -28,41 +28,22 @@ std::string RMSE::get_Name() const { return this->name; }
 std::string RMSE::get_Name_Static() { return "Root Mean Square Error"; }
 
 //
-double RMSE::compute(size_t position, const DataSet &data,
-                     const std::vector<size_t> &index,
-                     const double split_Criteria) const {
+double RMSE::compute(const std::vector<double> &exact,
+                     double prediction) const {
+  double res = 0.0;
+  size_t size = exact.size();
 
-  // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = data.split(position, split_Criteria, index);
+  std::vector<double> prediction_Vector(size, (prediction));
 
-  size_t base_Population = index.size();
+  std::vector<double> absoluteDifferences(size);
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
 
-  double left_RMSE = 0.0;
-  double left_Prediction = data.labels_Mean(left_index.value());
-  size_t left_Population = left_index.value().size();
+  // Computes the yi - ŷi part of the RMSE
+  cblas_daxpy(size, -1.0, prediction_Vector.data(), 1,
+              absoluteDifferences.data(), 1);
 
-  double right_RMSE = 0.0;
-  double right_Prediction = data.labels_Mean(right_index.value());
-  size_t right_Population = right_index.value().size();
+  // RMSE computing
+  res = cblas_dnrm2(static_cast<int>(size), absoluteDifferences.data(), 1);
 
-  const std::vector<double> &labels = data.get_Labels();
-
-  for (size_t idx : left_index.value()) {
-    left_RMSE += pow((std::abs(labels[idx] - left_Prediction)), 2) *
-                 (1.0 / left_Population);
-  }
-  left_RMSE = sqrt(left_RMSE);
-
-  for (size_t idx : right_index.value()) {
-    right_RMSE += pow((std::abs(labels[idx] - right_Prediction)), 2) *
-                  (1.0 / right_Population);
-  }
-  right_RMSE = sqrt(right_RMSE);
-
-  // Compute the result of RMSE for the split at position
-  double res =
-      ((left_RMSE * left_Population) + (right_RMSE * right_Population));
-
-  res *= (1.0 / base_Population);
   return res;
 }

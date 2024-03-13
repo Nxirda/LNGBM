@@ -48,8 +48,8 @@ UniqueValues::compute(const std::vector<double> &list,
                                     list_To_Compute.end());
 
   // Cast back in array for the result || move to avoid copy
-  std::vector<double> res(std::make_move_iterator(unique.begin()),
+  std::vector<double> unique_Values(std::make_move_iterator(unique.begin()),
                           std::make_move_iterator(unique.end()));
 
-  return res;
+  return unique_Values;
 }

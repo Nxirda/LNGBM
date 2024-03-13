@@ -73,7 +73,7 @@ void tree_Prediction(const DataSet &data, std::vector<double> &result,
 
   // Put the correct indexes
   auto [left_Index, right_Index] =
-      data.split(node->get_Split_Column(), node->get_Split_Criterion(), index);
+      data.split_Index(node->get_Split_Column(), node->get_Split_Criterion(), index);
 
   if (node->get_Left_Node() && left_Index) {
     tree_Prediction(data, result, *left_Index, node->get_Left_Node());
