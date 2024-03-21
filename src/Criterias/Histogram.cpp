@@ -43,7 +43,7 @@ std::string Histogram::get_Name_Static() { return "Histogram"; }
 std::vector<double> Histogram::compute(const std::vector<double> &list,
                                        const std::vector<size_t> &idx) const {
 
-  double min = INT_MAX;
+  double min = std::numeric_limits<double>::max();
   double max = 0;
 
   for (const auto &i : idx) {

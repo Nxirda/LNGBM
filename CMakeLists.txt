@@ -30,7 +30,7 @@ add_subdirectory(src)
 target_link_libraries(main PRIVATE Source_Lib)
 
 #Add compilation options 
-add_compile_options(-std=c++23 -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
+add_compile_options(-std=c++23 -g -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
 
 # ===== Testing Part =====
 

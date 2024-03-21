@@ -48,6 +48,33 @@ public:
                     const ICriteria *splitting_Criteria, uint16_t max_Depth,
                     size_t treshold);
 
+  static void train_Test(const DataSet &data, TreeNode *node,
+                         const IOperator *splitting_Operator,
+                         const ICriteria *splitting_Criteria,
+                         uint16_t max_Depth, size_t treshold);
+
+  /*
+   */
+  static void find_Best_Split_Test(
+      const DataSet &data, const std::vector<size_t> &index,
+      const IOperator *splitting_Operator, const ICriteria *splitting_Criteria,
+      std::vector<std::tuple<double, double, size_t>> &candidates,
+      std::vector<std::vector<double>> &splitting_Thresholds);
+
+  /*
+   */
+  static double compute_Split_Value_Test(const std::vector<size_t> &index,
+                                         const DataSet &data, size_t feature,
+                                         double criteria, const IOperator *op);
+
+  /*
+   */
+  static std::tuple<std::optional<std::vector<double>>,
+                    std::optional<std::vector<double>>>
+  split_Labels_Test(const std::vector<double> &column,
+                    const std::vector<double> &labels, double criterion,
+                    const std::vector<size_t> &idx);
+
   /*
    */
   static std::tuple<std::optional<std::vector<size_t>>,
@@ -55,7 +82,7 @@ public:
   split_Index(const std::vector<double> &column,
               const std::vector<size_t> &index, double criterion);
 
-private:
+public:
   void set_Root(size_t dataset_Size, TreeNode *node);
   void bootstrap_Index(size_t dataset_Size);
 
@@ -68,9 +95,8 @@ private:
   /*
    */
   std::tuple<size_t, double>
-  find_Best_Split_Parallel_2(const DataSet &data,
-                             const IOperator *splitting_Operator,
-                             const ICriteria *splitting_Criteria) const;
+  find_Best_Split(const DataSet &data, const IOperator *splitting_Operator,
+                  const ICriteria *splitting_Criteria) const;
   /*
    */
   double compute_Split_Value(const std::vector<size_t> &index,
@@ -88,6 +114,13 @@ private:
    */
   double mean_Vector_At_Index(const std::vector<double> &vector,
                               const std::vector<size_t> &index) const;
+
+  /**************************** TEST ************************************/
+
+  /*
+   */
+  std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
+  split_Node_Test(const DataSet &data, size_t column, double criterion);
 };
 
 #endif

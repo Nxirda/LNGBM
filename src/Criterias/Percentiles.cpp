@@ -48,6 +48,6 @@ std::vector<double> Percentiles::compute(const std::vector<double> &list,
 
   for (size_t i = 0; i < this->percentiles.size(); ++i) {
     percentiles_Values[i] = sorted_Data[len * (this->percentiles[i] / 100)];
-  }
+  }  
   return percentiles_Values;
 }
