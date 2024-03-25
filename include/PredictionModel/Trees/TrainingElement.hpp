@@ -67,6 +67,10 @@ public:
                                          const DataSet &data, size_t feature,
                                          double criteria, const IOperator *op);
 
+  static void mean_Vector_At_Index_Test(const std::vector<double> &vector,
+                                        const std::vector<size_t> &index,
+                                        double &mean, double &length);
+
   /*
    */
   static std::tuple<std::optional<std::vector<double>>,
@@ -74,6 +78,14 @@ public:
   split_Labels_Test(const std::vector<double> &column,
                     const std::vector<double> &labels, double criterion,
                     const std::vector<size_t> &idx);
+
+  /*
+   */
+  static void split_Index_Test(const std::vector<double> &column,
+                               const std::vector<size_t> &index,
+                               double criterion,
+                               std::vector<size_t> &right_Index,
+                               std::vector<size_t> &left_Index);
 
   /*
    */
@@ -120,7 +132,10 @@ public:
   /*
    */
   std::tuple<std::optional<TrainingElement>, std::optional<TrainingElement>>
-  split_Node_Test(const DataSet &data, size_t column, double criterion);
+  split_Node_Test(const DataSet &data, size_t column, double criterion,
+                  double predic_Left, double predict_Right,
+                  std::vector<size_t> &right_Index,
+                  std::vector<size_t> &left_Index);
 };
 
 #endif

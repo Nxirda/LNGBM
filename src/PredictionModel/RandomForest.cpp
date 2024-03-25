@@ -50,7 +50,7 @@ void RandomForest::train(const DataSet &data, ICriteria *crit, IOperator *op) {
 
 //
 std::vector<double> RandomForest::predict(const DataSet &data) const {
-  size_t size = data.samples_Number();
+  size_t size = data.samples_Number();  
   std::vector<double> result(size, 0);
 
   std::vector<double> tree_Result(size, 0);
