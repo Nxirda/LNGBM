@@ -14,9 +14,7 @@ add_executable(main main.cpp)
 
 #Required dependencies 
 find_package(MPI REQUIRED)
-find_package(TBB REQUIRED)
 find_package(BLAS REQUIRED)
-find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization mpi)
 
@@ -24,12 +22,15 @@ find_package(Boost REQUIRED COMPONENTS serialization mpi)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
 
+#AVX2 support
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
+
 #Add the subdirectory for the source files
 add_subdirectory(src)
 
 target_link_libraries(main PRIVATE Source_Lib)
 
-#Add compilation options 
+#Add compilation options
 add_compile_options(-std=c++23 -g -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
 
 # ===== Testing Part =====

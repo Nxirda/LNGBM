@@ -100,7 +100,7 @@ DataSet::DataSet(std::string file_Path) {
   }
 
   // Transpose matrix (might change that) to have fast column access instead of
-  // lines as we use columns more often
+  // lines as we use columns more often (will be slow on huge matrices)
 
   transpose_Matrix(this->samples);
 

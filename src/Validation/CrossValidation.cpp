@@ -31,21 +31,22 @@ std::tuple<std::vector<DataSet>, std::vector<DataSet>>
 compute_Folds(const DataSet &data, const std::vector<size_t> &global_Index,
               size_t total_Size, uint8_t K) {
 
-  size_t foldSize = total_Size / K;
+  const size_t fold_Size = total_Size / K;
 
   std::vector<DataSet> test_Folds(K);
   std::vector<DataSet> train_Folds(K);
 
   for (uint8_t j = 0; j < K; ++j) {
 
-    std::vector<size_t> test_Folds_Construct(foldSize, 0);
+    std::vector<size_t> test_Folds_Construct(fold_Size, 0);
     size_t test_Curr_Index = 0;
 
-    std::vector<size_t> train_Folds_Construct(total_Size - foldSize + 1, 0);
+    std::vector<size_t> train_Folds_Construct(total_Size - fold_Size + 1, 0);
     size_t train_Curr_Index = 0;
 
-    size_t upper_Bound = (j + 1) * foldSize;
-    size_t lower_Bound = j * foldSize;
+    size_t upper_Bound = (j + 1) * fold_Size;
+    size_t lower_Bound = j * fold_Size;
+
     for (size_t i = 0; i < total_Size; ++i) {
       if ((i > lower_Bound) && (i < upper_Bound)) {
         test_Folds_Construct[test_Curr_Index] = global_Index[i];
@@ -58,7 +59,7 @@ compute_Folds(const DataSet &data, const std::vector<size_t> &global_Index,
     test_Folds[j] = DataSet(data, test_Folds_Construct);
     train_Folds[j] = DataSet(data, train_Folds_Construct);
   }
-  return std::make_tuple(test_Folds, train_Folds);
+  return std::make_tuple(std::move(test_Folds), std::move(train_Folds));
 }
 
 //
@@ -71,7 +72,7 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
   Answers validation_Result{};
 
   // Getting infos on the model
-  int precision = 5;
+  const int precision = 5;
 
   //
   std::string formatted_File_Size =
@@ -102,7 +103,7 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
   t_Global.start();
 
   // Actual infos for the function
-  size_t total_Size = data.samples_Number();
+  const size_t total_Size = data.samples_Number();
   std::vector<size_t> global_Index(total_Size, 0);
 
   // Computes the index for the given DataSet

@@ -31,7 +31,7 @@ std::string RMSE::get_Name_Static() { return "Root Mean Square Error"; }
 double RMSE::compute(const std::vector<double> &exact,
                      double prediction) const {
   double res = 0.0;
-  size_t size = exact.size();
+  const size_t size = exact.size();
 
   std::vector<double> prediction_Vector(size, (prediction));
 

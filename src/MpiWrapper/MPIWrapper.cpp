@@ -76,7 +76,7 @@ void MPI_Cross_Val(const BaggingModel &model, const DataSet &data, int K) {
  */
 void MPI_Main(int argc, char **argv) {
 
-  pid_t pid = getpid();
+  const pid_t pid = getpid();
 
   int rank, size;
 
@@ -88,9 +88,9 @@ void MPI_Main(int argc, char **argv) {
   std::string metric = argv[2];
   std::string criteria = argv[3];
 
-  uint16_t depth = std::stoi(argv[4]);
-  uint16_t number_Of_Trees = std::atoi(argv[5]);
-  uint16_t trees_For_Proc = balancer(number_Of_Trees, size, rank);
+  const uint16_t depth = std::stoi(argv[4]);
+  const uint16_t number_Of_Trees = std::atoi(argv[5]);
+  const uint16_t trees_For_Proc = balancer(number_Of_Trees, size, rank);
 
   BaggingModel model{metric, criteria, depth, trees_For_Proc};
 
@@ -110,7 +110,7 @@ void MPI_Main(int argc, char **argv) {
   if (argc == 8) {
     // For the cross validation
     std::string cross_Val = argv[6];
-    int folds = std::atoi(argv[7]);
+    const int folds = std::atoi(argv[7]);
 
     if (cross_Val.compare("CV"))
       return;

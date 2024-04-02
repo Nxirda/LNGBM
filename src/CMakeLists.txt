@@ -28,9 +28,9 @@ add_library(Source_Lib
     #MPI Wrapper
     MpiWrapper/MPIWrapper.cpp
     #Tools part
-    Tools/Timer.cpp
-    Tools/Tools.cpp
-    Tools/Serializer.cpp 
+    Utils/Timer.cpp
+    Utils/Tools.cpp
+    Utils/Serializer.cpp 
 )   
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -38,7 +38,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 # Dont forget to include headers so cpp can compile
 target_include_directories(Source_Lib
     PUBLIC
-    ${CMAKE_SOURCE_DIR}/include/Tools/
+    ${CMAKE_SOURCE_DIR}/include/Utils/
     ${CMAKE_SOURCE_DIR}/include/Dataset/
     ${CMAKE_SOURCE_DIR}/include/Operators/
     ${CMAKE_SOURCE_DIR}/include/Criterias/
@@ -53,8 +53,6 @@ target_link_libraries(Source_Lib
     MPI::MPI_CXX 
     Boost::mpi 
     Boost::serialization 
-    Threads::Threads 
     BLAS::BLAS
     OpenMP::OpenMP_CXX
-    TBB::tbb
 )

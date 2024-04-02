@@ -43,7 +43,7 @@ std::vector<double> Percentiles::compute(const std::vector<double> &list,
   }
 
   // Sort the data
-  size_t len = sorted_Data.size();
+  const size_t len = sorted_Data.size();
   std::sort(sorted_Data.begin(), sorted_Data.end());
 
   for (size_t i = 0; i < this->percentiles.size(); ++i) {

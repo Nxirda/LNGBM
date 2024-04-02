@@ -65,8 +65,8 @@ RandomValues::compute(const std::vector<double> &list,
     list_To_Compute.push_back(list[i]);
   }
 
-  auto min = std::min_element(list_To_Compute.begin(), list_To_Compute.end());
-  auto max = std::max_element(list_To_Compute.begin(), list_To_Compute.end());
+  const auto min = std::min_element(list_To_Compute.begin(), list_To_Compute.end());
+  const auto max = std::max_element(list_To_Compute.begin(), list_To_Compute.end());
 
   std::vector<double> random_Values(this->size, 0);
   random_Values[0] = *min;

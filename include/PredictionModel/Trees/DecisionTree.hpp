@@ -52,7 +52,7 @@ public:
   void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
   std::vector<double> predict(const DataSet &data) const override;
 
-  void print_Tree();
+  /* void print_Tree(); */
 };
 
 #endif

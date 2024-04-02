@@ -22,7 +22,7 @@ std::string format_Size(double size, const std::string &unit, int precision) {
 std::string matrix_Memory_Size(int length, int width, int element_Size,
                                int precision) {
   // Calculate the size in bytes
-  int matrixSizeInBytes = length * width * element_Size;
+  const int matrixSizeInBytes = length * width * element_Size;
 
   // Convert bytes
   const int kibibyte = 1024;

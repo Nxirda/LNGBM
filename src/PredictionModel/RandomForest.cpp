@@ -50,10 +50,11 @@ void RandomForest::train(const DataSet &data, ICriteria *crit, IOperator *op) {
 
 //
 std::vector<double> RandomForest::predict(const DataSet &data) const {
-  size_t size = data.samples_Number();  
+  const size_t size = data.samples_Number();  
   std::vector<double> result(size, 0);
 
   std::vector<double> tree_Result(size, 0);
+
   // Iterate through the Forest
   for (size_t i = 0; i < this->trees.size(); ++i) {
 
@@ -62,7 +63,7 @@ std::vector<double> RandomForest::predict(const DataSet &data) const {
       std::cerr << "Couldn't find wanted tree \n";
       exit(1);
     }
-
+    std::cout << "Random Forest Prediction is wrong with MPI\n";
     tree_Result = this->trees.at(i).predict(data);
 
     // Adds two vectors

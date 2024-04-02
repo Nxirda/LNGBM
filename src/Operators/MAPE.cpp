@@ -30,7 +30,7 @@ double MAPE::compute(const std::vector<double> &exact,
                      double prediction) const {
 
   double res = 0.0;
-  size_t size = exact.size();
+  const size_t size = exact.size();
 
   std::vector<double> prediction_Vector(size, (prediction));
 
@@ -58,7 +58,7 @@ double MAPE::apply(const std::vector<double> &exact,
 
   // Figure out how to do the division part with blas when we have two vectors
   double res = 0.0;
-  size_t size = prediction.size();
+  const size_t size = prediction.size();
 
   for (size_t i = 0; i < size; ++i) {
     res += std::abs(exact[i] - prediction[i]) * (1.0 / exact[i]);

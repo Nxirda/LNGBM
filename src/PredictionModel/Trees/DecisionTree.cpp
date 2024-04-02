@@ -50,16 +50,14 @@ void DecisionTree::set_Root(std::unique_ptr<TreeNode> node) {
 }
 
 //
-void DecisionTree::print_Tree() { this->root->node_Print(); }
-
+/* void DecisionTree::print_Tree() { this->root->node_Print(); }
+ */
 //
 void DecisionTree::train(const DataSet &data, ICriteria *crit, IOperator *op) {
-  size_t threshold = 5;
+  const size_t threshold = 5;
 
-  /* TrainingElement::train(data, this->get_Root(), op, crit, this->max_Depth,
-                         threshold);    */
-  TrainingElement::train_Test(data, this->get_Root(), op, crit, this->max_Depth,
-                              threshold);
+  TrainingElement::train(data, this->get_Root(), op, crit, this->max_Depth,
+                         threshold);    
 }
 
 //
@@ -90,7 +88,7 @@ void tree_Prediction(const DataSet &data, std::vector<double> &result,
 //
 std::vector<double> DecisionTree::predict(const DataSet &data) const {
 
-  size_t size = data.samples_Number();
+  const size_t size = data.samples_Number();
   std::vector<double> result(size, 0);
 
   // Computes the index

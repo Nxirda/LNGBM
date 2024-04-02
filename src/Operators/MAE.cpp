@@ -31,7 +31,7 @@ std::string MAE::get_Name_Static() { return "Mean Absolute Value"; }
 double MAE::compute(const std::vector<double> &exact, double prediction) const {
 
   double res = 0.0;
-  size_t size = exact.size();
+  const size_t size = exact.size();
 
   std::vector<double> prediction_Vector(size, (prediction));
 
@@ -54,7 +54,7 @@ double MAE::apply(const std::vector<double> &exact,
                   const std::vector<double> &prediction) {
 
   double res = 0.0;
-  size_t size = exact.size();
+  const size_t size = exact.size();
 
   std::vector<double> result_Vector(size);
   cblas_dcopy(size, exact.data(), 1, result_Vector.data(), 1);
