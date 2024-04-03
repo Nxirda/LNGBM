@@ -13,13 +13,13 @@
  */
 class DataSet {
 protected:
+ std::vector<std::vector<double>>
+      samples; /**< A 2D Matrix containing the sample values as doubles (f64)*/
   std::vector<double>
       labels; /**< A vector containing the labels as doubles (f64)*/
   std::vector<std::string>
       features; /**< A vector containing the features as doubles (f64)*/
-  std::vector<std::vector<double>>
-      samples; /**< A 2D Matrix containing the sample values as doubles (f64)*/
-
+ 
 public:
   /**
    * @brief Default constructor for the DataSet class.

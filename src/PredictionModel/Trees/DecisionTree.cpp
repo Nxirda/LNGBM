@@ -16,25 +16,37 @@
 /********************/
 
 //
-DecisionTree::DecisionTree() {
+DecisionTree::DecisionTree() noexcept {
   this->root = std::make_unique<TreeNode>();
   this->max_Depth = 0;
 }
 
 //
-DecisionTree::DecisionTree(uint16_t max_Depth) {
+DecisionTree::DecisionTree(uint16_t max_Depth) noexcept {
   this->root = std::make_unique<TreeNode>();
   this->max_Depth = max_Depth;
 }
 
 //
-DecisionTree::DecisionTree(const DecisionTree &dt) {
+DecisionTree::DecisionTree(const DecisionTree &dt) noexcept {
   this->root = std::make_unique<TreeNode>(*dt.get_Root());
 }
 
 //
-DecisionTree &DecisionTree::operator=(const DecisionTree &tree) {
+DecisionTree::DecisionTree(DecisionTree &&dt) noexcept {
+  this->max_Depth = dt.max_Depth;
+  this->root = std::move(dt.root);
+}
+
+//
+DecisionTree &DecisionTree::operator=(const DecisionTree &tree) noexcept {
   this->root = std::make_unique<TreeNode>(*tree.get_Root());
+  return *this;
+}
+
+//
+DecisionTree &DecisionTree::operator=(DecisionTree &&tree) noexcept {
+  this->root = std::move(tree.root);
   return *this;
 }
 
@@ -50,14 +62,11 @@ void DecisionTree::set_Root(std::unique_ptr<TreeNode> node) {
 }
 
 //
-/* void DecisionTree::print_Tree() { this->root->node_Print(); }
- */
-//
 void DecisionTree::train(const DataSet &data, ICriteria *crit, IOperator *op) {
   const size_t threshold = 5;
 
   TrainingElement::train(data, this->get_Root(), op, crit, this->max_Depth,
-                         threshold);    
+                         threshold);
 }
 
 //
@@ -97,7 +106,6 @@ std::vector<double> DecisionTree::predict(const DataSet &data) const {
     index[i] = i;
   }
 
-  // std::vector<double> tree_Result(size, 0);
   tree_Prediction(data, result, index, this->root.get());
 
   return result;

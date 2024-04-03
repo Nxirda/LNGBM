@@ -12,10 +12,11 @@
 class Quartiles : public ICriteria {
 private:
   // Parameters
+
+  const std::vector<double> quartiles = {25.0, 50.0, 75.0}; /**< Array
+                                  containing the values in % of the quartiles*/        
   const std::string name =
       "Quartiles"; /**< A string variable to display the name. */
-  const std::vector<double> quartiles = {25.0, 50.0, 75.0}; /**< Array
-                                  containing the values in % of the quartiles*/
 
   size_t size;
 
@@ -50,7 +51,7 @@ public:
    * @return The name of the Quartiles criteria.
    */
   std::string get_Name() const override;
-  
+
   /**
    * @brief Static method to get the name of the Quartiles criteria.
    *

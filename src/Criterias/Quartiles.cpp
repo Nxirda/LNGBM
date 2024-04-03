@@ -43,11 +43,11 @@ std::vector<double> Quartiles::compute(const std::vector<double> &list,
   }
 
   // Sort the data
-  const size_t len = sorted_Data.size();
+  const size_t length = sorted_Data.size();
   std::sort(sorted_Data.begin(), sorted_Data.end());
 
   for (size_t i = 0; i < this->quartiles.size(); ++i) {
-    quartiles_Values[i] = sorted_Data[len * (this->quartiles[i] / 100)];
+    quartiles_Values[i] = sorted_Data[length * (this->quartiles[i] / 100)];
   }
   return quartiles_Values;
 }

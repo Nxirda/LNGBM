@@ -14,13 +14,14 @@
 class TreeNode {
 private:
   // Parameters
-  std::unique_ptr<TreeNode> right;
-  std::unique_ptr<TreeNode> left;
 
   // Values used to parse the test dataset
-  size_t split_Column = 0;
   double split_Criterion = -1.0;
   double predicted_Value = -1.0;
+  size_t split_Column = 0;
+
+  std::unique_ptr<TreeNode> right;
+  std::unique_ptr<TreeNode> left;
 
   // Boost part to serialize the nodes so we can send them to other MPIs Process
   // Might need to build some sort of verif for MPI/Boost install at some point
@@ -29,7 +30,7 @@ private:
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version) {
     // Unused param but necessary for boost
-    static_cast<void>(version); 
+    static_cast<void>(version);
     ar &split_Column;
     ar &split_Criterion;
     ar &predicted_Value;
@@ -40,11 +41,16 @@ private:
 public:
   // Constructor
 
-  TreeNode();
-  TreeNode(size_t split_Column, double split_Criterion, double predicted_Value);
+  TreeNode() noexcept;
+  TreeNode(size_t split_Column, double split_Criterion,
+           double predicted_Value) noexcept;
 
-  TreeNode(const TreeNode &node);
-  TreeNode &operator=(const TreeNode &tn); // copy assignment
+  TreeNode(const TreeNode &node) noexcept;
+  TreeNode &operator=(const TreeNode &tn) noexcept; // copy assignment
+
+  // Move semantic part
+  TreeNode(TreeNode &&node) noexcept;
+  TreeNode &operator=(TreeNode &&tn) noexcept;
 
   // Destructor
 
@@ -70,7 +76,7 @@ public:
 
   // Methods
 
-  //void node_Print();
+  // void node_Print();
 };
 
 #endif

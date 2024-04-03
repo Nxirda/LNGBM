@@ -13,13 +13,13 @@
 class Percentiles : public ICriteria {
 private:
   // Parameters
-  const std::string name =
-      "Percentiles"; /**< A string variable to display the name. */
 
   const std::vector<double> percentiles = {
       10.0, 20.0, 30.0, 40.0, 50.0,
       60.0, 70.0, 80.0, 90.0}; /**< Array containing the values in % of the
                                   percentiles*/
+  const std::string name =
+      "Percentiles"; /**< A string variable to display the name. */
 
   size_t size; /**< A size_t value that stores the number of elements the class
                   computes*/

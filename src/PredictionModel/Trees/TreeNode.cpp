@@ -7,7 +7,7 @@
 /********************/
 
 //
-TreeNode::TreeNode() {
+TreeNode::TreeNode() noexcept {
   this->split_Column = 0;
   this->split_Criterion = -1;
   this->predicted_Value = -1;
@@ -17,14 +17,14 @@ TreeNode::TreeNode() {
 
 //
 TreeNode::TreeNode(size_t split_Column, double split_Criterion,
-                   double predicted_Value) {
+                   double predicted_Value) noexcept {
   this->split_Column = split_Column;
   this->split_Criterion = split_Criterion;
   this->predicted_Value = predicted_Value;
 }
 
 //
-TreeNode::TreeNode(const TreeNode &node) {
+TreeNode::TreeNode(const TreeNode &node) noexcept {
   this->split_Column = node.split_Column;
   this->split_Criterion = node.split_Criterion;
   this->predicted_Value = node.predicted_Value;
@@ -43,10 +43,29 @@ TreeNode::TreeNode(const TreeNode &node) {
 }
 
 //
+TreeNode::TreeNode(TreeNode &&node) noexcept {
+  this->split_Column = node.split_Column;
+  this->split_Criterion = node.split_Criterion;
+  this->predicted_Value = node.predicted_Value;
+
+  if (node.left) {
+    this->left = std::move(node.left);
+  } else {
+    this->left.reset();
+  }
+
+  if (node.right) {
+    this->right = std::move(node.right);
+  } else {
+    this->right.reset();
+  }
+}
+
+//
 TreeNode::~TreeNode() {}
 
 //
-TreeNode &TreeNode::operator=(const TreeNode &tn) {
+TreeNode &TreeNode::operator=(const TreeNode &tn) noexcept {
 
   this->predicted_Value = tn.get_Predicted_Value();
   this->split_Column = tn.get_Split_Column();
@@ -65,7 +84,29 @@ TreeNode &TreeNode::operator=(const TreeNode &tn) {
   }
 
   return *this;
-} 
+}
+
+//
+TreeNode &TreeNode::operator=(TreeNode &&tn) noexcept {
+
+  this->predicted_Value = tn.get_Predicted_Value();
+  this->split_Column = tn.get_Split_Column();
+  this->split_Criterion = tn.get_Split_Criterion();
+
+  if (tn.left) {
+    this->left = std::move(tn.left);
+  } else {
+    this->left.reset();
+  }
+
+  if (tn.right) {
+    this->right = std::move(tn.right);
+  } else {
+    this->right.reset();
+  }
+
+  return *this;
+}
 
 //
 void TreeNode::set_Split_Column(size_t col) { this->split_Column = col; }
@@ -104,16 +145,3 @@ TreeNode *TreeNode::get_Left_Node() const { return this->left.get(); }
 
 //
 TreeNode *TreeNode::get_Right_Node() const { return this->right.get(); }
-
-//
-/* void TreeNode::node_Print() {
-  std::cout << "-> Split Column is : " << this->split_Column << "\n";
-  std::cout << "-> Split Criterion is : " << this->split_Criterion << "\n";
-  std::cout << "-> Split Prediction is : " << this->predicted_Value << "\n";
-  if (this->left) {
-    this->left->node_Print();
-  }
-  if (this->right) {
-    this->right->node_Print();
-  }
-} */

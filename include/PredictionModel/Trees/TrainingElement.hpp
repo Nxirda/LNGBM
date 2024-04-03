@@ -11,10 +11,9 @@ struct TrainingElement {
 
 private:
   // Parameters
-
-  uint16_t depth;
   TreeNode *node;
   std::vector<size_t> index;
+  uint16_t depth;
 
 public:
   // Constructor
@@ -22,9 +21,11 @@ public:
   TrainingElement(TreeNode *node, const std::vector<size_t> &index,
                   uint16_t depth);
   TrainingElement(const TrainingElement &TE);
+  TrainingElement(TrainingElement &&TE);
 
   // Operator Overloading
   TrainingElement &operator=(const TrainingElement &TE);
+  TrainingElement &operator=(TrainingElement &&TE);
 
   // Destructor
 
@@ -83,11 +84,6 @@ private:
    */
   double mean_Vector_At_Index(const std::vector<double> &vector,
                               const std::vector<size_t> &index) const;
-
-  std::tuple<std::optional<std::vector<size_t>>,
-             std::optional<std::vector<size_t>>>
-  split_Index_Views(const std::vector<double> &column,
-                    const std::vector<size_t> &index, double criterion) const;
 };
 
 #endif

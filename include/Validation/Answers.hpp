@@ -11,9 +11,9 @@
 
 class Answers {
 private:
-  std::vector<std::string> header;
-  std::vector<std::vector<std::string>> values;
   std::vector<std::vector<double>> numeric_Values;
+  std::vector<std::vector<std::string>> values;
+  std::vector<std::string> header;
 
   friend class boost::serialization::access;
   template <class Archive>

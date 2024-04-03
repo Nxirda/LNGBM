@@ -11,17 +11,32 @@
 /**************************/
 
 //
-RandomForest::RandomForest() {
+RandomForest::RandomForest() noexcept{
   this->size = 0;
   this->max_Depth = 0;
   this->trees = std::unordered_map<uint16_t, DecisionTree>();
 }
 
 //
-RandomForest::RandomForest(uint16_t n, uint16_t depth) {
+RandomForest::RandomForest(uint16_t n, uint16_t depth) noexcept{
   this->size = n;
   this->max_Depth = depth;
   this->trees = std::unordered_map<uint16_t, DecisionTree>(n);
+}
+
+//
+RandomForest::RandomForest(RandomForest &&forest) noexcept{
+  this->size = forest.size;
+  this->max_Depth = forest.max_Depth;
+  this->trees = std::move(forest.trees);
+}
+
+//
+RandomForest &RandomForest::operator=(RandomForest &&forest) noexcept {
+  this->size = forest.size;
+  this->max_Depth = forest.max_Depth;
+  this->trees = std::move(forest.trees);
+  return *this;
 }
 
 //

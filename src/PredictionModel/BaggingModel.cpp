@@ -9,9 +9,13 @@
 /********************/
 
 //
+BaggingModel::BaggingModel() noexcept {};
+
+//
 BaggingModel::BaggingModel(const std::string &split_Operator,
                            const std::string &split_Criteria,
-                           uint16_t max_Depth, uint16_t number_Of_Trees) {
+                           uint16_t max_Depth,
+                           uint16_t number_Of_Trees) noexcept {
 
   // Here we just prepare the infos for the model
   if (max_Depth < 1) {
@@ -22,6 +26,25 @@ BaggingModel::BaggingModel(const std::string &split_Operator,
   this->max_Depth = max_Depth;
   set_Operator(split_Operator);
   set_Criteria(split_Criteria);
+}
+
+//
+BaggingModel::BaggingModel(BaggingModel &&model) noexcept{
+  this->forest = std::move(model.forest);
+  this->max_Depth = model.max_Depth;
+  this->number_Of_Trees = model.number_Of_Trees;
+  this->split_Criteria = std::move(model.split_Criteria);
+  this->split_Operator = std::move(model.split_Operator);
+}
+
+//
+BaggingModel &BaggingModel::operator=(BaggingModel &&model) noexcept{
+  this->forest = std::move(model.forest);
+  this->max_Depth = model.max_Depth;
+  this->number_Of_Trees = model.number_Of_Trees;
+  this->split_Criteria = std::move(model.split_Criteria);
+  this->split_Operator = std::move(model.split_Operator);
+  return *this;
 }
 
 //
@@ -90,6 +113,14 @@ void BaggingModel::set_Criteria(const std::string &criteria) {
     std::cerr << "Chosen criteria is invalid\n";
     abort();
   }
+}
+
+//
+void BaggingModel::set_Depth(uint16_t depth) { this->max_Depth = depth; }
+
+//
+void BaggingModel::set_Trees_Number(uint16_t trees) {
+  this->number_Of_Trees = trees;
 }
 
 //

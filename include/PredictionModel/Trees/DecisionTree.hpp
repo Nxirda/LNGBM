@@ -1,7 +1,6 @@
 #ifndef DECISION_TREE_H_
 #define DECISION_TREE_H_
 
-//#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -13,7 +12,6 @@
 class DecisionTree : IModel {
 private:
   // Parameters
-
   uint16_t max_Depth;
   std::unique_ptr<TreeNode> root;
 
@@ -31,10 +29,13 @@ private:
 public:
   // Constructor
 
-  DecisionTree();
-  DecisionTree(uint16_t max_Depth);
-  DecisionTree(const DecisionTree &dt);
-  DecisionTree &operator=(const DecisionTree &tree);
+  DecisionTree() noexcept;
+  DecisionTree(uint16_t max_Depth) noexcept;
+  DecisionTree(const DecisionTree &dt) noexcept;
+  DecisionTree &operator=(const DecisionTree &tree) noexcept;
+
+  DecisionTree(DecisionTree &&tree) noexcept;
+  DecisionTree &operator=(DecisionTree &&tree) noexcept;
 
   // Destructor
 
@@ -51,8 +52,6 @@ public:
 
   void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
   std::vector<double> predict(const DataSet &data) const override;
-
-  /* void print_Tree(); */
 };
 
 #endif

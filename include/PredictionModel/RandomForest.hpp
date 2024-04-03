@@ -11,17 +11,19 @@ class RandomForest : IModel {
 
 private:
   // Parameters
-
+  
+  std::unordered_map<uint16_t, DecisionTree> trees;
   uint16_t size;
   uint16_t max_Depth;
-
-  std::unordered_map<uint16_t, DecisionTree> trees;
 
 public:
   // Constructor
 
-  RandomForest();
-  RandomForest(uint16_t n, uint16_t depth);
+  RandomForest() noexcept;
+  RandomForest(uint16_t n, uint16_t depth) noexcept;
+
+  RandomForest(RandomForest &&forest) noexcept;
+  RandomForest &operator=(RandomForest &&forest) noexcept;
   // Destructor
 
   ~RandomForest() override;

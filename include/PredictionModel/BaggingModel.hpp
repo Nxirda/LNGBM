@@ -17,10 +17,13 @@ private:
 public:
   // Constructor
 
-  BaggingModel() = delete;
+  BaggingModel() noexcept; //= delete;
   BaggingModel(const std::string &split_Operator,
                const std::string &split_Criteria, uint16_t max_Depth,
-               uint16_t number_Of_Trees);
+               uint16_t number_Of_Trees) noexcept;
+
+  BaggingModel(BaggingModel &&model) noexcept;
+  BaggingModel &operator=(BaggingModel &&model) noexcept;
 
   // Getters
 
@@ -32,7 +35,8 @@ public:
   const std::unordered_map<uint16_t, DecisionTree> &get_Forest() const;
 
   // Setters
-
+  void set_Depth(uint16_t depth);
+  void set_Trees_Number(uint16_t number_Of_Trees);
   void set_Operator(const std::string &op);
   void set_Criteria(const std::string &criteria);
 
