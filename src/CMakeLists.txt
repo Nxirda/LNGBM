@@ -31,6 +31,8 @@ add_library(Source_Lib
     Utils/Timer.cpp
     Utils/Tools.cpp
     Utils/Serializer.cpp 
+    #User part (temporary)
+    UserHandler/UserHandler.cpp
 )   
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -46,6 +48,8 @@ target_include_directories(Source_Lib
     ${CMAKE_SOURCE_DIR}/include/MpiWrapper/
     ${CMAKE_SOURCE_DIR}/include/PredictionModel/
     ${CMAKE_SOURCE_DIR}/include/PredictionModel/Trees
+    #Temporary User part
+    ${CMAKE_SOURCE_DIR}/include/UserHandler
 )
 
 target_link_libraries(Source_Lib 
