@@ -60,20 +60,21 @@ $ cd build && cmake ..
 $ make -j
 ```
 
-If your installation of MPI isnt in your path you can do the following command
+If your installation of MPI isnt in your path you can run the following command
 instead of "cmake .."
 
 ```sh
 $ cmake -DCMAKE_CXX_COMPILER=/path/to/your/mpi/c++/compiler -DCMAKE_PREFIX_PATH=/path/to/your/mpi/installation ..
 ```
 
-
 ## Usage :
 
 ```sh
 # Ensure the project has been built properly
 cd build
-./main [Path to DataSet] [Split Metric] [Depth] [Number of Trees]
+Usage is : mpiexec -np [Process]  \
+           ./main [Path to DataSet] [Split Metric] [Split Criteria] [Depth] [Number of Trees] \
+           [Cross_Val] [Folds]
 ```
 
 ## Tests : 

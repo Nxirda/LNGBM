@@ -11,56 +11,45 @@
 /*                        */
 /**************************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Unique Values class
-*/
+//
 UniqueValues::UniqueValues() {}
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 UniqueValues::~UniqueValues() {}
 
-/*
-Print function to see the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-void UniqueValues::print() {
+//
+void UniqueValues::print() const {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-std::string UniqueValues::get_Name() { return "Unique Values"; }
+//
+size_t UniqueValues::get_Criteria_Number() const { return this->size; };
 
-/*
-Compute the Uniques Values of the given vector
-Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
-*/
-std::vector<float>
-UniqueValues::compute(const std::vector<float> list) const {
+//
+std::string UniqueValues::get_Name() const { return "UV"; }
 
-  // Cast in set to get unique values (unordered set of efficiency)
-  std::unordered_set<float> unique(list.begin(), list.end());
+//
+std::string UniqueValues::get_Name_Static() { return "Unique Values"; }
 
-  // Cast back in array for the result
-  std::vector<float> res(unique.begin(), unique.end());
+//
+std::vector<double>
+UniqueValues::compute(const std::vector<double> &list,
+                      const std::vector<size_t> &idx) const {
 
-  return res;
+  std::vector<double> list_To_Compute;
+  list_To_Compute.reserve(idx.size());
+
+  for (const auto &i : idx) {
+    list_To_Compute.push_back(list[i]);
+  }
+
+  // Cast in set to get unique values (unordered set for efficiency)
+  std::unordered_set<double> unique(list_To_Compute.begin(),
+                                    list_To_Compute.end());
+
+  // Cast back in array for the result || move to avoid copy
+  std::vector<double> unique_Values(std::make_move_iterator(unique.begin()),
+                          std::make_move_iterator(unique.end()));
+
+  return unique_Values;
 }

@@ -1,5 +1,3 @@
-#include <errno.h>
-
 #include "BaggingModel.hpp"
 #include "EnumCriteria.hpp"
 #include "EnumOperator.hpp"
@@ -10,173 +8,165 @@
 /*                  */
 /********************/
 
-/*
-Constructor with operator and depth fixed
-Parameters : split metric, split criteria, max depth
-Inputs     : string, string, int
-Outputs    : Object of BaggingModel class
-*/
-BaggingModel::BaggingModel(std::string split_Metric, std::string split_Criteria,
-                           int max_Depth) {
+//
+BaggingModel::BaggingModel() noexcept {};
+
+//
+BaggingModel::BaggingModel(const std::string &split_Operator,
+                           const std::string &split_Criteria,
+                           uint16_t max_Depth,
+                           uint16_t number_Of_Trees) noexcept {
 
   // Here we just prepare the infos for the model
-
   if (max_Depth < 1) {
-    errno = EINVAL;
-    perror("Depth parameter should be at least 1");
+    std::cerr << "Depth parameter should be at least 1\n";
     abort();
   }
-
+  this->number_Of_Trees = number_Of_Trees;
   this->max_Depth = max_Depth;
-  set_Metric(split_Metric);
+  set_Operator(split_Operator);
   set_Criteria(split_Criteria);
 }
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
-BaggingModel::~BaggingModel() {
-  delete (this->split_Metric);
-  delete (this->split_Criteria);
-};
+//
+BaggingModel::BaggingModel(BaggingModel &&model) noexcept{
+  this->forest = std::move(model.forest);
+  this->max_Depth = model.max_Depth;
+  this->number_Of_Trees = model.number_Of_Trees;
+  this->split_Criteria = std::move(model.split_Criteria);
+  this->split_Operator = std::move(model.split_Operator);
+}
 
-/*
-Sets the metric to split the nodes of the trees
-Parameters : split metric
-Inputs     : string
-Outputs    :
-*/
-void BaggingModel::set_Metric(std::string metric) {
+//
+BaggingModel &BaggingModel::operator=(BaggingModel &&model) noexcept{
+  this->forest = std::move(model.forest);
+  this->max_Depth = model.max_Depth;
+  this->number_Of_Trees = model.number_Of_Trees;
+  this->split_Criteria = std::move(model.split_Criteria);
+  this->split_Operator = std::move(model.split_Operator);
+  return *this;
+}
+
+//
+BaggingModel::~BaggingModel(){};
+
+//
+void BaggingModel::set_Operator(const std::string &metric) {
 
   std::map<std::string, operators::type>::iterator it;
 
   it = operators::dictionnary.find(metric);
 
   if (it == operators::dictionnary.end()) {
-    errno = EINVAL;
-    perror("Chosen metric is invalid");
+    std::cerr << "Chosen metric is invalid\n";
     abort();
   }
 
   switch (it->second) {
   case (operators::type::MAE):
-    this->split_Metric = new MAE();
+    this->split_Operator = std::make_unique<MAE>();
     break;
   case (operators::type::MAPE):
-    this->split_Metric = new MAPE();
+    this->split_Operator = std::make_unique<MAPE>();
     break;
   case (operators::type::RMSE):
-    this->split_Metric = new RMSE();
+    this->split_Operator = std::make_unique<RMSE>();
     break;
   case (operators::type::RIV):
-    this->split_Metric = new RIV();
+    this->split_Operator = std::make_unique<RIV>();
     break;
   default:
-    errno = EINVAL;
-    perror("Chosen metric is invalid");
+    std::cerr << "Chosen metric is invalid\n";
     abort();
   }
 }
 
-/*
-Sets the criteria to split the nodes of the trees
-Parameters : split criteria
-Inputs     : string
-Outputs    :
-*/
-void BaggingModel::set_Criteria(std::string criteria) {
+//
+void BaggingModel::set_Criteria(const std::string &criteria) {
 
   std::map<std::string, criterias::type>::iterator it;
 
   it = criterias::dictionary.find(criteria);
 
   if (it == criterias::dictionary.end()) {
-    errno = EINVAL;
-    perror("Chosen criteria is invalid");
+    std::cerr << "Chosen criteria is invalid\n";
     abort();
   }
 
   switch (it->second) {
   case (criterias::type::Histogram):
-    this->split_Criteria = new Histogram();
+    this->split_Criteria = std::make_unique<Histogram>();
     break;
   case (criterias::type::Percentiles):
-    this->split_Criteria = new Percentiles();
+    this->split_Criteria = std::make_unique<Percentiles>();
     break;
   case (criterias::type::Quartiles):
-    this->split_Criteria = new Quartiles();
+    this->split_Criteria = std::make_unique<Quartiles>();
     break;
   case (criterias::type::RandomValues):
-    this->split_Criteria = new RandomValues();
+    this->split_Criteria = std::make_unique<RandomValues>();
     break;
   case (criterias::type::UniqueValues):
-    this->split_Criteria = new UniqueValues();
+    this->split_Criteria = std::make_unique<UniqueValues>();
     break;
   default:
-    errno = EINVAL;
-    perror("Chosen criteria is invalid");
+    std::cerr << "Chosen criteria is invalid\n";
     abort();
   }
 }
 
-/*
- */
-int BaggingModel::get_Depth() { return this->max_Depth; }
+//
+void BaggingModel::set_Depth(uint16_t depth) { this->max_Depth = depth; }
 
-/*
- */
-int BaggingModel::get_Trees_Number() { return this->forest.get_size(); };
+//
+void BaggingModel::set_Trees_Number(uint16_t trees) {
+  this->number_Of_Trees = trees;
+}
 
-/**/
-std::map<int, DecisionTree> BaggingModel::get_Forest() const {
+//
+ICriteria *BaggingModel::get_Criteria() const {
+  return this->split_Criteria.get();
+}
+
+//
+IOperator *BaggingModel::get_Operator() const {
+  return this->split_Operator.get();
+}
+
+//
+uint16_t BaggingModel::get_Depth() const { return this->max_Depth; }
+
+//
+uint16_t BaggingModel::get_Trees_Number() const {
+  return this->forest.get_size();
+};
+
+//
+const std::unordered_map<uint16_t, DecisionTree> &
+BaggingModel::get_Forest() const {
   return this->forest.get_Trees();
 }
 
-/*
- */
-void BaggingModel::aggregate_Forest(const std::map<int, DecisionTree> &forest) {
-  this->forest.aggregate_Trees(forest);
-}
-
-/*
-Train the trees on the given dataset on the configured max depth
-Parameters : Dataset for training
-Inputs     : const DataSet
-Outputs    :
-*/
+//
 void BaggingModel::train(const DataSet &data) {
-  this->train(data, this->forest.get_size());
+  ICriteria *criteria = this->split_Criteria.release();
+  IOperator *op = this->split_Operator.release();
+
+  train(data, criteria, op);
+
+  this->split_Criteria.reset(criteria);
+  this->split_Operator.reset(op);
 }
 
-/*
-train the model on the DataSet with the operator and depth fixed
-Parameters : Dataset for training, number of trees to train
-Inputs     : const DataSet, int
-Outputs    :
-*/
-void BaggingModel::train(const DataSet &data, int n) {
+//
+void BaggingModel::train(const DataSet &data, ICriteria *crit, IOperator *op) {
+  this->forest =
+      std::move(RandomForest(this->number_Of_Trees, this->max_Depth));
 
-  if (n < 1) {
-    errno = EINVAL;
-    perror("Number of Trees should be at least 1");
-    abort();
-  }
-
-  this->forest = RandomForest(data, this->split_Metric, this->split_Criteria, n,
-                              this->max_Depth);
-
-  this->forest.generate_Forest(n);
+  this->forest.train(data, crit, op);
 }
 
-/*
-predict the labels for the given dataset with the operator and depth fixed
-Parameters : Dataset for prediction
-Inputs     : const DataSet
-Outputs    : vector<float>
-*/
-std::vector<float> BaggingModel::predict(const DataSet &data) {
-  return this->forest.predict_Results(data);
+//
+std::vector<double> BaggingModel::predict(const DataSet &data) const {
+  return this->forest.predict(data);
 }

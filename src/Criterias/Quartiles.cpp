@@ -1,6 +1,4 @@
 #include <algorithm>
-#include <execution>
-#include <omp.h>
 
 #include "Quartiles.hpp"
 #include "TrainingElement.hpp"
@@ -11,59 +9,45 @@
 /*                      */
 /************************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Quartiles class
-*/
-Quartiles::Quartiles() {}
+//
+Quartiles::Quartiles() { this->size = this->quartiles.size(); }
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 Quartiles::~Quartiles() {}
 
-/*
-Print function to see the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-void Quartiles::print() {
+//
+void Quartiles::print() const {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-std::string Quartiles::get_Name() { return "Quartiles"; }
+//
+size_t Quartiles::get_Criteria_Number() const { return this->size; };
 
-/*
-Compute the Quartiles of the given vector
-Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
-*/
-std::vector<float> Quartiles::compute(const std::vector<float> list) const {
+//
+std::string Quartiles::get_Name() const { return "Q"; }
 
-  std::vector<float> quartiles_Values(this->quartiles.size(), 0);
+//
+std::string Quartiles::get_Name_Static() { return "Quartiles"; }
+
+//
+std::vector<double> Quartiles::compute(const std::vector<double> &list,
+                                       const std::vector<size_t> &idx) const {
+
+  std::vector<double> quartiles_Values(this->quartiles.size());
+
+  std::vector<double> sorted_Data;
+  sorted_Data.reserve(idx.size());
+
+  for (const auto &i : idx) {
+    sorted_Data.push_back(list[i]);
+  }
+
   // Sort the data
-  std::vector<float> sorted_Data = list;
-  std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
+  const size_t length = sorted_Data.size();
+  std::sort(sorted_Data.begin(), sorted_Data.end());
 
-#pragma omp parallel for
   for (size_t i = 0; i < this->quartiles.size(); ++i) {
-    float res = sorted_Data[sorted_Data.size() * (this->quartiles[i] / 100)];
-    quartiles_Values[i] = res;
+    quartiles_Values[i] = sorted_Data[length * (this->quartiles[i] / 100)];
   }
   return quartiles_Values;
 }

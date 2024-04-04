@@ -11,7 +11,11 @@
  */
 class UniqueValues : public ICriteria {
 private:
-  const std::string name = "Unique_Values";  /**< A string variable to display the name. */
+  const std::string name =
+      "Unique_Values"; /**< A string variable to display the name. */
+
+  size_t size = 0; /**< A size_t variable that stores the number of elements to
+                      generate */
 
 public:
   /**
@@ -29,22 +33,40 @@ public:
   /**
    * @brief Prints the name of the class on standard output.
    */
-  void print() override;
+  void print() const override;
+
+  /**
+   * @brief Returns the number of element the Histogram will compute
+   *
+   * @return Type : size_t, the number of elements
+   */
+  size_t get_Criteria_Number() const override;
 
   /**
    * @brief Static method to get the name of the UniqueValues criteria.
    *
    * @return The name of the UniqueValues criteria.
    */
-  static std::string get_Name();
+  std::string get_Name() const override;
+
+  /**
+   * @brief Static method to get the name of the UniqueValues criteria.
+   *
+   * @return The name of the UniqueValues criteria.
+   */
+  static std::string get_Name_Static();
 
   /**
    * @brief Computes the unique values of a given data distribution.
    *
-   * @param vector<float> list: The distribution of data
-   * @return Type: vector<float>, A vector of the unique values
+   * @param vector<double> list: The distribution of data
+   * @param vector<size_t> idx : The index we can access in the data
+   * distribution
+   * 
+   * @return Type: vector<double>, A vector of the unique values
    */
-  std::vector<float> compute(const std::vector<float> list) const override;
+  std::vector<double> compute(const std::vector<double> &list,
+                              const std::vector<size_t> &idx) const override;
 };
 
 #endif

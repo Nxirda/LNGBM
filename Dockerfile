@@ -9,7 +9,8 @@ RUN apt-get update -y && \
     apt install build-essential -y && \
     apt install cmake -y && \
     apt install vim -y && \
-    apt install libgtest-dev -y
+    apt install libgtest-dev -y && \
+    apt install mpich -y 
 
 #Environment 
 VOLUME /root/env
@@ -22,5 +23,5 @@ ENV HOSTNAME=docker
 #Build the project
 RUN mkdir build && \
     cd build && \
-    cmake .. && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release && \
 	make -j 8

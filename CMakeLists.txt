@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-# ===== Testing Part =====
+# ===== Main Part =====
 
 #Set the project name
 project(PPN)
@@ -9,47 +9,29 @@ project(PPN)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#Add the subdirectory for the source files
-add_subdirectory(src)
-
 #Add the executable
 add_executable(main main.cpp)
 
-# Set MPI 
+#Required dependencies 
 find_package(MPI REQUIRED)
+find_package(BLAS REQUIRED)
+find_package(OpenMP REQUIRED)
+find_package(Boost REQUIRED COMPONENTS serialization mpi)
+
+#
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-target_link_libraries(main PRIVATE ${MPI_C_LIBRARIES})
 set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
 
-# Set Boost
-find_package(Boost REQUIRED COMPONENTS serialization mpi)
-target_link_libraries(main PRIVATE Boost::serialization Boost::mpi)
+#AVX2 support
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
 
-# Set OpenMP 
-find_package(OpenMP REQUIRED)
-if(OpenMP_CXX_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+#Add the subdirectory for the source files
+add_subdirectory(src)
 
-target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
-
-find_package(TBB REQUIRED)
-
-# Find BLAS library
-find_package(BLAS REQUIRED)
-
-target_include_directories(main PRIVATE ${BLAS_INCLUDE_DIRS})
-# Link with BLAS (CBLAS)
-target_link_libraries(main PRIVATE BLAS::BLAS)
-
-#Add our Libraries
 target_link_libraries(main PRIVATE Source_Lib)
 
-#For parallel execution policies
-target_link_libraries(main PRIVATE TBB::tbb)
-
-#Add compilation options    
-add_compile_options(-std=c++23 -fopenmp -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
+#Add compilation options
+add_compile_options(-std=c++23 -g -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
 
 # ===== Testing Part =====
 
@@ -59,35 +41,31 @@ find_package(GTest REQUIRED)
 #To be able to launch tests with ctest
 enable_testing()
 
-add_executable(Tests test/DataSet_Test.cpp 
-                    test/DecisionTree_Test.cpp 
-                    test/TreeNode_Test.cpp 
-                    src/
-)
-
-add_test(myTest Tests)
-
 add_subdirectory(test)
 
-target_include_directories(Tests PUBLIC include/ )
+add_executable(tests test/main_Test.cpp) 
 
-target_link_libraries(Tests PRIVATE Test_Lib)
-target_link_libraries(Tests PRIVATE GTest::GTest GTest::Main)
-target_link_libraries(Tests PRIVATE Source_Lib)
-target_link_libraries(Tests PRIVATE TBB::tbb)
-target_link_libraries(Tests PRIVATE BLAS::BLAS)
+add_test(myTest tests)
 
+target_include_directories(tests PUBLIC include/ )
 
-gtest_discover_tests(Tests)
+target_link_libraries(tests PRIVATE Test_Lib)
+target_link_libraries(tests PRIVATE GTest::GTest GTest::Main)
+target_link_libraries(tests PRIVATE Source_Lib)
+target_link_libraries(tests PRIVATE BLAS::BLAS)
+
+gtest_discover_tests(tests)
 
 # ===== Benchmark Part =====
 
-add_executable(Benchmarks benchmark/mainBenchmark.cpp)
+#add_executable(Benchmarks benchmark/mainBenchmark.cpp)
 
-add_subdirectory(benchmark)
+#add_subdirectory(benchmark)
 
-target_link_libraries(Benchmarks PRIVATE Benchmark_Lib)
-target_link_libraries(Benchmarks PRIVATE OpenMP::OpenMP_CXX)
-target_link_libraries(Benchmarks PRIVATE TBB::tbb)
-target_link_libraries(Benchmarks PRIVATE BLAS::BLAS)
+#target_link_libraries(Benchmarks PRIVATE Benchmark_Lib)
+#target_link_libraries(Benchmarks PRIVATE OpenMP::OpenMP_CXX)
+#target_link_libraries(Benchmarks PRIVATE TBB::tbb)
+#target_link_libraries(Benchmarks PRIVATE BLAS::BLAS)
+#target_link_libraries(Benchmarks PRIVATE Boost::serialization Boost::mpi)
+
 

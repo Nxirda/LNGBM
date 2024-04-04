@@ -44,3 +44,4 @@ cmake-build-*
 # Specific to the project
 *.dat
 Benchmark/Results/
+Notes.md

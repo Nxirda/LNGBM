@@ -1,7 +1,4 @@
 #include <algorithm>
-#include <execution>
-#include <omp.h>
-#include <random>
 
 #include "RandomValues.hpp"
 #include "TrainingElement.hpp"
@@ -12,93 +9,71 @@
 /*                        */
 /**************************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Random_Values class
-*/
-RandomValues::RandomValues() {}
-
-/*
-Constructor with argument for the number of values to compute
-Parameters : number of values
-Inputs     : int
-Outputs    : Object of Random Values class
-*/
-RandomValues::RandomValues(int x) {
-  if (x <= 0) {
-    errno = EINVAL;
-    perror("Can't compute split criterias with x <= 0\n x is set to 5");
-    this->number_Of_Elements = 10;
-  } else {
-    this->number_Of_Elements = x;
-  }
+//
+RandomValues::RandomValues() {
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  this->gen = generator;
 }
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
+RandomValues::RandomValues(size_t x) {
+  if (x <= 0) {
+    std::cerr << "Can't compute split criterias with x <= 0\n x is set to 32\n";
+    this->size = 32;
+  } else {
+    this->size = x;
+  }
+
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  this->gen = generator;
+}
+
+//
 RandomValues::~RandomValues() {}
 
-/*
-Computes a random float between min and max
-Parameters : minimum value, maximum value
-Inputs     : float, float
-Outputs    : float
- */
-float RandomValues::get_Random_Float(float min, float max) const {
-  // Hardware based entropy
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
-  std::uniform_real_distribution<float> dist(min, max);
-  return dist(gen);
+//
+double RandomValues::get_Random_double(double min, double max) const {
+  std::uniform_real_distribution<double> dist(min, max);
+  return dist(this->gen);
 }
 
-/*
-Print function to see the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-void RandomValues::print() {
+//
+void RandomValues::print() const {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-std::string RandomValues::get_Name() { return "Random Values"; }
+//
+size_t RandomValues::get_Criteria_Number() const { return this->size; }
 
-/*
-Compute random values in the given vector
-Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
-*/
-std::vector<float> RandomValues::compute(const std::vector<float> list) const {
+//
+std::string RandomValues::get_Name() const { return "RV"; }
 
-  auto min = std::min_element(std::execution::par, list.begin(), list.end());
-  auto max = std::max_element(std::execution::par, list.begin(), list.end());
+//
+std::string RandomValues::get_Name_Static() { return "Random Values"; }
 
-  std::vector<float> res(this->number_Of_Elements, 0);
-  res[0] = *min;
-  res[this->number_Of_Elements - 1] = *max;
+//
+std::vector<double>
+RandomValues::compute(const std::vector<double> &list,
+                      const std::vector<size_t> &idx) const {
 
-  if (this->number_Of_Elements > 0) {
-#pragma omp parallel for
-    for (int i = 1; i < this->number_Of_Elements - 1; ++i) {
-      res[i] = get_Random_Float(*min, *max);
-    }
+  std::vector<double> list_To_Compute;
+  list_To_Compute.reserve(idx.size());
+
+  for (const auto &i : idx) {
+    list_To_Compute.push_back(list[i]);
   }
-  return res;
+
+  const auto min = std::min_element(list_To_Compute.begin(), list_To_Compute.end());
+  const auto max = std::max_element(list_To_Compute.begin(), list_To_Compute.end());
+
+  std::vector<double> random_Values(this->size, 0);
+  random_Values[0] = *min;
+  random_Values[this->size - 1] = *max;
+
+  for (size_t i = 1; i < this->size - 1; ++i) {
+    random_Values[i] = get_Random_double(*min, *max);
+  }
+  return random_Values;
 }

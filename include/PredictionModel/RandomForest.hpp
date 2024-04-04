@@ -1,50 +1,41 @@
 #ifndef RANDOM_FOREST_H_
 #define RANDOM_FOREST_H_
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "DecisionTree.hpp"
-#include "ICriteria.hpp"
-#include "IOperator.hpp"
-#include "TrainingElement.hpp"
+#include "IModel.hpp"
 
-class RandomForest {
+class RandomForest : IModel {
 
 private:
   // Parameters
-
-  int size;
-  int max_Depth;
-  IOperator *splitting_Operator;
-  ICriteria *splitting_Criteria;
-  std::map<int, DecisionTree> trees;
-  DataSet dataset;
+  
+  std::unordered_map<uint16_t, DecisionTree> trees;
+  uint16_t size;
+  uint16_t max_Depth;
 
 public:
   // Constructor
 
-  RandomForest();
-  RandomForest(const DataSet &dataset, IOperator *op, ICriteria *crit, int n,
-               int depth);
+  RandomForest() noexcept;
+  RandomForest(uint16_t n, uint16_t depth) noexcept;
 
+  RandomForest(RandomForest &&forest) noexcept;
+  RandomForest &operator=(RandomForest &&forest) noexcept;
   // Destructor
 
-  ~RandomForest();
+  ~RandomForest() override;
 
   // Getters
-
-  std::map<int, DecisionTree> get_Trees() const;
-  int get_size();
-  // std::vector<float> get_results();
+  const std::unordered_map<uint16_t, DecisionTree> &get_Trees() const;
+  uint16_t get_size() const;
 
   // Methods
-  void generate_Forest(int size);
-  void aggregate_Trees(const std::map<int, DecisionTree> &forest);
-  std::vector<float> predict_Results(const DataSet &dataset);
-  void tree_Prediction(const DataSet &data,
-                       std::shared_ptr<std::vector<float>> result,
-                       std::vector<int> index, TreeNode *node);
+
+  void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
+  std::vector<double> predict(const DataSet &data) const override;
 };
 
 #endif

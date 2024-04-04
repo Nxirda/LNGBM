@@ -1,8 +1,8 @@
+#include <cblas.h>
 #include <cmath>
 #include <omp.h>
 
 #include "MAE.hpp"
-#include "TrainingElement.hpp"
 
 /********************/
 /*                  */
@@ -10,114 +10,61 @@
 /*                  */
 /********************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 MAE::MAE() {}
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 MAE::~MAE() {}
 
-/*
-Print function to see the name of the operator
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 void MAE::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the operator
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-std::string MAE::get_Name() { return "Mean Absolute Value"; }
+//
+std::string MAE::get_Name() const { return this->name; }
 
-/*
-Computes the Mean Absolute Error of a split on a given column
-Index is used to get the column of the dataset that can be accessed
-Parameters : position, DataSet, index
-Inputs     : int, DataSet, vector<int>
-Outputs    : float
-*/
-float MAE::compute(int position, const DataSet &data, std::vector<int> index,
-                   const float split_Criteria) const {
+//
+std::string MAE::get_Name_Static() { return "Mean Absolute Value"; }
 
-  float left_MAE = 0;
-  float right_MAE = 0;
+//
+double MAE::compute(const std::vector<double> &exact, double prediction) const {
 
-  // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = data.split(position, split_Criteria, index);
+  double res = 0.0;
+  const size_t size = exact.size();
 
-  float base_Population = index.size();
+  std::vector<double> prediction_Vector(size, (prediction));
 
-  // Creating a left child
-  TreeNode left_Child{};
+  std::vector<double> absoluteDifferences(size);
+  // Copy necessary for daxpy
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
 
-  // Creating a right child
-  TreeNode right_Child{};
+  // Computes the yi - ŷi part of the MAE
+  cblas_daxpy(size, -1.0, prediction_Vector.data(), 1,
+              absoluteDifferences.data(), 1);
 
-  // Get the labels
-  std::vector<float> labels = data.get_Labels();
-
-  // Computes the Mean Absolute Error for left child
-  float left_Prediction = data.labels_Mean(left_index.value());
-  float left_Population = left_index.value().size();
-
-#pragma omp parallel for reduction(+ : left_MAE)
-  for (int idx : left_index.value()) {
-    left_MAE += std::abs(labels[idx] - left_Prediction);
-  }
-  left_MAE /= left_Population;
-
-  // Computes the Mean Absolute Error for right child
-  float right_Prediction = data.labels_Mean(right_index.value());
-  float right_Population = right_index.value().size();
-
-#pragma omp parallel for reduction(+ : right_MAE)
-  for (int idx : right_index.value()) {
-    right_MAE += std::abs(labels[idx] - right_Prediction);
-  }
-  right_MAE /= right_Population;
-
-  // Compute the result of MAE for the split at position
-  float res = ((left_MAE * left_Population) + (right_MAE * right_Population)) /
-              base_Population;
-
+  // MAE computing (dasum takes the absolute values)
+  res = cblas_dasum(static_cast<int>(size), absoluteDifferences.data(), 1);
+  res *= 1.0 / size;
   return res;
 }
 
-/*
-Computes the MAE of two vectors
-Parameters : exact results, prediction results
-Inputs     : const vector<float>, const vector<float>
-Outputs    : double
-*/
-float MAE::apply(const std::vector<float> &exact,
-                 const std::vector<float> &prediction) {
+//
+double MAE::apply(const std::vector<double> &exact,
+                  const std::vector<double> &prediction) {
 
-  float res = 0;
-  int size = prediction.size();
-#pragma omp parallel for reduction(+ : res)
-  for (int i = 0; i < size; ++i) {
-    res += std::abs(exact[i] - prediction[i]);
-  }
+  double res = 0.0;
+  const size_t size = exact.size();
 
-  // Compute the MAE
-  res = res / size;
+  std::vector<double> result_Vector(size);
+  cblas_dcopy(size, exact.data(), 1, result_Vector.data(), 1);
 
+  // Computes the yi - ŷi part of the MAE
+  cblas_daxpy(size, -1.0, prediction.data(), 1, result_Vector.data(), 1);
+
+  // MAE computing
+  res = cblas_dasum(static_cast<int>(size), result_Vector.data(), 1);
+
+  res *= (1.0 / size);
   return res;
 }

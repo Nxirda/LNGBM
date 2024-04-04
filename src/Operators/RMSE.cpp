@@ -1,8 +1,8 @@
+#include <cblas.h>
 #include <cmath>
 #include <omp.h>
 
 #include "RMSE.hpp"
-#include "TreeNode.hpp"
 
 /********************/
 /*                  */
@@ -10,92 +10,40 @@
 /*                  */
 /********************/
 
-/*
-Constructor
-Parameters :
-Input      :
-Output     :
-*/
+//
 RMSE::RMSE() {}
 
-/*
-Destructor
-Parameters :
-Input      :
-Output     :
-*/
+//
 RMSE::~RMSE() {}
 
-/*
-Print function to see the name of the operator
-(For debugging mainly)
-Parameters :
-Input      :
-Output     :
-*/
+//
 void RMSE::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the operator
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-std::string RMSE::get_Name() { return "Root Mean Square Error"; }
+//
+std::string RMSE::get_Name() const { return this->name; }
 
-/*
-Computes the Root Mean Square Error of a split on a given column
-Index is used to get the column of the dataset that can be accessed
-Parameters : position, DataSet, index
-Inputs     : int, DataSet, vector<int>
-Outputs    : float
-*/
-float RMSE::compute(int position, const DataSet &data, std::vector<int> index,
-                    const float split_Criteria) const {
+//
+std::string RMSE::get_Name_Static() { return "Root Mean Square Error"; }
 
-  float right_RMSE = 0;
-  float left_RMSE = 0;
+//
+double RMSE::compute(const std::vector<double> &exact,
+                     double prediction) const {
+  double res = 0.0;
+  const size_t size = exact.size();
 
-  // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = data.split(position, split_Criteria, index);
+  std::vector<double> prediction_Vector(size, (prediction));
 
-  float base_Population = index.size();
+  std::vector<double> absoluteDifferences(size);
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
 
-  // Creating a left child
-  TreeNode left_Child{};
+  // Computes the yi - ŷi part of the RMSE
+  cblas_daxpy(size, -1.0, prediction_Vector.data(), 1,
+              absoluteDifferences.data(), 1);
 
-  // Creating a right child
-  TreeNode right_Child{};
+  // RMSE computing
+  res = cblas_dnrm2(static_cast<int>(size), absoluteDifferences.data(), 1);
 
-  // Get the labels
-  std::vector<float> labels = data.get_Labels();
-
-  // Computes the Root Mean Square Error for left child
-  float left_Prediction = data.labels_Mean(left_index.value());
-  float left_Population = left_index.value().size();
-
-#pragma omp parallel for reduction(+ : left_RMSE)
-  for (int idx : left_index.value()) {
-    left_RMSE += pow((std::abs(labels[idx] - left_Prediction)), 2)/left_Population;
-  }
-  left_RMSE = sqrt(left_RMSE);
-
-  // Computes the Root Mean Square Error for left child
-  float right_Prediction = data.labels_Mean(right_index.value());
-  float right_Population = right_index.value().size();
-
-#pragma omp parallel for reduction(+ : right_RMSE)
-  for (int idx : right_index.value()) {
-    right_RMSE += pow((std::abs(labels[idx] - right_Prediction)), 2)/right_Population;
-  }
-  right_RMSE = sqrt(right_RMSE);
-
-  // Compute the result of RMSE for the split at position
-  float res =
-      ((left_RMSE * left_Population) + (right_RMSE * right_Population)) /
-      base_Population;
   return res;
 }

@@ -4,7 +4,7 @@
 //
 TEST(TreeNodeTest, DefaultConstructor) {
   TreeNode default_Node{};
-  ASSERT_EQ(default_Node.get_Split_Column(), -1);
+  ASSERT_EQ(default_Node.get_Split_Column(), 0);
   ASSERT_EQ(default_Node.get_Split_Criterion(), -1);
   ASSERT_EQ(default_Node.get_Predicted_Value(), -1);
 }
@@ -42,9 +42,9 @@ TEST(TreeNodeTest, AddChildNode) {
 
 //
 TEST(TreeNodeTest, ValueValidation) {
-  TreeNode invalid_node{-1, -1.0, -1.0};
+  TreeNode invalid_node{0, -1.0, -1.0};
 
-  ASSERT_EQ(invalid_node.get_Split_Column(), -1.0);
+  ASSERT_EQ(invalid_node.get_Split_Column(), 0);
   ASSERT_EQ(invalid_node.get_Split_Criterion(), -1.0);
   ASSERT_EQ(invalid_node.get_Predicted_Value(), -1.0);
 }

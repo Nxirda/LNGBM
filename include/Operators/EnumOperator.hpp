@@ -7,46 +7,36 @@
 
 #include "MAE.hpp"
 #include "MAPE.hpp"
-#include "RMSE.hpp"
 #include "RIV.hpp"
+#include "RMSE.hpp"
 
 namespace operators {
 
-/**/
+/**
+ * @brief Enumeration representing the different types of Operators used for splitting
+ *
+ * This enumeration should contain the implemented types of criteria:
+ * 
+ * Mean Absolute Error, Mean Absolute Percentage Error
+ * Root Mean Square Error, Reduction In Variance
+ */
 enum class type { MAE, MAPE, RMSE, RIV, Other };
 
-/**/
-inline std::map<std::string, type> dictionnary = {
-    {"MAE", type::MAE},
-    {"MAPE", type::MAPE},
-    {"RMSE", type::RMSE},
-    {"RIV", type::RIV}};
+/**
+ * @brief Dictionary mapping string representations to enum values.
+ *
+ * This map associates string representations with the corresponding enum
+ * values from the 'type' enumeration.
+ */
+extern std::map<std::string, type> dictionnary;
 
-/**/
-inline void print() {
-  for (auto const &pair : dictionnary) {
-    std::cout << "{" << pair.first << "} : ";
-    switch (pair.second) {
-    case (operators::type::MAE):
-      std::cout << MAE::get_Name();
-      break;
-    case (operators::type::MAPE):
-      std::cout << MAPE::get_Name();
-      break;
-    case (operators::type::RMSE):
-      std::cout << RMSE::get_Name();
-      break;
-    case (operators::type::RIV):
-      std::cout << RIV::get_Name();
-      break;
-    default:
-      std::cout << " Unknown Type";
-    }
-
-    std::cout << "\n";
-  }
-  return;
-}
+/**
+ * @brief Prints the names associated with each enum value.
+ *
+ * This function iterates through the 'dictionary' map and prints the names
+ * associated with each 'type' enum value.
+ */
+void print();
 } // namespace operators
 
 #endif

@@ -1,6 +1,4 @@
 #include <algorithm>
-#include <execution>
-#include <omp.h>
 
 #include "Histogram.hpp"
 #include "TrainingElement.hpp"
@@ -11,77 +9,60 @@
 /*                        */
 /**************************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Histogram class
-*/
+//
 Histogram::Histogram() {}
 
-/*
-Constructor with argument for the number of bins
-Parameters : number of bins
-Inputs     : int
-Outputs    : Object of Histogram class
-*/
-Histogram::Histogram(int x) {
+//
+Histogram::Histogram(size_t x) {
   if (x <= 0) {
-    errno = EINVAL;
-    perror("Can't compute split criterias with x <= 0\n x is set to 5");
-    this->number_Of_Bins = 10;
+    std::cerr << "Can't compute Histogram with x(bins) <= 0\n x is set to "
+                 "default (32)\n";
   } else {
-    this->number_Of_Bins = x;
+    this->size = x;
   }
 }
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 Histogram::~Histogram() {}
 
-/*
-Print function to see the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-void Histogram::print() {
+//
+void Histogram::print() const {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-std::string Histogram::get_Name() { return "Histogram"; }
+//
+size_t Histogram::get_Criteria_Number() const { return this->size; }
 
-/*
-Compute the historgam of the given vector
-Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
-*/
-std::vector<float> Histogram::compute(const std::vector<float> list) const {
+//
+std::string Histogram::get_Name() const { return "H"; }
 
-  auto min = std::min_element(std::execution::par, list.begin(), list.end());
-  auto max = std::max_element(std::execution::par, list.begin(), list.end());
+//
+std::string Histogram::get_Name_Static() { return "Histogram"; }
 
-  std::vector<float> res(this->number_Of_Bins, 0.0);
+//
+std::vector<double> Histogram::compute(const std::vector<double> &list,
+                                       const std::vector<size_t> &idx) const {
 
-  int bin_size = (*max - *min) / this->number_Of_Bins;
+  double min = std::numeric_limits<double>::max();
+  double max = 0;
+  const size_t size = this->size;
 
-#pragma omp parallel for
-  for (int i = 0; i < this->number_Of_Bins; ++i) {
-    // Returns the values that separates two bins
-    res[i] = *min + bin_size * i;
+  for (const auto &i : idx) {
+    const auto &elem = list[i];
+    if (elem < min)
+      min = elem;
+    else if (elem > max)
+      max = elem;
   }
-  return res;
+
+  std::vector<double> bins(size, 0.0);
+
+  const size_t bin_size = (max - min) * (1.0 / size);
+
+  for (size_t i = 0; i < size; ++i) {
+    // Returns the values that separates two bins
+    bins[i] = min + bin_size * i;
+  }
+
+  return bins;
 }

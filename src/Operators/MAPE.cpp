@@ -1,8 +1,8 @@
+#include <cblas.h>
 #include <cmath>
 #include <omp.h>
 
 #include "MAPE.hpp"
-#include "TreeNode.hpp"
 
 /********************/
 /*                  */
@@ -10,116 +10,83 @@
 /*                  */
 /********************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 MAPE::MAPE() {}
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 MAPE::~MAPE() {}
 
-/*
-Print function to see the name of the operator
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 void MAPE::print() {
   std::cout << "=== Operator is : " << this->name << " ===\n";
 }
+//
+std::string MAPE::get_Name() const { return this->name; }
 
-/*
-Return the name of the operator
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-std::string MAPE::get_Name() { return "Mean Absolute Percentage Value"; }
+//
+std::string MAPE::get_Name_Static() { return "Mean Absolute Percentage Value"; }
 
-/*
-Computes the Mean Absolute Percentage Error of a split on a given column
-Index is used to get the column of the dataset that can be accessed
-Parameters : position, DataSet, index
-Inputs     : int, DataSet, vector<int>
-Outputs    : float
-*/
-float MAPE::compute(int position, const DataSet &data, std::vector<int> index,
-                    const float split_Criteria) const {
+double MAPE::compute(const std::vector<double> &exact,
+                     double prediction) const {
 
-  float left_MAPE = 0;
-  float right_MAPE = 0;
+  double res = 0.0;
+  const size_t size = exact.size();
 
-  // Computes the DataSet Row Indexes that child nodes can access
-  auto [left_index, right_index] = data.split(position, split_Criteria, index);
+  std::vector<double> prediction_Vector(size, (prediction));
 
-  float base_Population = index.size();
+  std::vector<double> absoluteDifferences(size);
+  // Copy necessary for daxpy
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
 
-  // Creating a left child
-  TreeNode left_Child{};
+  // Computes the yi - ŷi part of the MAPE
+  cblas_daxpy(size, -1.0, prediction_Vector.data(), 1,
+              absoluteDifferences.data(), 1);
 
-  // Creating a right child
-  TreeNode right_Child{};
+  // Computes the yi / N part of the MAPE
+  cblas_dscal(size, 1.0 / prediction, absoluteDifferences.data(), 1);
 
-  // Get the labels
-  std::vector<float> labels = data.get_Labels();
+  // Computes the final reduction of the MAPE (dasum takes the absolute values)
+  res = cblas_dasum(static_cast<int>(size), absoluteDifferences.data(), 1);
 
-  // Computes the Mean Absolute Percentage Error for left child
-  float left_Prediction = data.labels_Mean(left_index.value());
-  float left_Population = left_index.value().size();
-
-#pragma omp parallel for reduction(+ : left_MAPE)
-  for (int idx : left_index.value()) {
-    left_MAPE += (std::abs(labels[idx] - left_Prediction)) / left_Prediction;
-  }
-  left_MAPE *= 100;
-  left_MAPE /= left_Population;
-
-  // Computes the Mean Absolute Percentage Error for left child
-  float right_Prediction = data.labels_Mean(right_index.value());
-  float right_Population = right_index.value().size();
-
-#pragma omp parallel for reduction(+ : right_MAPE)
-  for (int idx : right_index.value()) {
-    right_MAPE += (std::abs(labels[idx] - right_Prediction)) / right_Prediction;
-  }
-  right_MAPE *= 100;
-  right_MAPE /= right_Population;
-
-  // Compute the result of MAPE for the split at position
-  float res =
-      ((left_MAPE * left_Population) + (right_MAPE * right_Population)) /
-      base_Population;
+  res = (res * 100.0) * (1.0 / size);
   return res;
 }
 
-/*
-Computes the MAPE of two vectors
-Parameters : exact results, prediction results
-Inputs     : const vector<float>, const vector<float>
-Outputs    : double
-*/
-float MAPE::apply(const std::vector<float> &exact,
-                  const std::vector<float> &prediction) {
+//
+double MAPE::apply(const std::vector<double> &exact,
+                   const std::vector<double> &prediction) {
 
-  float res = 0;
-  int size = prediction.size();
-#pragma omp parallel for reduction(+ : res)
-  for (int i = 0; i < size; ++i) {
-    res += std::abs(exact[i] - prediction[i]) / exact[i];
+  // Figure out how to do the division part with blas when we have two vectors
+  double res = 0.0;
+  const size_t size = prediction.size();
+
+  for (size_t i = 0; i < size; ++i) {
+    res += std::abs(exact[i] - prediction[i]) * (1.0 / exact[i]);
   }
 
   // Compute the MAPE
-  res = (res * 100) / size;
+  res = (res * 100.0) * (1.0 / size);
 
   return res;
 }
+
+/* double res = 0.0;
+  size_t size = exact.size();
+
+  //std::vector<double> prediction_Vector(size, (prediction));
+
+  std::vector<double> absoluteDifferences(size);
+  // Copy necessary for daxpy
+  cblas_dcopy(size, exact.data(), 1, absoluteDifferences.data(), 1);
+
+  // Computes the yi - ŷi part of the MAPE
+  cblas_daxpy(size, -1.0, prediction.data(), 1,
+              absoluteDifferences.data(), 1);
+
+  cblas_dscal(size, 1.0 / prediction, absoluteDifferences.data(), 1);
+
+  // MAE computing (dasum takes the absolute values)
+  res = cblas_dasum(static_cast<int>(size), absoluteDifferences.data(), 1);
+
+  res = (res * 100.0) * (1.0 / size);
+  return res; */

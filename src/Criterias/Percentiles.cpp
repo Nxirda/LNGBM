@@ -1,6 +1,4 @@
 #include <algorithm>
-#include <execution>
-#include <omp.h>
 
 #include "Percentiles.hpp"
 #include "TrainingElement.hpp"
@@ -11,59 +9,45 @@
 /*                      */
 /************************/
 
-/*
-Constructor
-Parameters :
-Inputs     :
-Outputs    : Object of Percentile class
-*/
-Percentiles::Percentiles() {}
+//
+Percentiles::Percentiles() { this->size = this->percentiles.size(); }
 
-/*
-Destructor
-Parameters :
-Inputs     :
-Outputs    :
-*/
+//
 Percentiles::~Percentiles() {}
 
-/*
-Print function to see the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-void Percentiles::print() {
+//
+void Percentiles::print() const {
   std::cout << "=== Criteria is : " << this->name << " ===\n";
 }
 
-/*
-Return the name of the criteria
-(For debugging mainly)
-Parameters :
-Inputs     :
-Outputs    :
-*/
-std::string Percentiles::get_Name() { return "Percentiles"; }
+//
+size_t Percentiles::get_Criteria_Number() const { return this->size; }
 
-/*
-Compute the percentiles of the given vector
-Parameters : Element distribution
-Inputs     : const vector<float>
-Outputs    : vector<float>
-*/
-std::vector<float> Percentiles::compute(const std::vector<float> list) const {
+//
+std::string Percentiles::get_Name() const { return "P"; }
 
-  std::vector<float> percentiles_Values(this->percentiles.size(), 0);
-  // Sort the data
-  std::vector<float> sorted_Data = list;
-  std::sort(std::execution::par, sorted_Data.begin(), sorted_Data.end());
+//
+std::string Percentiles::get_Name_Static() { return "Percentiles"; }
 
-#pragma omp parallel for
-  for (size_t i = 0; i < this->percentiles.size(); ++i) {
-    float res = sorted_Data[sorted_Data.size() * (this->percentiles[i] / 100)];
-    percentiles_Values[i] = res;
+//
+std::vector<double> Percentiles::compute(const std::vector<double> &list,
+                                         const std::vector<size_t> &idx) const {
+
+  std::vector<double> percentiles_Values(this->percentiles.size(), 0);
+
+  std::vector<double> sorted_Data;
+  sorted_Data.reserve(idx.size());
+
+  for (const auto &i : idx) {
+    sorted_Data.push_back(list[i]);
   }
+
+  // Sort the data
+  const size_t length = sorted_Data.size();
+  std::sort(sorted_Data.begin(), sorted_Data.end());
+
+  for (size_t i = 0; i < this->percentiles.size(); ++i) {
+    percentiles_Values[i] = sorted_Data[length * (this->percentiles[i] / 100)];
+  }  
   return percentiles_Values;
 }

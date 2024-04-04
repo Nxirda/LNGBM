@@ -13,12 +13,13 @@
  */
 class DataSet {
 protected:
-  std::vector<float> labels; /**< A vector containing the labels as floats */
+ std::vector<std::vector<double>>
+      samples; /**< A 2D Matrix containing the sample values as doubles (f64)*/
+  std::vector<double>
+      labels; /**< A vector containing the labels as doubles (f64)*/
   std::vector<std::string>
-      features; /**< A vector containing the features as floats */
-  std::vector<std::vector<float>>
-      samples; /**< A 2D Matrix containing the sample values as floats */
-
+      features; /**< A vector containing the features as doubles (f64)*/
+ 
 public:
   /**
    * @brief Default constructor for the DataSet class.
@@ -41,34 +42,26 @@ public:
    * changed)
    *
    * @param vector<string> features : the features of the dataset to copy
-   * @param vector<vector<float> values :  2D Matrix of the dataset elements
-   * @param vector<float> labels : vector containing the "truth" values of the
+   * @param vector<vector<double> values :  2D Matrix of the dataset elements
+   * @param vector<double> labels : vector containing the "truth" values of the
    * dataset
    *
    * Initializes the class with filled parameters.
    */
-  DataSet(std::vector<std::string> features,
-          std::vector<std::vector<float>> values, std::vector<float> labels);
+  DataSet(const std::vector<std::string> &features,
+          const std::vector<std::vector<double>> &values,
+          const std::vector<double> &labels);
 
   /**
    * @brief Copy constructor for the DataSet class, needed for splitting the
    * dataset into subsets (exp: train/test)
    *
    * @param DataSet data : the dataset to copy
-   * @param vector<int> idx : the indexes we want to copy
+   * @param vector<size_t> idx : the indexes we want to copy
    *
    * Initializes the class with filled parameters.
    */
-  DataSet(const DataSet &data, std::vector<int> idx);
-
-  /**
-   * @brief static method to load a new dataset given by the path
-   *
-   * @param string file_Path : the path where the dataset is stored
-   *
-   * Initializes a new DataSet
-   */
-  static DataSet load(std::string file_Path);
+  DataSet(const DataSet &data, const std::vector<size_t> &idx);
 
   /**
    * @brief Destructor for the DataSet class.
@@ -76,72 +69,116 @@ public:
   ~DataSet();
 
   /**
-   * @brief Method to make a copy of the features vector
+   * @brief Copy of the features vector
    *
-   * @return The features of the current dataset as a vector of strings
+   * @return Type : vector::<string>, The features of the current dataset as a
+   * vector of strings
    */
-  std::vector<std::string> get_Features() const;
+  const std::vector<std::string> &get_Features() const;
 
   /**
-   * @brief Method to make a copy of the samples 2D Matrix
+   * @brief Copy of the samples 2D Matrix
    *
-   * @return The samples of the current dataset as a 2D vector of floats
+   * @return Type : vector<vector<double>>, The samples of the current dataset
+   * as a 2D vector of floats
    */
-  std::vector<std::vector<float>> get_Samples() const;
+  const std::vector<std::vector<double>> &get_Samples() const;
 
   /**
-   * @brief Method to copy specified samples of the 2D Matrix (DataSet)
+   * @brief Copy specified samples of the 2D Matrix (DataSet)
    *
-   * @return The specified samples of the current dataset as a 2D vector of
-   * floats
+   * @param const vector<size_t> &index: index of the samples to get
+   *
+   * @return Type : vector<vector<double>>, The specified samples of the current
+   * dataset as a 2D vector of floats
    */
-  std::vector<std::vector<float>>
-  get_Samples(const std::vector<int> &idx) const;
+  std::vector<std::vector<double>>
+  get_Samples(const std::vector<size_t> &idx) const;
 
   /**
-   * @brief Method to make a copy of the labels of the DataSet
+   * @brief Returns a reference to the specified labels of the DataSet
    *
-   * @return The  labels of the current dataset as a vector of floats
+   * @return Type : vector<double>, The specified labels of the current dataset
    */
-  std::vector<float> get_Labels() const;
+  const std::vector<double> &get_Labels() const;
 
   /**
-   * @brief Method to copy specified labels of the DataSet
+   * @brief Returns a copy of the specified labels of the
+   * DataSet
    *
-   * @return The specified labels of the current dataset as a vector of floats
+   * @param const vector<size_t> &, index of the labels to to copy
+   *
+   * @return Type : vector<double>, The  labels of the current dataset
    */
-  std::vector<float> get_Labels(const std::vector<int> &idx) const;
+  std::vector<double> get_Labels(const std::vector<size_t> &idx) const;
 
   /**
-   * @brief Method to copy a column of the DataSet (samples value on one feature)
+   * @brief Returns a reference to a column of the DataSet (samples value on one
+   * feature)
    *
-   * @param int position : the feature to copy
-   * @param vector<idx> : the samples values to copy in the column
-   * 
-   * @return The values contained at the feature position for the samples in idx
+   * @param size_t position : the column to copy
+   *
+   * @return The values contained for the feature at position
    */
-  std::vector<float> get_Column(int position,
-                                const std::vector<int> &idx) const;
+  const std::vector<double> &get_Column(size_t position) const;
 
-  // Methods
-
+  /**
+   * @brief Prints the whole dataset as a matrix
+   */
   void print() const;
+
+  /**
+   * @brief Prints the dataset for the specified samples as a matrix
+   *
+   * @param vector<size_t>, index of the samples to copy
+   */
+  void print_With_Index(const std::vector<size_t> &idx) const;
+
+  /**
+   * @brief Tests whether or not the dataset is empty
+   *
+   * @return bool, true if the dataset is empty false if it's not
+   */
   bool empty() const;
 
-  void print_With_Index(std::vector<int> idx) const;
+  /**
+   * @brief Returns the number of labels the dataset has
+   *
+   * @return size_t, the number of labels
+   */
+  size_t labels_Number() const;
 
-  int labels_Number() const;
-  int samples_Number() const;
-  int features_Length() const;
+  /**
+   * @brief Returns the number of samples the dataset has
+   *
+   * @return size_t, the number of samples
+   */
+  size_t samples_Number() const;
+
+  /**
+   * @brief Returns the number of features the dataset has
+   *
+   * @return size_t, the number of features
+   */
+  size_t features_Number() const;
+
+  /**
+   * @brief Returns the size of the type that represents the dataset's values
+   * (ex : int, float)
+   *
+   * @return int, the size of the type
+   */
   int element_Size() const;
 
-  float whole_Labels_Mean() const;
-  float labels_Mean(const std::vector<int> &idx) const;
-  float labels_Variance(const std::vector<int> &idx) const;
-  float column_Mean(int position, const std::vector<int> &idx) const;
-
-  std::tuple<std::optional<std::vector<int>>, std::optional<std::vector<int>>>
-  split(int position, float criterion, const std::vector<int> &idx) const;
+private:
+  /**
+   * @brief Transpose the dataset matrix so the column access are aligned (only used for storage)
+   *
+   * @param const vector<vector<double>> &: the current matrix 
+   *
+   * @return void : updates the given matrix
+   */
+  void transpose_Matrix(std::vector<std::vector<double>> &matrix);
 };
 
 #endif
