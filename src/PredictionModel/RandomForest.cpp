@@ -79,7 +79,7 @@ std::vector<double> RandomForest::predict(const DataSet &data) const {
       exit(1);
     }
     std::cout << "Random Forest Prediction is wrong with MPI\n";
-    tree_Result = this->trees.at(i).predict(data);
+    tree_Result = std::move(this->trees.at(i).predict(data));
 
     // Adds two vectors
     std::transform(result.begin(), result.end(), tree_Result.begin(),
