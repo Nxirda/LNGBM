@@ -11,7 +11,7 @@
 int main(int argc, char **argv) {
 
   UserHandler handler{};
-  int out = handler.handle_Command_Line(argc, argv);
+  int out = handler.command_Line_Handler(argc, argv);
 
   if (out == 1) {
     std::cerr << "\nProgram terminated with an error\n";

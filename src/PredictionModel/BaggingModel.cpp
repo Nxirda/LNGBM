@@ -58,8 +58,8 @@ void BaggingModel::set_Operator(const std::string &metric) {
   it = operators::dictionnary.find(metric);
 
   if (it == operators::dictionnary.end()) {
-    std::cerr << "Chosen metric is invalid\n";
-    abort();
+    std::cerr << " < Chosen metric is invalid : " << metric << "\n";
+    exit(1);
   }
 
   switch (it->second) {
@@ -76,8 +76,8 @@ void BaggingModel::set_Operator(const std::string &metric) {
     this->split_Operator = std::make_unique<RIV>();
     break;
   default:
-    std::cerr << "Chosen metric is invalid\n";
-    abort();
+    std::cerr << " < Chosen metric is invalid : " << metric << "\n";
+    exit(1);
   }
 }
 
@@ -89,8 +89,8 @@ void BaggingModel::set_Criteria(const std::string &criteria) {
   it = criterias::dictionary.find(criteria);
 
   if (it == criterias::dictionary.end()) {
-    std::cerr << "Chosen criteria is invalid\n";
-    abort();
+    std::cerr << " < Chosen criteria is invalid : "<< criteria << "\n";
+    exit(1);
   }
 
   switch (it->second) {
@@ -110,8 +110,8 @@ void BaggingModel::set_Criteria(const std::string &criteria) {
     this->split_Criteria = std::make_unique<UniqueValues>();
     break;
   default:
-    std::cerr << "Chosen criteria is invalid\n";
-    abort();
+    std::cerr << " < Chosen criteria is invalid : " << criteria << "\n";;
+    exit(1);
   }
 }
 
