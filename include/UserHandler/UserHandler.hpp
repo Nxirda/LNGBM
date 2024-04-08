@@ -36,9 +36,6 @@ private:
   void process_Infos_Printer(int rank, const Timer &t);
   void helper_Printer(std::string program_Name);
 
-  uint16_t balancer(uint16_t total_Elements, uint16_t num_Processes,
-                    int process_Rank);
-
   uint8_t is_Integer(const std::string &str);
 
   void first_Arg_Handler(char **argv, int rank, int size);

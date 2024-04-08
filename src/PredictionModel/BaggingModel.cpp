@@ -15,21 +15,21 @@ BaggingModel::BaggingModel() noexcept {};
 BaggingModel::BaggingModel(const std::string &split_Operator,
                            const std::string &split_Criteria,
                            uint16_t max_Depth,
-                           uint16_t number_Of_Trees) noexcept {
+                           uint16_t trees_Number) noexcept {
 
   // Here we just prepare the infos for the model
   if (max_Depth < 1) {
-    std::cerr << "Depth parameter should be at least 1\n";
-    abort();
+    std::cerr << " < Depth parameter should be at least 1\n";
+    exit(1);
   }
-  this->number_Of_Trees = number_Of_Trees;
+  this->number_Of_Trees = trees_Number;
   this->max_Depth = max_Depth;
   set_Operator(split_Operator);
   set_Criteria(split_Criteria);
 }
 
 //
-BaggingModel::BaggingModel(BaggingModel &&model) noexcept{
+BaggingModel::BaggingModel(BaggingModel &&model) noexcept {
   this->forest = std::move(model.forest);
   this->max_Depth = model.max_Depth;
   this->number_Of_Trees = model.number_Of_Trees;
@@ -38,7 +38,7 @@ BaggingModel::BaggingModel(BaggingModel &&model) noexcept{
 }
 
 //
-BaggingModel &BaggingModel::operator=(BaggingModel &&model) noexcept{
+BaggingModel &BaggingModel::operator=(BaggingModel &&model) noexcept {
   this->forest = std::move(model.forest);
   this->max_Depth = model.max_Depth;
   this->number_Of_Trees = model.number_Of_Trees;
@@ -89,7 +89,7 @@ void BaggingModel::set_Criteria(const std::string &criteria) {
   it = criterias::dictionary.find(criteria);
 
   if (it == criterias::dictionary.end()) {
-    std::cerr << " < Chosen criteria is invalid : "<< criteria << "\n";
+    std::cerr << " < Chosen criteria is invalid : " << criteria << "\n";
     exit(1);
   }
 
@@ -110,7 +110,8 @@ void BaggingModel::set_Criteria(const std::string &criteria) {
     this->split_Criteria = std::make_unique<UniqueValues>();
     break;
   default:
-    std::cerr << " < Chosen criteria is invalid : " << criteria << "\n";;
+    std::cerr << " < Chosen criteria is invalid : " << criteria << "\n";
+    ;
     exit(1);
   }
 }
@@ -138,7 +139,8 @@ uint16_t BaggingModel::get_Depth() const { return this->max_Depth; }
 
 //
 uint16_t BaggingModel::get_Trees_Number() const {
-  return this->forest.get_size();
+  //return this->forest.get_size();
+  return this->number_Of_Trees;
 };
 
 //

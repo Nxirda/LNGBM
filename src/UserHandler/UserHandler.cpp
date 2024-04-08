@@ -33,15 +33,6 @@ uint8_t UserHandler::is_Integer(const std::string &str) {
 }
 
 //
-uint16_t UserHandler::balancer(uint16_t total_Elements, uint16_t num_Processes,
-                               int process_Rank) {
-  uint16_t res = total_Elements / num_Processes;
-  uint16_t remainder = total_Elements % num_Processes;
-
-  return res + (process_Rank < remainder ? 1 : 0);
-}
-
-//
 void UserHandler::parse_dataset_Path(const std::string &value) {
   this->dataset_Path = value;
 }
@@ -74,7 +65,8 @@ void UserHandler::parse_Number_Of_Trees(const std::string &value, int rank) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   if (is_Integer(value)) {
-    this->number_Of_Trees = balancer(std::stoi(value), size, rank);
+    this->number_Of_Trees =
+        std::stoi(value); // balancer(std::stoi(value), size, rank);
   } else {
     if (rank == 0)
       std::cerr << " < Value after -nt should be an integer\n";
@@ -110,7 +102,7 @@ void UserHandler::input_Parser(int argc, char **argv, int rank, int size) {
     exit(1);
   }
 
-  //Suppose to be either dataset or helper commands
+  // Suppose to be either dataset or helper commands
   first_Arg_Handler(argv, rank, size);
 
   std::smatch match;

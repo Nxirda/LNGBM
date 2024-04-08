@@ -32,6 +32,7 @@ public:
 
   uint16_t get_Depth() const;
   uint16_t get_Trees_Number() const;
+
   const std::unordered_map<uint16_t, DecisionTree> &get_Forest() const;
 
   // Setters

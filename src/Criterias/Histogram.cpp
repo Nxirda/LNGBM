@@ -1,7 +1,8 @@
 #include <algorithm>
+#include <iostream>
+#include <limits>
 
 #include "Histogram.hpp"
-#include "TrainingElement.hpp"
 
 /**************************/
 /*                        */

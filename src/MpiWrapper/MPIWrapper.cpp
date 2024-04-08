@@ -12,6 +12,16 @@
 namespace MPI_Wrapper {
 
 //
+uint16_t balancer(uint16_t total_Elements, uint16_t num_Processes,
+                  int process_Rank) {
+  uint16_t res = total_Elements / num_Processes;
+  uint16_t remainder = total_Elements % num_Processes;
+
+  return res + (process_Rank < remainder ? 1 : 0);
+}
+
+// Need to do a reduction in an other way because if to much processes
+// then the comm will become a bottleneck
 void MPI_Cross_Val(const BaggingModel &model, const DataSet &data, int K) {
 
   int rank, size;
@@ -68,6 +78,16 @@ void MPI_Cross_Val(const BaggingModel &model, const DataSet &data, int K) {
 }
 
 //
-void MPI_Train(BaggingModel &model, const DataSet &data) { model.train(data); }
+void MPI_Train(BaggingModel &model, const DataSet &data) {
+  int rank, size;
+
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  uint16_t trees_For_Process = balancer(model.get_Trees_Number(), size, rank);
+
+  model.set_Trees_Number(trees_For_Process);
+  model.train(data);
+}
 
 } // namespace MPI_Wrapper
