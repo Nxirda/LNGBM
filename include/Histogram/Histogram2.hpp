@@ -9,19 +9,17 @@
 
 class Histogram2 {
 private:
-  size_t size = 32; /**< An size_t variable to store the number of Bin to
-                       generate. (default : 32 Bin) */
-
   std::vector<Bin> histogram;
+  size_t number_Of_Bins = 256; /**< An size_t variable to store the number of
+                       Bin to generate. (default : 256 Bin) */
 
 public:
   Histogram2();
 
-  Histogram2(size_t size, const std::vector<double> &list,
-             const ICriteria *criteria);
+  Histogram2(size_t size, const std::vector<double> &list);
 
   Histogram2(size_t size, const std::vector<double> &list,
-             const ICriteria *criteria, const std::vector<size_t> &idx);
+             const std::vector<size_t> &idx);
 
   //
   Histogram2(Histogram2 &&histo);
@@ -31,10 +29,8 @@ public:
 
   ~Histogram2();
 
-  void print() const;
-
-  size_t get_Number_Of_Bin() const;
-  std::vector<double> get_Histogram() const;
+  size_t get_Number_Of_Bins() const;
+  std::vector<Bin> get_Histogram() const;
 };
 
 #endif

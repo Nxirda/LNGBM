@@ -13,8 +13,7 @@ struct HistogramTrainingElement {
 private:
   // Parameters
   TreeNode *node;
-  // std::vector<size_t> index;
-  // Might need to be re factored to an independnt class
+
   std::vector<double> labels;
   std::unordered_map<uint16_t, Histogram2> Histograms;
   uint16_t depth;
@@ -55,8 +54,8 @@ private:
   // Setters
   void set_depth(uint16_t depth);
   void set_Node(TreeNode *node);
-  // void set_Index(const std::vector<size_t> &index);
-  void set_Root(const DataSet &data, TreeNode *node, const ICriteria *criteria);
+  void set_Root(const DataSet &data, TreeNode *node);
+
   std::vector<size_t> bootstrap_Index(size_t dataset_Size);
 
   /*

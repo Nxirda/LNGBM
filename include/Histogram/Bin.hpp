@@ -6,9 +6,9 @@
 
 class Bin {
 private:
-  uint64_t count;
   double min;
   double max;
+  uint64_t count;
 
 public:
   Bin();
@@ -20,9 +20,9 @@ public:
   Bin &operator=(Bin &&bin);
   Bin &operator=(const Bin &bin);
 
-  uint64_t get_Count() const;
   double get_Min() const;
   double get_Max() const;
+  uint64_t get_Count() const;
 };
 
 #endif

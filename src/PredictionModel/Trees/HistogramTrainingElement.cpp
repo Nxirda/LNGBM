@@ -19,7 +19,6 @@
 HistogramTrainingElement::HistogramTrainingElement() {
   this->depth = 0;
   this->node = nullptr;
-  // this->index = std::vector<size_t>();
 }
 
 //
@@ -27,7 +26,6 @@ HistogramTrainingElement::HistogramTrainingElement(TreeNode *node,
                                                    uint16_t depth) {
   this->node = node;
   this->depth = depth;
-  // this->index = std::move(index);
 }
 
 //
@@ -37,7 +35,6 @@ HistogramTrainingElement::HistogramTrainingElement(
   this->depth = TE.depth;
   this->Histograms = TE.Histograms;
   this->labels = TE.labels;
-  // this->index = TE.index;
 }
 
 //
@@ -47,7 +44,6 @@ HistogramTrainingElement::HistogramTrainingElement(
   this->depth = TE.depth;
   this->Histograms = std::move(TE.Histograms);
   this->labels = std::move(TE.labels);
-  // this->index = std::move(TE.index);
 }
 
 HistogramTrainingElement &
@@ -98,14 +94,14 @@ HistogramTrainingElement::bootstrap_Index(size_t dataset_Size) {
 }
 
 //
-void HistogramTrainingElement::set_Root(const DataSet &data, TreeNode *node,
-                                        const ICriteria *criteria) {
+void HistogramTrainingElement::set_Root(const DataSet &data, TreeNode *node) {
   this->depth = 0;
   std::vector<size_t> base_Index = bootstrap_Index(data.samples_Number());
+
   // HAVE TO SET LABELS BOOTSTRAPPED TOO
 
   for (size_t i = 0; i < data.features_Number(); ++i) {
-    Histogram2 h(256, data.get_Column(i), criteria, base_Index);
+    Histogram2 h(256, data.get_Column(i), base_Index);
     this->Histograms[i] = std::move(h);
   }
 
