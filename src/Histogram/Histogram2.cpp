@@ -58,7 +58,7 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list) {
     bin_Min = min + bin_size * i;
     bin_Max = bin_Min + bin_size;
 
-    this->histogram[i] = std::move(Bin(number_Of_Elems, bin_Min, bin_Max));
+    this->histogram[i] = std::move(Bin(bin_Min, bin_Max));
   }
 }
 
@@ -66,6 +66,7 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list) {
 Histogram2::Histogram2(size_t size, const std::vector<double> &list,
                        const std::vector<size_t> &idx) {
 
+  // Just verify : (size == gradient_Sum.size)
   double min = std::numeric_limits<double>::max();
   double max = 0;
   this->number_Of_Bins = size;
@@ -92,7 +93,20 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list,
     bin_Min = min + bin_size * i;
     bin_Max = bin_Min + bin_size;
 
-    this->histogram[i] = std::move(Bin(number_Of_Elems, bin_Min, bin_Max));
+    this->histogram[i] = std::move(Bin(bin_Min, bin_Max));
+  }
+}
+
+//
+void Histogram2::add_Point(double point_Value, double statistic) {
+  for (size_t bin = 0; bin < this->histogram.size(); ++bin) {
+    if (point_Value < this->histogram[bin].get_Max()) {
+      uint64_t count = this->histogram[bin].get_Count();
+      double stat = this->histogram[bin].get_Statistic();
+
+      this->histogram[bin].set_Count(count + 1);
+      this->histogram[bin].set_Statistic(stat + statistic);
+    }
   }
 }
 
@@ -103,4 +117,4 @@ Histogram2::~Histogram2() {}
 size_t Histogram2::get_Number_Of_Bins() const { return this->number_Of_Bins; }
 
 //
-std::vector<Bin> Histogram2::get_Histogram() const { return this->histogram; }
+std::vector<Bin> Histogram2::get_Bins() const { return this->histogram; }

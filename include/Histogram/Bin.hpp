@@ -8,11 +8,12 @@ class Bin {
 private:
   double min;
   double max;
+  double statistic;
   uint64_t count;
 
 public:
   Bin();
-  Bin(uint64_t elems, double min, double max);
+  Bin(double min, double max);
   ~Bin();
 
   Bin(Bin &&bin);
@@ -22,7 +23,11 @@ public:
 
   double get_Min() const;
   double get_Max() const;
+  double get_Statistic() const;
   uint64_t get_Count() const;
+
+  void set_Count(uint64_t new_Count);
+  void set_Statistic(double new_Statistic);
 };
 
 #endif

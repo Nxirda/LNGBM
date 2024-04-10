@@ -27,10 +27,13 @@ public:
   Histogram2 &operator=(Histogram2 &&histo);
   Histogram2 &operator=(const Histogram2 &histo);
 
+  //
+  void add_Point(double point_Value, double statistic);
+
   ~Histogram2();
 
   size_t get_Number_Of_Bins() const;
-  std::vector<Bin> get_Histogram() const;
+  std::vector<Bin> get_Bins() const;
 };
 
 #endif

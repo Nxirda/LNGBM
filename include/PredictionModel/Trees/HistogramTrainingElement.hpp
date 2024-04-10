@@ -14,7 +14,7 @@ private:
   // Parameters
   TreeNode *node;
 
-  std::vector<double> labels;
+  // std::vector<double> labels;
   std::unordered_map<uint16_t, Histogram2> Histograms;
   uint16_t depth;
 
@@ -54,9 +54,12 @@ private:
   // Setters
   void set_depth(uint16_t depth);
   void set_Node(TreeNode *node);
-  void set_Root(const DataSet &data, TreeNode *node);
+  void set_Root(/* const DataSet &data,  */ TreeNode *node);
 
-  std::vector<size_t> bootstrap_Index(size_t dataset_Size);
+  void init_Histograms(const DataSet &data);
+  void fill_Histograms(const DataSet &data, const std::vector<size_t> &index);
+
+  std::vector<size_t> bootstrap(size_t dataset_Size);
 
   /*
    */
@@ -67,9 +70,11 @@ private:
 
   /*
    */
-  std::tuple<std::optional<std::vector<double>>,
-             std::optional<std::vector<double>>>
-  split_Bin(size_t feature, double criterion);
+  std::tuple<Histogram2, Histogram2> split_Histogram(size_t feature) const;
+
+  /*
+   */
+  std::tuple<double, double, size_t> best_Histogram_Split(size_t feature) const;
 
   /*
    */
@@ -78,9 +83,8 @@ private:
                   /*,const ICriteria *splitting_Criteria*/) const;
   /*
    */
-  double compute_Split_Value(const std::vector<size_t> &index,
-                             const DataSet &data, size_t feature,
-                             /*double criteria,*/ const IOperator *op) const;
+  double compute_Split_Value(size_t bin_Index, size_t feature,
+                             const IOperator *op) const;
 };
 
 #endif
