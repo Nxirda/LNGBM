@@ -36,17 +36,7 @@ public:
   ~HistogramTrainingElement();
 
   // Methods
-  static void train(const DataSet &data, TreeNode *node,
-                    const IOperator *splitting_Operator,
-                    /*const ICriteria *splitting_Criteria,*/ uint16_t max_Depth,
-                    size_t treshold);
-
-  /*
-   */
-  static std::tuple<std::optional<std::vector<size_t>>,
-                    std::optional<std::vector<size_t>>>
-  split_Index(const std::vector<double> &column,
-              const std::vector<size_t> &index, double criterion);
+  static void train(const DataSet &data, TreeNode *node, uint16_t max_Depth);
 
 private:
   // Getters
@@ -54,7 +44,9 @@ private:
   // Setters
   void set_depth(uint16_t depth);
   void set_Node(TreeNode *node);
-  void set_Root(/* const DataSet &data,  */ TreeNode *node);
+  void set_Root(TreeNode *node);
+
+  void set_Histogram(size_t feature, Histogram2 &&histogram);
 
   void init_Histograms(const DataSet &data);
   void fill_Histograms(const DataSet &data, const std::vector<size_t> &index);
@@ -65,26 +57,28 @@ private:
    */
   std::tuple<std::optional<HistogramTrainingElement>,
              std::optional<HistogramTrainingElement>>
-  split_Node(const DataSet &data, const IOperator *splitting_Operator
-             /*,const ICriteria *splitting_Criteria*/);
+  split_Node(const DataSet &data);
 
   /*
    */
-  std::tuple<Histogram2, Histogram2> split_Histogram(size_t feature) const;
+  std::tuple<std::optional<Histogram2>, std::optional<Histogram2>>
+  split_Histogram(size_t bin, size_t feature) const;
 
   /*
    */
-  std::tuple<double, double, size_t> best_Histogram_Split(size_t feature) const;
+  std::tuple<double, size_t, size_t> best_Histogram_Split(size_t feature) const;
 
   /*
    */
-  std::tuple<size_t, double>
-  find_Best_Split(/* const DataSet &data, */ const IOperator *splitting_Operator
-                  /*,const ICriteria *splitting_Criteria*/) const;
+  std::tuple<size_t, size_t> find_Best_Split() const;
+
   /*
    */
-  double compute_Split_Value(size_t bin_Index, size_t feature,
-                             const IOperator *op) const;
+  double compute_Split_Value(size_t bin_Index, size_t feature) const;
+
+  /*
+   */
+  double compute_Predicted_Value() const;
 };
 
 #endif

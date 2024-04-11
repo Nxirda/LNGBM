@@ -10,7 +10,13 @@
 /**************************/
 
 //
-Histogram2::Histogram2() {}
+Histogram2::Histogram2() { this->number_Of_Bins = 0; }
+
+//
+Histogram2::Histogram2(std::vector<Bin> &&new_Bins) {
+  this->number_Of_Bins = new_Bins.size();
+  this->histogram = std::move(new_Bins);
+}
 
 Histogram2::Histogram2(Histogram2 &&histo) {
   this->number_Of_Bins = histo.number_Of_Bins;
@@ -49,7 +55,7 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list) {
 
   this->histogram.resize(size);
 
-  const size_t bin_size = static_cast<size_t>((max - min) * (1.0 / size));
+  const double bin_size = ((max - min) * (1.0 / size));
 
   double bin_Min = 0;
   double bin_Max = 0;
@@ -71,8 +77,6 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list,
   double max = 0;
   this->number_Of_Bins = size;
 
-  size_t number_Of_Elems = idx.size() / size;
-
   for (const auto &i : idx) {
     const auto &elem = list[i];
     if (elem < min)
@@ -83,7 +87,7 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list,
 
   this->histogram.resize(size);
 
-  const size_t bin_size = static_cast<size_t>((max - min) * (1.0 / size));
+  const double bin_size = ((max - min) * (1.0 / size));
 
   double bin_Min = 0;
   double bin_Max = 0;
@@ -98,16 +102,27 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list,
 }
 
 //
-void Histogram2::add_Point(double point_Value, double statistic) {
+void Histogram2::add_Point(double point_Value, double residual, double target) {
   for (size_t bin = 0; bin < this->histogram.size(); ++bin) {
-    if (point_Value < this->histogram[bin].get_Max()) {
-      uint64_t count = this->histogram[bin].get_Count();
-      double stat = this->histogram[bin].get_Statistic();
-
-      this->histogram[bin].set_Count(count + 1);
-      this->histogram[bin].set_Statistic(stat + statistic);
+    if (this->histogram[bin].get_Min() <= point_Value &&
+        point_Value < this->histogram[bin].get_Max()) {
+      this->histogram[bin].add_Element(residual, target);
+      return;
     }
   }
+}
+
+//
+void Histogram2::clean_Empty_Bins() {
+  for (auto it = this->histogram.begin(); it != this->histogram.end();) {
+    if (it->get_Count() == 0) {
+      it = this->histogram.erase(it);
+      number_Of_Bins -= 1;
+    } else {
+      ++it;
+    }
+  }
+  this->histogram.shrink_to_fit();
 }
 
 //
@@ -117,4 +132,14 @@ Histogram2::~Histogram2() {}
 size_t Histogram2::get_Number_Of_Bins() const { return this->number_Of_Bins; }
 
 //
-std::vector<Bin> Histogram2::get_Bins() const { return this->histogram; }
+const std::vector<Bin> &Histogram2::get_Bins() const { return this->histogram; }
+
+//
+void Histogram2::print() {
+  for (size_t i = 0; i < this->number_Of_Bins; ++i) {
+    std::cout << "Bin n° " << i << " "
+              << " min " << this->histogram[i].get_Min() << " max "
+              << this->histogram[i].get_Max() << " ";
+    this->histogram[i].print();
+  }
+}

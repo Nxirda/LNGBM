@@ -8,7 +8,8 @@ class Bin {
 private:
   double min;
   double max;
-  double statistic;
+  double target_Sum;
+  double residual_Sum;
   uint64_t count;
 
 public:
@@ -23,11 +24,13 @@ public:
 
   double get_Min() const;
   double get_Max() const;
-  double get_Statistic() const;
+  double get_Residual_Sum() const;
+  double get_Target() const;
   uint64_t get_Count() const;
 
-  void set_Count(uint64_t new_Count);
-  void set_Statistic(double new_Statistic);
+  void add_Element(double residual, double target);
+
+  void print();
 };
 
 #endif

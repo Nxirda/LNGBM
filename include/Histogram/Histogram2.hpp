@@ -16,6 +16,8 @@ private:
 public:
   Histogram2();
 
+  Histogram2(std::vector<Bin> &&new_Bins);
+
   Histogram2(size_t size, const std::vector<double> &list);
 
   Histogram2(size_t size, const std::vector<double> &list,
@@ -28,12 +30,16 @@ public:
   Histogram2 &operator=(const Histogram2 &histo);
 
   //
-  void add_Point(double point_Value, double statistic);
+  void add_Point(double point_Value, double residual, double target);
 
   ~Histogram2();
 
   size_t get_Number_Of_Bins() const;
-  std::vector<Bin> get_Bins() const;
+  const std::vector<Bin> &get_Bins() const;
+
+  void clean_Empty_Bins();
+
+  void print();
 };
 
 #endif

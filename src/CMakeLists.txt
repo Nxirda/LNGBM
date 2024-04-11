@@ -22,7 +22,7 @@ add_library(Source_Lib
     PredictionModel/Trees/TreeNode.cpp
     PredictionModel/Trees/DecisionTree.cpp
     PredictionModel/Trees/TrainingElement.cpp
-    #PredictionModel/Trees/HistogramTrainingElement.cpp
+    PredictionModel/Trees/HistogramTrainingElement.cpp
     PredictionModel/RandomForest.cpp
     PredictionModel/BaggingModel.cpp
     #Validation
