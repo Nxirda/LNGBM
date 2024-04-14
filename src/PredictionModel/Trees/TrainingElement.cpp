@@ -249,17 +249,7 @@ TrainingElement::split_Node(const DataSet &data,
   this->node->set_Split_Column(column);
   this->node->set_Split_Criterion(criterion);
 
-  // Case 1 : Build Right Node (if information gained)
-  if (right_index.has_value()) {
-    double predic_Right = mean_Vector_At_Index(data.get_Labels(), *right_index);
-    TreeNode right{};
-    right.set_Predicted_Value(predic_Right);
-    this->node->add_Right(std::make_unique<TreeNode>(std::move(right)));
-    train_Right = std::move(TrainingElement(
-        this->node->get_Right_Node(), std::move(*right_index), next_Depth));
-  }
-
-  // Case 2 : Build Left Node (if information gained)
+  // Case 1 : Build Left Node (if information gained)
   if (left_index.has_value()) {
     double predic_Left = mean_Vector_At_Index(data.get_Labels(), *left_index);
     TreeNode left{};
@@ -267,6 +257,16 @@ TrainingElement::split_Node(const DataSet &data,
     this->node->add_Left(std::make_unique<TreeNode>(std::move(left)));
     train_Left = std::move(TrainingElement(this->node->get_Left_Node(),
                                            std::move(*left_index), next_Depth));
+  }
+
+  // Case 2 : Build Right Node (if information gained)
+  if (right_index.has_value()) {
+    double predic_Right = mean_Vector_At_Index(data.get_Labels(), *right_index);
+    TreeNode right{};
+    right.set_Predicted_Value(predic_Right);
+    this->node->add_Right(std::make_unique<TreeNode>(std::move(right)));
+    train_Right = std::move(TrainingElement(
+        this->node->get_Right_Node(), std::move(*right_index), next_Depth));
   }
 
   return {train_Left, train_Right};

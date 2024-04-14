@@ -39,7 +39,7 @@ public:
 
   void clean_Empty_Bins();
 
-  void print();
+  void print() const;
 };
 
 #endif

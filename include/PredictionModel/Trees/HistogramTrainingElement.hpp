@@ -16,13 +16,15 @@ private:
 
   // std::vector<double> labels;
   std::unordered_map<uint16_t, Histogram2> Histograms;
+  std::vector<size_t> index;
   uint16_t depth;
 
 public:
   // Constructor
   HistogramTrainingElement();
 
-  HistogramTrainingElement(TreeNode *node, uint16_t depth);
+  HistogramTrainingElement(TreeNode *node, const std::vector<size_t> &index,
+                           uint16_t depth);
 
   HistogramTrainingElement(const HistogramTrainingElement &TE);
   HistogramTrainingElement(HistogramTrainingElement &&TE);
@@ -47,8 +49,10 @@ private:
   void set_Root(TreeNode *node);
 
   void set_Histogram(size_t feature, Histogram2 &&histogram);
+  void set_Index(std::vector<size_t> &&new_Index);
 
   void init_Histograms(const DataSet &data);
+  void init_Histograms(const DataSet &data, const std::vector<size_t> &index);
   void fill_Histograms(const DataSet &data, const std::vector<size_t> &index);
 
   std::vector<size_t> bootstrap(size_t dataset_Size);
@@ -66,6 +70,11 @@ private:
 
   /*
    */
+  std::tuple<std::vector<size_t>,std::vector<size_t>>
+  split_Index(const DataSet &data, size_t bin, size_t feature) const;
+
+  /*
+   */
   std::tuple<double, size_t, size_t> best_Histogram_Split(size_t feature) const;
 
   /*
@@ -78,7 +87,7 @@ private:
 
   /*
    */
-  double compute_Predicted_Value() const;
+  double compute_Predicted_Value(const DataSet &data) const;
 };
 
 #endif

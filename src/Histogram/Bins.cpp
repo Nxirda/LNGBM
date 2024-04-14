@@ -73,11 +73,12 @@ double Bin::get_Max() const { return this->max; }
 double Bin::get_Residual_Sum() const { return this->residual_Sum; }
 
 //
-double Bin::get_Target() const { 
-  if(this->count == 0){
+double Bin::get_Target() const {
+  if (this->count == 0) {
     return this->count;
-  } 
-  return this->target_Sum / this->count; }
+  }
+  return this->target_Sum / this->count;
+}
 
 //
 void Bin::add_Element(double residual, double target) {
@@ -87,6 +88,7 @@ void Bin::add_Element(double residual, double target) {
 }
 
 //
-void Bin::print(){
-  std::cout << "Residual Sum " << residual_Sum << " count " << count << std::endl;
+void Bin::print() const {
+  std::cout << "Residual Sum " << residual_Sum << " count " << count
+            << std::endl;
 }

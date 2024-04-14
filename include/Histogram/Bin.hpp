@@ -30,7 +30,7 @@ public:
 
   void add_Element(double residual, double target);
 
-  void print();
+  void print() const;
 };
 
 #endif

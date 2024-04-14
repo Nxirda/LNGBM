@@ -22,10 +22,12 @@ HistogramTrainingElement::HistogramTrainingElement() {
 }
 
 //
-HistogramTrainingElement::HistogramTrainingElement(TreeNode *node,
-                                                   uint16_t depth) {
+HistogramTrainingElement::HistogramTrainingElement(
+    TreeNode *node, const std::vector<size_t> &index, uint16_t depth) {
+
   this->node = node;
   this->depth = depth;
+  this->index = index;
 }
 
 //
@@ -34,6 +36,7 @@ HistogramTrainingElement::HistogramTrainingElement(
   this->node = TE.node;
   this->depth = TE.depth;
   this->Histograms = TE.Histograms;
+  this->index = TE.index;
 }
 
 //
@@ -42,6 +45,7 @@ HistogramTrainingElement::HistogramTrainingElement(
   this->node = std::move(TE.node);
   this->depth = TE.depth;
   this->Histograms = std::move(TE.Histograms);
+  this->index = std::move(TE.index);
 }
 
 HistogramTrainingElement &
@@ -49,6 +53,7 @@ HistogramTrainingElement::operator=(HistogramTrainingElement &&TE) {
   this->node = std::move(TE.node);
   this->depth = TE.depth;
   this->Histograms = std::move(TE.Histograms);
+  this->index = std::move(TE.index);
   return *this;
 }
 
@@ -58,6 +63,7 @@ HistogramTrainingElement::operator=(const HistogramTrainingElement &TE) {
   this->node = TE.node;
   this->depth = TE.depth;
   this->Histograms = TE.Histograms;
+  this->index = TE.index;
   return *this;
 }
 
@@ -73,6 +79,12 @@ void HistogramTrainingElement::set_depth(uint16_t depth) {
 }
 
 //
+void HistogramTrainingElement::set_Root(TreeNode *node) {
+  this->depth = 0;
+  this->node = node;
+}
+
+//
 void HistogramTrainingElement::set_Histogram(size_t feature,
                                              Histogram2 &&histogram) {
   if (this->Histograms.size() < feature) {
@@ -80,6 +92,11 @@ void HistogramTrainingElement::set_Histogram(size_t feature,
     exit(1);
   }
   this->Histograms.at(feature) = std::move(histogram);
+}
+
+//
+void HistogramTrainingElement::set_Index(std::vector<size_t> &&new_Index) {
+  this->index = std::move(new_Index);
 }
 
 //
@@ -99,12 +116,12 @@ std::vector<size_t> HistogramTrainingElement::bootstrap(size_t dataset_Size) {
   return std::move(index);
 }
 
-//
+// TMP
 double compute_Residual(double actual, double predicted) {
   return actual - predicted;
 }
 
-//
+// TMP
 double mean_Vector_At_Index(const std::vector<double> &vector,
                             const std::vector<size_t> &index) {
   if (index.empty()) {
@@ -127,7 +144,6 @@ void HistogramTrainingElement::fill_Histograms(
     const DataSet &data, const std::vector<size_t> &index) {
 
   size_t number_Of_Features = data.features_Number();
-  size_t number_Of_Samples = data.samples_Number();
 
   const std::vector<double> &labels = data.get_Labels();
 
@@ -140,6 +156,7 @@ void HistogramTrainingElement::fill_Histograms(
     for (auto &sample_Index : index) {
 
       double sample_Value = values[sample_Index];
+
       double target = labels[sample_Index];
 
       double residual = -compute_Residual(target, label_Mean);
@@ -152,28 +169,28 @@ void HistogramTrainingElement::fill_Histograms(
 
 //
 void HistogramTrainingElement::init_Histograms(const DataSet &data) {
+  this->index = std::move(bootstrap(data.samples_Number()));
+  /* std::cout << "Index size is " << this->index.size() << "\n"; */
+  for (size_t feature = 0; feature < data.features_Number(); ++feature) {
+    Histogram2 h(256, data.get_Column(feature), index);
+    this->Histograms[feature] = std::move(h);
+  }
+}
 
-  std::vector<size_t> index = std::move(bootstrap(data.samples_Number()));
+//
+void HistogramTrainingElement::init_Histograms(
+    const DataSet &data, const std::vector<size_t> &index) {
 
   for (size_t feature = 0; feature < data.features_Number(); ++feature) {
     Histogram2 h(256, data.get_Column(feature), index);
     this->Histograms[feature] = std::move(h);
   }
-
-  fill_Histograms(data, index);
-}
-
-//
-void HistogramTrainingElement::set_Root(TreeNode *node) {
-  this->depth = 0;
-  this->node = node;
 }
 
 //
 std::tuple<std::optional<Histogram2>, std::optional<Histogram2>>
 HistogramTrainingElement::split_Histogram(size_t bin, size_t feature) const {
-   std::cout << "We enter histogram split function \n";
-   
+
   const Histogram2 &histogram = this->Histograms.at(feature);
   const std::vector<Bin> &bins = histogram.get_Bins();
   const size_t size = histogram.get_Number_Of_Bins();
@@ -183,21 +200,41 @@ HistogramTrainingElement::split_Histogram(size_t bin, size_t feature) const {
   }
 
   std::vector<Bin> left_Bins(bin);
-  std::vector<Bin> right_Bins(size - bin + 1);
+  std::vector<Bin> right_Bins(size - bin);
 
   size_t curr_Bin;
   for (curr_Bin = 0; curr_Bin < bin; ++curr_Bin) {
     left_Bins[curr_Bin] = bins[curr_Bin];
   }
 
-  for (curr_Bin = bin; curr_Bin < size; ++curr_Bin) {
-    right_Bins[size - curr_Bin] = bins[curr_Bin];
+  for (curr_Bin; curr_Bin < size; ++curr_Bin) {
+    right_Bins[curr_Bin - bin] = bins[curr_Bin];
   }
 
   Histogram2 left_Histogram(std::move(left_Bins));
   Histogram2 right_Histogram(std::move(right_Bins));
 
   return {std::move(left_Histogram), std::move(right_Histogram)};
+}
+
+//
+std::tuple<std::vector<size_t>, std::vector<size_t>>
+HistogramTrainingElement::split_Index(const DataSet &data, size_t bin,
+                                      size_t feature) const {
+
+  double split_Value = this->Histograms.at(feature).get_Bins()[bin].get_Max();
+
+  std::vector<size_t> left_Idx;
+  std::vector<size_t> right_Idx;
+
+  for (const size_t &idx : this->index) {
+    if (data.get_Column(feature)[idx] < split_Value) {
+      left_Idx.push_back(idx);
+    } else {
+      right_Idx.push_back(idx);
+    }
+  }
+  return {std::move(left_Idx), std::move(right_Idx)};
 }
 
 //
@@ -221,6 +258,7 @@ double HistogramTrainingElement::compute_Split_Value(size_t bin_Index,
   // Two for just to avoid branching
   for (bin = 0; bin < bin_Index; ++bin) {
     const Bin &curr_Bin = histogram.get_Bins()[bin];
+
     left_Population += curr_Bin.get_Count();
 
     residual_Sums_Left += curr_Bin.get_Residual_Sum();
@@ -240,45 +278,28 @@ double HistogramTrainingElement::compute_Split_Value(size_t bin_Index,
   double score_Right =
       pow(residual_Sums_Right, 2) * (1.0 / (hessian_Value * right_Population));
 
-  double res = score_Left + score_Right;
+  double res = std::abs(score_Left + score_Right);
 
   return res;
 }
 
 //
-double HistogramTrainingElement::compute_Predicted_Value() const {
-  double label_Sum = 0;
-  double total_Bins = 0;
-  for (size_t feature = 0; feature < this->Histograms.size(); ++feature) {
-    for (size_t bin = 0;
-         bin < this->Histograms.at(feature).get_Number_Of_Bins(); ++bin) {
-      label_Sum += this->Histograms.at(feature).get_Bins()[bin].get_Target();
-      /* std::cout << this->Histograms.at(feature).get_Bins()[bin].get_Target()
-                << "\n";*/
-      total_Bins += 1; 
-      // this->Histograms.at(feature).get_Bins()[bin].get_Count();
-    }
-  }
-  // HERE
-  std::cout << label_Sum * (1.0 / total_Bins) << "\n";
-  return label_Sum * (1.0 / total_Bins);
+double
+HistogramTrainingElement::compute_Predicted_Value(const DataSet &data) const {
+  return mean_Vector_At_Index(data.get_Labels(), this->index);
 }
 
 //
 std::tuple<double, size_t, size_t>
 HistogramTrainingElement::best_Histogram_Split(size_t feature) const {
 
-  /*   std::cout << "We enter best histogram split finding \n";
-   */
   const Histogram2 &histogram = this->Histograms.at(feature);
 
   double best_Score = 0.0;
-  std::tuple<double, double, float> candidate;
+  std::tuple<double, size_t, size_t> candidate;
   // Might start at one
   for (size_t bin = 0; bin < histogram.get_Number_Of_Bins(); ++bin) {
     double split_Score = compute_Split_Value(bin, feature);
-    
-    //std::cout << "Split score = " << split_Score << std::endl;
 
     if (split_Score > best_Score) {
       best_Score = split_Score;
@@ -296,11 +317,6 @@ std::tuple<size_t, size_t> HistogramTrainingElement::find_Best_Split() const {
 
   for (size_t idx_H = 0; idx_H < this->Histograms.size(); ++idx_H) {
     candidates[idx_H] = std::move(best_Histogram_Split(idx_H));
-    std::cout << "Candidate : " << idx_H;
-    std::cout << "| split score : " << std::get<0>(candidates[idx_H]);
-    std::cout << "| split bin : " << std::get<1>(candidates[idx_H]);
-    std::cout << "| split feature : " << std::get<2>(candidates[idx_H]);
-    std::cout << "\n";  
   }
 
   std::tuple<double, size_t, size_t> best_Split = {-1.0, 0, 0};
@@ -320,18 +336,17 @@ std::tuple<std::optional<HistogramTrainingElement>,
            std::optional<HistogramTrainingElement>>
 HistogramTrainingElement::split_Node(const DataSet &data) {
 
-  std::cout << "Enter split node\n";
   // Left node
   std::optional<HistogramTrainingElement> train_Left = std::nullopt;
 
   // Right node
   std::optional<HistogramTrainingElement> train_Right = std::nullopt;
 
+  // Compute Histograms for the new datas
+  this->fill_Histograms(data, this->index);
+
   // Compute split attributes
   auto [bin, feature] = find_Best_Split();
-
-  std::cout << "Best Bin     is " << bin << "\n";
-  std::cout << "Best feature is " << feature << "\n";
 
   // Compute new Histogram
   auto [left_Histogram, right_Histogram] = split_Histogram(bin, feature);
@@ -339,6 +354,9 @@ HistogramTrainingElement::split_Node(const DataSet &data) {
   if (!left_Histogram && !right_Histogram) {
     return {train_Left, train_Right};
   }
+
+  // Set new indexes (based on the)
+  auto [left_Index, right_Index] = split_Index(data, bin, feature);
 
   uint16_t next_Depth = this->depth + 1;
 
@@ -348,37 +366,45 @@ HistogramTrainingElement::split_Node(const DataSet &data) {
   this->node->set_Split_Column(feature);
   this->node->set_Split_Criterion(split_Criterion);
 
-  // Case 1 : Build Right Node (if information gained)
-  if (right_Histogram.has_value()) {
-    TreeNode right{};
-
-    this->node->add_Right(std::make_unique<TreeNode>(std::move(right)));
-    HistogramTrainingElement train_Right_Tmp = *this;
-    train_Right_Tmp.set_depth(next_Depth);
-    train_Right_Tmp.set_Node(this->node->get_Right_Node());
-    train_Right_Tmp.set_Histogram(feature, std::move(*right_Histogram));
-
-    train_Right = std::move(train_Right_Tmp);
-
-    double prediction = train_Right.value().compute_Predicted_Value();
-    train_Right.value().node->set_Predicted_Value(prediction);
-  }
-
-  // Case 2 : Build Left Node(if information gained)
+  // Case 1 : Build Left Node(if information gained)
   if (left_Histogram.has_value()) {
+
     TreeNode left{};
 
     this->node->add_Left(std::make_unique<TreeNode>(std::move(left)));
-    HistogramTrainingElement train_Left_Tmp = *this;
-    train_Left_Tmp.set_depth(next_Depth);
-    train_Left_Tmp.set_Node(this->node->get_Left_Node());
+
+    HistogramTrainingElement train_Left_Tmp(this->node->get_Left_Node(),
+                                            std::move(left_Index), next_Depth);
+
+    train_Left_Tmp.init_Histograms(data, left_Index);
     train_Left_Tmp.set_Histogram(feature, std::move(*left_Histogram));
+    train_Left_Tmp.fill_Histograms(data, left_Index);
 
     train_Left = std::move(train_Left_Tmp);
 
-    double prediction = train_Left.value().compute_Predicted_Value();
+    double prediction = train_Left.value().compute_Predicted_Value(data);
     train_Left.value().node->set_Predicted_Value(prediction);
   }
+
+  // Case 2 : Build Right Node (if information gained)
+  if (right_Histogram.has_value()) {
+
+    TreeNode right{};
+
+    this->node->add_Right(std::make_unique<TreeNode>(std::move(right)));
+
+    HistogramTrainingElement train_Right_Tmp(
+        this->node->get_Right_Node(), std::move(right_Index), next_Depth);
+    train_Right_Tmp.init_Histograms(data, right_Index);
+    train_Right_Tmp.set_Histogram(feature, std::move(*right_Histogram));
+    train_Right_Tmp.fill_Histograms(data, right_Index);
+
+    train_Right = std::move(train_Right_Tmp);
+
+    double prediction = train_Right.value().compute_Predicted_Value(data);
+    train_Right.value().node->set_Predicted_Value(prediction);
+  }
+
   return {train_Left, train_Right};
 }
 

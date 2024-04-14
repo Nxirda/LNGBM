@@ -51,7 +51,7 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list) {
   double min = *min_max.first;
   double max = *min_max.second;
 
-  size_t number_Of_Elems = list.size() / size;
+  // size_t number_Of_Elems = list.size() / size;
 
   this->histogram.resize(size);
 
@@ -135,7 +135,7 @@ size_t Histogram2::get_Number_Of_Bins() const { return this->number_Of_Bins; }
 const std::vector<Bin> &Histogram2::get_Bins() const { return this->histogram; }
 
 //
-void Histogram2::print() {
+void Histogram2::print() const {
   for (size_t i = 0; i < this->number_Of_Bins; ++i) {
     std::cout << "Bin n° " << i << " "
               << " min " << this->histogram[i].get_Min() << " max "
