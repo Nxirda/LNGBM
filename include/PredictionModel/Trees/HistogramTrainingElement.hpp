@@ -51,7 +51,7 @@ private:
   void set_Histogram(size_t feature, Histogram2 &&histogram);
   void set_Index(std::vector<size_t> &&new_Index);
 
-  void init_Histograms(const DataSet &data);
+  // void init_Histograms(const DataSet &data);
   void init_Histograms(const DataSet &data, const std::vector<size_t> &index);
   void fill_Histograms(const DataSet &data, const std::vector<size_t> &index);
 
@@ -70,7 +70,8 @@ private:
 
   /*
    */
-  std::tuple<std::vector<size_t>,std::vector<size_t>>
+  std::tuple<std::optional<std::vector<size_t>>,
+             std::optional<std::vector<size_t>>>
   split_Index(const DataSet &data, size_t bin, size_t feature) const;
 
   /*

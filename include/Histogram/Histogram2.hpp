@@ -30,7 +30,7 @@ public:
   Histogram2 &operator=(const Histogram2 &histo);
 
   //
-  void add_Point(double point_Value, double residual, double target);
+  void add_Point(double point_Value, double residual/* , double target */);
 
   ~Histogram2();
 

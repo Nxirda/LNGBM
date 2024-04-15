@@ -102,11 +102,11 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list,
 }
 
 //
-void Histogram2::add_Point(double point_Value, double residual, double target) {
+void Histogram2::add_Point(double point_Value, double residual/* , double target */) {
   for (size_t bin = 0; bin < this->histogram.size(); ++bin) {
     if (this->histogram[bin].get_Min() <= point_Value &&
         point_Value < this->histogram[bin].get_Max()) {
-      this->histogram[bin].add_Element(residual, target);
+      this->histogram[bin].add_Element(residual/* , target */);
       return;
     }
   }
