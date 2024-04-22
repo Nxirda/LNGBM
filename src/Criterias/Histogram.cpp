@@ -11,7 +11,7 @@
 /**************************/
 
 //
-Histogram::Histogram() {}
+Histogram::Histogram(){}
 
 //
 Histogram::Histogram(size_t x) {

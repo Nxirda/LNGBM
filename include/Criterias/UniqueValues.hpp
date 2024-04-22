@@ -23,7 +23,7 @@ public:
    *
    * Initializes the class with default parameters.
    */
-  UniqueValues();
+  UniqueValues() noexcept;
 
   /**
    * @brief Destructor for the UniqueValues class.

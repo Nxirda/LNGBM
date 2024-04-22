@@ -30,8 +30,8 @@ add_subdirectory(src)
 
 target_link_libraries(main PRIVATE Source_Lib)
 
-#Add compilation options
-add_compile_options(-std=c++23 -g -Wall -Wextra -Werror -Wpedantic -Wconversion -O3 -march=native)
+#Add compilation options -Wconversion
+add_compile_options(-std=c++23 -g -Wall -Wextra -Werror -Wpedantic -O3 -march=native)
 
 # ===== Testing Part =====
 
@@ -58,14 +58,8 @@ gtest_discover_tests(tests)
 
 # ===== Benchmark Part =====
 
-#add_executable(Benchmarks benchmark/mainBenchmark.cpp)
+add_executable(Benchmarks benchmark/mainBenchmark.cpp)
 
-#add_subdirectory(benchmark)
+add_subdirectory(benchmark)
 
-#target_link_libraries(Benchmarks PRIVATE Benchmark_Lib)
-#target_link_libraries(Benchmarks PRIVATE OpenMP::OpenMP_CXX)
-#target_link_libraries(Benchmarks PRIVATE TBB::tbb)
-#target_link_libraries(Benchmarks PRIVATE BLAS::BLAS)
-#target_link_libraries(Benchmarks PRIVATE Boost::serialization Boost::mpi)
-
-
+target_link_libraries(Benchmarks PRIVATE Source_Lib)

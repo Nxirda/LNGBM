@@ -3,7 +3,7 @@
 namespace criterias {
 
 //
-std::map<std::string, type> dictionary = {{"H", type::Histogram},
+std::map<std::string, type> dictionary = {{"H", type::Histogram}, 
                                           {"P", type::Percentiles},
                                           {"Q", type::Quartiles},
                                           {"RV", type::RandomValues},

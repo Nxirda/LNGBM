@@ -14,7 +14,6 @@ private:
   // Parameters
   TreeNode *node;
 
-  // std::vector<double> labels;
   std::unordered_map<uint16_t, Histogram2> Histograms;
   std::vector<size_t> index;
   uint16_t depth;
@@ -38,7 +37,7 @@ public:
   ~HistogramTrainingElement();
 
   // Methods
-  static void train(const DataSet &data, TreeNode *node, uint16_t max_Depth);
+  static void train(const DataSet &data, TreeNode *node, uint16_t max_Depth, size_t threshold);
 
 private:
   // Getters
@@ -65,8 +64,12 @@ private:
 
   /*
    */
-  std::tuple<std::optional<Histogram2>, std::optional<Histogram2>>
-  split_Histogram(size_t bin, size_t feature) const;
+  double compute_Residual(double actual, double predicted) const;
+
+  /*
+   */
+  double mean_Vector_At_Index(const std::vector<double> &vector,
+                              const std::vector<size_t> &index) const;
 
   /*
    */
@@ -85,10 +88,6 @@ private:
   /*
    */
   double compute_Split_Value(size_t bin_Index, size_t feature) const;
-
-  /*
-   */
-  double compute_Predicted_Value(const DataSet &data) const;
 };
 
 #endif

@@ -7,14 +7,12 @@ Bin::Bin() {
   this->min = 0;
   this->max = 0;
   this->residual_Sum = 0;
-  //this->target_Sum = 0;
 }
 
 //
 Bin::Bin(double min, double max) {
   this->count = 0;
   this->residual_Sum = 0;
-  //this->target_Sum = 0;
   this->min = min;
   this->max = max;
 }
@@ -25,7 +23,6 @@ Bin::Bin(Bin &&bin) {
   this->min = bin.min;
   this->max = bin.max;
   this->residual_Sum = bin.residual_Sum;
-  //this->target_Sum = bin.target_Sum;
 }
 
 //
@@ -34,7 +31,6 @@ Bin::Bin(const Bin &bin) {
   this->min = bin.min;
   this->max = bin.max;
   this->residual_Sum = bin.residual_Sum;
-  //this->target_Sum = bin.target_Sum;
 }
 
 //
@@ -43,7 +39,6 @@ Bin &Bin::operator=(Bin &&bin) {
   this->min = bin.min;
   this->max = bin.max;
   this->residual_Sum = bin.residual_Sum;
-  //this->target_Sum = bin.target_Sum;
   return *this;
 }
 
@@ -53,7 +48,6 @@ Bin &Bin::operator=(const Bin &bin) {
   this->min = bin.min;
   this->max = bin.max;
   this->residual_Sum = bin.residual_Sum;
-  //this->target_Sum = bin.target_Sum;
   return *this;
 }
 
@@ -73,17 +67,8 @@ double Bin::get_Max() const { return this->max; }
 double Bin::get_Residual_Sum() const { return this->residual_Sum; }
 
 //
-/* double Bin::get_Target() const {
-  if (this->count == 0) {
-    return this->count;
-  }
-  return this->target_Sum / this->count;
-} */
-
-//
-void Bin::add_Element(double residual/* , double target */) {
+void Bin::add_Element(double residual) {
   this->residual_Sum += residual;
-  //this->target_Sum += target;
   this->count += 1;
 }
 

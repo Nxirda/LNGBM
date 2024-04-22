@@ -10,7 +10,7 @@
 /************************/
 
 //
-Percentiles::Percentiles() { this->size = this->percentiles.size(); }
+Percentiles::Percentiles() noexcept { this->size = this->percentiles.size(); }
 
 //
 Percentiles::~Percentiles() {}

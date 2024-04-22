@@ -12,7 +12,7 @@
 /**************************/
 
 //
-UniqueValues::UniqueValues() {}
+UniqueValues::UniqueValues() noexcept {}
 
 //
 UniqueValues::~UniqueValues() {}

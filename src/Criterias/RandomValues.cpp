@@ -10,7 +10,7 @@
 /**************************/
 
 //
-RandomValues::RandomValues() {
+RandomValues::RandomValues() noexcept {
   std::random_device rd;
   std::mt19937 generator(rd());
   this->gen = generator;

@@ -26,7 +26,7 @@ public:
    *
    * Initializes the class with default parameters.
    */
-  RandomValues();
+  RandomValues() noexcept;
 
   /**
    * @brief Parameterized constructor for the RandomValues class.

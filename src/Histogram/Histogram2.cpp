@@ -36,6 +36,7 @@ Histogram2 &Histogram2::operator=(Histogram2 &&histo) {
   return *this;
 }
 
+//
 Histogram2 &Histogram2::operator=(const Histogram2 &histo) {
   this->number_Of_Bins = histo.number_Of_Bins;
   this->histogram = histo.histogram;
@@ -50,8 +51,6 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list) {
   auto min_max = std::minmax_element(list.begin(), list.end());
   double min = *min_max.first;
   double max = *min_max.second;
-
-  // size_t number_Of_Elems = list.size() / size;
 
   this->histogram.resize(size);
 
@@ -72,7 +71,6 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list) {
 Histogram2::Histogram2(size_t size, const std::vector<double> &list,
                        const std::vector<size_t> &idx) {
 
-  // Just verify : (size == gradient_Sum.size)
   double min = std::numeric_limits<double>::max();
   double max = 0;
   this->number_Of_Bins = size;
@@ -101,28 +99,24 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list,
   }
 }
 
-//
-void Histogram2::add_Point(double point_Value, double residual/* , double target */) {
-  for (size_t bin = 0; bin < this->histogram.size(); ++bin) {
-    if (this->histogram[bin].get_Min() <= point_Value &&
-        point_Value < this->histogram[bin].get_Max()) {
-      this->histogram[bin].add_Element(residual/* , target */);
+// Binary search because it's fast 
+void Histogram2::add_Point(double point_Value, double residual) {
+  size_t left = 0;
+  size_t right = this->histogram.size();
+
+  while (left < right) {
+    size_t mid = left + (right - left) / 2;
+    auto &bin = this->histogram[mid];
+
+    if (point_Value < bin.get_Min()) {
+      right = mid;
+    } else if (point_Value >= bin.get_Max()) {
+      left = mid + 1;
+    } else {
+      bin.add_Element(residual);
       return;
     }
   }
-}
-
-//
-void Histogram2::clean_Empty_Bins() {
-  for (auto it = this->histogram.begin(); it != this->histogram.end();) {
-    if (it->get_Count() == 0) {
-      it = this->histogram.erase(it);
-      number_Of_Bins -= 1;
-    } else {
-      ++it;
-    }
-  }
-  this->histogram.shrink_to_fit();
 }
 
 //
