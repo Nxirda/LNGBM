@@ -10,7 +10,7 @@
 /************************/
 
 //
-Quartiles::Quartiles() { this->size = this->quartiles.size(); }
+Quartiles::Quartiles() noexcept { this->size = this->quartiles.size(); }
 
 //
 Quartiles::~Quartiles() {}

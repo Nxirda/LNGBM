@@ -30,7 +30,7 @@ public:
    *
    * Initializes the class with default parameters.
    */
-  Percentiles();
+  Percentiles() noexcept;
 
   /**
    * @brief Destructor for the Percentiles class.

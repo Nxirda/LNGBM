@@ -1,6 +1,6 @@
 FROM debian:12
 
-LABEL maintainer="Nxirda <nerTren.@protonmail.com>" \
+LABEL maintainer="Nxirda <not@specified.email>" \
 	 description="Dockerfile for building this project with minimal tools"
 
 #Dependencies

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "DecisionTree.hpp"
+#include "HistogramTrainingElement.hpp"
 #include "TrainingElement.hpp"
 #include "TreeNode.hpp"
 
@@ -66,8 +67,15 @@ void DecisionTree::train(const DataSet &data, ICriteria *crit, IOperator *op) {
   const size_t threshold = 5;
 
   TrainingElement::train(data, this->get_Root(), op, crit, this->max_Depth,
-                         threshold);
+                         threshold);  
 }
+
+//
+void DecisionTree::train(const DataSet &data, uint64_t bins) {
+  const size_t threshold = 5;
+  HistogramTrainingElement::train(data, this->get_Root(), this->max_Depth, threshold, bins);
+}
+
 
 //
 void tree_Prediction(const DataSet &data, std::vector<double> &result,

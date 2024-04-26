@@ -2,6 +2,9 @@
 add_library(Source_Lib
     #Dataset part
     Dataset/DataSet.cpp
+    #UniformDistribution part
+    Histogram/Histogram.cpp 
+    Histogram/Bins.cpp 
     #Operator part
     Operators/EnumOperator.cpp
     Operators/RIV.cpp
@@ -10,7 +13,7 @@ add_library(Source_Lib
     Operators/RMSE.cpp
     #Criteria part
     Criterias/EnumCriteria.cpp
-    Criterias/Histogram.cpp
+    Criterias/UniformDistribution.cpp
     Criterias/Quartiles.cpp
     Criterias/Percentiles.cpp
     Criterias/RandomValues.cpp
@@ -19,6 +22,7 @@ add_library(Source_Lib
     PredictionModel/Trees/TreeNode.cpp
     PredictionModel/Trees/DecisionTree.cpp
     PredictionModel/Trees/TrainingElement.cpp
+    PredictionModel/Trees/HistogramTrainingElement.cpp
     PredictionModel/RandomForest.cpp
     PredictionModel/BaggingModel.cpp
     #Validation
@@ -31,6 +35,8 @@ add_library(Source_Lib
     Utils/Timer.cpp
     Utils/Tools.cpp
     Utils/Serializer.cpp 
+    #User part (temporary)
+    UserHandler/UserHandler.cpp
 )   
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -40,12 +46,15 @@ target_include_directories(Source_Lib
     PUBLIC
     ${CMAKE_SOURCE_DIR}/include/Utils/
     ${CMAKE_SOURCE_DIR}/include/Dataset/
+    ${CMAKE_SOURCE_DIR}/include/Histogram/
     ${CMAKE_SOURCE_DIR}/include/Operators/
     ${CMAKE_SOURCE_DIR}/include/Criterias/
     ${CMAKE_SOURCE_DIR}/include/Validation/
     ${CMAKE_SOURCE_DIR}/include/MpiWrapper/
     ${CMAKE_SOURCE_DIR}/include/PredictionModel/
     ${CMAKE_SOURCE_DIR}/include/PredictionModel/Trees
+    #Temporary User part
+    ${CMAKE_SOURCE_DIR}/include/UserHandler
 )
 
 target_link_libraries(Source_Lib 

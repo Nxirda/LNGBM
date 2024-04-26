@@ -18,8 +18,8 @@ public:
 
     void start();
     void stop();
-    std::string get_Duration();
-    void print(std::string func_name);
+    std::string get_Duration() const;
+    void print(std::string func_name) const;
 };
 
 #endif

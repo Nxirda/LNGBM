@@ -43,5 +43,12 @@ cmake-build-*
 
 # Specific to the project
 *.dat
-Benchmark/Results/
+LICENSE.md 
+README2.md 
 Notes.md
+
+# Keep only the actual scripts in git
+scripts/*
+!scripts/*.*
+
+results/

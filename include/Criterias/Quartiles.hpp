@@ -26,7 +26,7 @@ public:
    *
    * Initializes the class with default parameters.
    */
-  Quartiles();
+  Quartiles() noexcept;
 
   /**
    * @brief Destructor for the Quartiles class.

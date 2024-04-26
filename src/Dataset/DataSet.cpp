@@ -49,7 +49,9 @@ DataSet::DataSet(std::string file_Path) {
 
   // Make sure the file is open
   if (!file.is_open()) {
-    throw std::runtime_error("Could not open given file");
+    //throw std::runtime_error("Could not open given file");
+    std::cerr << " < Could not open given file : " << file_Path << "\n";
+    exit(1);
   }
 
   std::string line;
@@ -257,7 +259,7 @@ size_t DataSet::labels_Number() const { return this->labels.size(); }
 const std::vector<double> &DataSet::get_Column(size_t position) const {
   // Check column in bounds
   if (position >= this->features_Number()) {
-    std::cerr << "Position specified is out of the matrix\n";
+    std::cerr << " < Position specified is out of the matrix\n";
     exit(1);
   }
   return this->samples[position];

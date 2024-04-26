@@ -3,7 +3,7 @@
 namespace criterias {
 
 //
-std::map<std::string, type> dictionary = {{"H", type::Histogram},
+std::map<std::string, type> dictionary = {{"UD", type::UniformDistribution}, 
                                           {"P", type::Percentiles},
                                           {"Q", type::Quartiles},
                                           {"RV", type::RandomValues},
@@ -15,8 +15,8 @@ void print() {
   for (auto const &pair : dictionary) {
     std::cout << "{" << pair.first << "} : ";
     switch (pair.second) {
-    case type::Histogram:
-      std::cout << Histogram::get_Name_Static();
+    case type::UniformDistribution:
+      std::cout << UniformDistribution::get_Name_Static();
       break;
     case type::Percentiles:
       std::cout << Percentiles::get_Name_Static();

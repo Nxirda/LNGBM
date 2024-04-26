@@ -24,6 +24,7 @@ public:
 
   RandomForest(RandomForest &&forest) noexcept;
   RandomForest &operator=(RandomForest &&forest) noexcept;
+  RandomForest &operator=(const RandomForest &forest) noexcept;
   // Destructor
 
   ~RandomForest() override;
@@ -33,7 +34,8 @@ public:
   uint16_t get_size() const;
 
   // Methods
-
+  /* void train(const DataSet &data) override; */
+  void train(const DataSet &data, uint64_t bins) override;
   void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
   std::vector<double> predict(const DataSet &data) const override;
 };

@@ -8,6 +8,9 @@
 class IModel {
 public:
   virtual ~IModel(){};
+  /*   virtual void train(const DataSet &data) = 0;
+   */
+  virtual void train(const DataSet &data, uint64_t bins) = 0;
   virtual void train(const DataSet &data, ICriteria *crit, IOperator *op) = 0;
   virtual std::vector<double> predict(const DataSet &data) const = 0;
 };

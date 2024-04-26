@@ -67,6 +67,10 @@ instead of "cmake .."
 $ cmake -DCMAKE_CXX_COMPILER=/path/to/your/mpi/c++/compiler -DCMAKE_PREFIX_PATH=/path/to/your/mpi/installation ..
 ```
 
+```sh
+$ cmake -S . -B <BUILD_DIR> <CMAKE OPTIONS>
+```
+
 ## Usage :
 
 ```sh

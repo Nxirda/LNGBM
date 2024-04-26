@@ -87,9 +87,6 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
   double global_MAPE = 0.0;
   double global_Std_Dev = 0.0;
 
-  std::vector<std::string> inner_Values;
-  std::vector<double> inner_Numerical_Values;
-
   // Size is K + 1 : we need results from each folds and the global result
   std::vector<std::vector<std::string>> global_Result(
       K + 1, std::vector<std::string>());
@@ -117,6 +114,9 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
 
   for (uint8_t i = 0; i < K; ++i) {
 
+    std::vector<std::string> inner_Values;
+    std::vector<double> inner_Numerical_Values;
+
     // Creating Test Dataset for this iteration
     DataSet test_Set = test_Folds[i];
 
@@ -135,7 +135,8 @@ Answers K_Folds(BaggingModel &model, const DataSet &data, uint8_t K) {
         metric::compute_accuracy(model, test_Set);
 
     std::string inner_Formatted_File_Size = Tools::matrix_Memory_Size(
-        train_Set.samples_Number(), data.features_Number(), data.element_Size(), precision);
+        train_Set.samples_Number(), data.features_Number(), data.element_Size(),
+        precision);
 
     inner_Values = {"Folds n*" + std::to_string(i),
                     std::to_string(model.get_Depth()),

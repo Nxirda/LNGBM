@@ -19,7 +19,7 @@ void Timer::stop() {
 }
 
 //
-std::string Timer::get_Duration() {
+std::string Timer::get_Duration() const {
   auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(this->end_time - this->start_time);
 
   std::ostringstream result;
@@ -44,7 +44,7 @@ std::string Timer::get_Duration() {
 }
 
 //
-void Timer::print(std::string func_name) {
+void Timer::print(std::string func_name) const{
   // Timer in micro-seconds
   auto micro_s_duration = std::chrono::duration_cast<std::chrono::microseconds>(
       this->end_time - this->start_time);

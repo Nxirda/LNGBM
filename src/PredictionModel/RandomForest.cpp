@@ -11,21 +11,21 @@
 /**************************/
 
 //
-RandomForest::RandomForest() noexcept{
+RandomForest::RandomForest() noexcept {
   this->size = 0;
   this->max_Depth = 0;
   this->trees = std::unordered_map<uint16_t, DecisionTree>();
 }
 
 //
-RandomForest::RandomForest(uint16_t n, uint16_t depth) noexcept{
+RandomForest::RandomForest(uint16_t n, uint16_t depth) noexcept {
   this->size = n;
   this->max_Depth = depth;
   this->trees = std::unordered_map<uint16_t, DecisionTree>(n);
 }
 
 //
-RandomForest::RandomForest(RandomForest &&forest) noexcept{
+RandomForest::RandomForest(RandomForest &&forest) noexcept {
   this->size = forest.size;
   this->max_Depth = forest.max_Depth;
   this->trees = std::move(forest.trees);
@@ -40,6 +40,15 @@ RandomForest &RandomForest::operator=(RandomForest &&forest) noexcept {
 }
 
 //
+RandomForest &RandomForest::operator=(const RandomForest &forest) noexcept{
+  this->size = forest.size;
+  this->max_Depth = forest.max_Depth;
+  this->trees = forest.trees;
+  return *this;
+}
+
+
+//
 RandomForest::~RandomForest(){};
 
 //
@@ -50,6 +59,16 @@ const std::unordered_map<uint16_t, DecisionTree> &
 RandomForest::get_Trees() const {
   return this->trees;
 }
+
+//
+/* void RandomForest::train(const DataSet &data) {
+  for (uint16_t i = 0; i < size; ++i) {
+    DecisionTree tree{this->max_Depth};
+
+    tree.train(data);
+    this->trees.emplace(i, std::move(tree));
+  }
+} */
 
 //
 void RandomForest::train(const DataSet &data, ICriteria *crit, IOperator *op) {
@@ -64,8 +83,19 @@ void RandomForest::train(const DataSet &data, ICriteria *crit, IOperator *op) {
 }
 
 //
+void RandomForest::train(const DataSet &data, uint64_t bins) {
+  for (uint16_t i = 0; i < size; ++i) {
+
+    DecisionTree tree{this->max_Depth};
+
+    tree.train(data, bins);
+    this->trees.emplace(i, std::move(tree));
+  }
+}
+
+//
 std::vector<double> RandomForest::predict(const DataSet &data) const {
-  const size_t size = data.samples_Number();  
+  const size_t size = data.samples_Number();
   std::vector<double> result(size, 0);
 
   std::vector<double> tree_Result(size, 0);
@@ -78,7 +108,7 @@ std::vector<double> RandomForest::predict(const DataSet &data) const {
       std::cerr << "Couldn't find wanted tree \n";
       exit(1);
     }
-    std::cout << "Random Forest Prediction is wrong with MPI\n";
+    // std::cout << "Random Forest Prediction is wrong with MPI\n";
     tree_Result = std::move(this->trees.at(i).predict(data));
 
     // Adds two vectors

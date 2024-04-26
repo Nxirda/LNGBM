@@ -11,6 +11,8 @@ private:
   RandomForest forest;
   uint16_t max_Depth;
   uint16_t number_Of_Trees;
+  // If used with histogram training element
+  uint64_t bins;
   std::unique_ptr<ICriteria> split_Criteria;
   std::unique_ptr<IOperator> split_Operator;
 
@@ -22,8 +24,12 @@ public:
                const std::string &split_Criteria, uint16_t max_Depth,
                uint16_t number_Of_Trees) noexcept;
 
+  BaggingModel(uint64_t bins, uint16_t depth,
+               uint16_t number_Of_Trees) noexcept;
+
   BaggingModel(BaggingModel &&model) noexcept;
   BaggingModel &operator=(BaggingModel &&model) noexcept;
+  BaggingModel &operator=(const BaggingModel &model) noexcept;
 
   // Getters
 
@@ -32,6 +38,7 @@ public:
 
   uint16_t get_Depth() const;
   uint16_t get_Trees_Number() const;
+
   const std::unordered_map<uint16_t, DecisionTree> &get_Forest() const;
 
   // Setters
@@ -47,8 +54,11 @@ public:
   // Methods
 
   void train(const DataSet &data);
-  void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
   std::vector<double> predict(const DataSet &datas) const override;
+
+private:
+  void train(const DataSet &data, uint64_t bins) override;
+  void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
 };
 
 #endif
