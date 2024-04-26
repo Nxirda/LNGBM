@@ -50,5 +50,5 @@ Notes.md
 # Keep only the actual scripts in git
 scripts/*
 !scripts/*.*
-scripts/*.pdf
+
 results/
