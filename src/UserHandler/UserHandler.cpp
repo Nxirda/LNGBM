@@ -15,6 +15,8 @@ UserHandler::UserHandler() {
   this->depth = 5;
   this->number_Of_Trees = 5;
 
+  this->algorithm_Flag = 's';
+  this->bins = 256;
   this->cross_Val_Flag = 0;
   this->cross_Val_Folds = 0;
 };
@@ -45,6 +47,38 @@ void UserHandler::parse_Metric(const std::string &value) {
 //
 void UserHandler::parse_Criteria(const std::string &value) {
   this->criteria = value;
+}
+
+/*
+Only supported modes atm are standard and histograms
+This isnt really elegant but it will do the trick
+*/
+void UserHandler::parse_Algorithm(const std::string &value, int rank) {
+  if (value.length() == 1 && (value.at(0) == 'h' || value.at(0) == 's'))
+    this->algorithm_Flag = value.at(0);
+  else {
+    if (rank == 0)
+      std::cerr << " < Value after -alg should be a char\n";
+    exit(1);
+  }
+}
+
+//
+void UserHandler::parse_Bins(const std::string &value, int rank) {
+  if (this->algorithm_Flag == 'h') {
+    if (is_Integer(value)) {
+      this->bins = std::stoi(value);
+    } else {
+      if (rank == 0)
+        std::cerr << " < Value after -b should be an integer\n";
+      exit(1);
+    }
+  } else {
+    if (rank == 0)
+      std::cerr << " < Bins can be set only if the histogram algorithm is "
+                   "set\n";
+    exit(1);
+  }
 }
 
 //
@@ -132,7 +166,14 @@ void UserHandler::input_Parser(int argc, char **argv, int rank, int size) {
 
       } else if (!flag.compare("c")) {
         parse_Criteria(value);
+
+      } else if (!flag.compare("alg")) {
+        parse_Algorithm(value, rank);
+
+      } else if (!flag.compare("b")) {
+        parse_Bins(value, rank);
       }
+
     } else {
       std::cout << " < Invalid argument " << arg << "\n";
       exit(1);
@@ -151,7 +192,7 @@ void UserHandler::input_Parser(int argc, char **argv, int rank, int size) {
 //
 void UserHandler::first_Arg_Handler(char **argv, int rank, int size) {
 
-  // Argument is either dataset path, -list or -help
+  // Argument is either dataset path, -list or -help (-h)
   std::smatch match;
   std::string arg = argv[1];
   std::regex flag_regex("-([a-zA-Z_]+)");
@@ -160,7 +201,9 @@ void UserHandler::first_Arg_Handler(char **argv, int rank, int size) {
     if (!match[1].str().compare("list") && rank == 0) {
       flags_Printer();
 
-    } else if (!match[1].str().compare("help") && rank == 0) {
+    } else if ((!match[1].str().compare("help") ||
+                !match[1].str().compare("h")) &&
+               rank == 0) {
       helper_Printer(argv[0]);
 
     } else if (!match[1].str().compare("list_operators") && rank == 0) {
@@ -194,10 +237,17 @@ int UserHandler::command_Line_Handler(int argc, char **argv) {
   input_Parser(argc, argv, rank, size);
 
   config_Printer();
-
+  // Option -alg= either s for standard or h for histogram
   DataSet data{this->dataset_Path};
-  BaggingModel model{this->metric, this->criteria, this->depth,
-                     this->number_Of_Trees};
+  BaggingModel model;
+  
+  if (this->algorithm_Flag != 'h') {
+    model = std::move(BaggingModel{this->metric, this->criteria, this->depth,
+                                   this->number_Of_Trees});
+  } else {
+    model =
+        std::move(BaggingModel{this->bins, this->depth, this->number_Of_Trees});
+  }
 
   Timer t;
   t.start();
@@ -219,7 +269,7 @@ int UserHandler::command_Line_Handler(int argc, char **argv) {
 //
 void UserHandler::helper_Printer(std::string program_Name) {
   std::cout << "Usage is : mpiexec -np [Process] ./main "
-            << "[Path to DataSet]\n";
+            << "[-h] [Path to DataSet]\n";
 
   std::cout << "\n";
   std::cout << "> Run with " << program_Name
@@ -237,11 +287,18 @@ void UserHandler::flags_Printer() {
   std::cout << "\n === Splitting Algorithm ===\n";
   std::cout << " > -o=<string>   : set the operator\n";
   std::cout << " > -c=<string>   : set the criteria\n";
-  std::cout << "\n > Run with -list_operators | -list_criterias for "
-               "additionnal informations\n";
+
+  std::cout << "\n === Training Algorithm ===\n";
+  std::cout << " > -alg=<char>   : set the algorithm\n";
 
   std::cout << "\n === Cross Validation ===\n";
   std::cout << " > -cv=<integer> : set the number of Folds\n";
+
+  std::cout << "\n === Other Flag ===\n";
+  std::cout << " > -b=<integer>   : set the bins if used with -alg=h\n";
+  std::cout << " > -list_operators: list the available operators\n";
+  std::cout << " > -list_criterias: list the available operators\n";
+
   std::cout << std::endl;
 }
 
@@ -254,8 +311,13 @@ void UserHandler::config_Printer() {
     std::cout << " === Running Configuration ===\n";
     std::cout << "\n";
 
-    std::cout << "> Metric   : " << this->metric << "\n";
-    std::cout << "> Criteria : " << this->criteria << "\n";
+    if (this->algorithm_Flag != 'h') {
+      std::cout << "> Metric   : " << this->metric << "\n";
+      std::cout << "> Criteria : " << this->criteria << "\n";
+    } else {
+      std::cout << "> Algorithm: " << this->algorithm_Flag << "\n";
+      std::cout << "> Bins     : " << this->bins << "\n";
+    }
     std::cout << "> Depth    : " << this->depth << "\n";
     std::cout << "> Trees    : " << this->number_Of_Trees << "\n";
 

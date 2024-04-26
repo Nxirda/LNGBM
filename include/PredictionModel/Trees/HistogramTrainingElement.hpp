@@ -4,8 +4,7 @@
 #include <optional>
 #include <unordered_map>
 
-#include "Histogram2.hpp"
-#include "IOperator.hpp"
+#include "Histogram.hpp"
 #include "TreeNode.hpp"
 
 struct HistogramTrainingElement {
@@ -14,16 +13,17 @@ private:
   // Parameters
   TreeNode *node;
 
-  std::unordered_map<uint16_t, Histogram2> Histograms;
+  std::unordered_map<uint16_t, Histogram> Histograms;
   std::vector<size_t> index;
   uint16_t depth;
+  uint64_t bins;
 
 public:
   // Constructor
   HistogramTrainingElement();
 
   HistogramTrainingElement(TreeNode *node, const std::vector<size_t> &index,
-                           uint16_t depth);
+                           uint16_t depth, uint64_t bins);
 
   HistogramTrainingElement(const HistogramTrainingElement &TE);
   HistogramTrainingElement(HistogramTrainingElement &&TE);
@@ -37,7 +37,7 @@ public:
   ~HistogramTrainingElement();
 
   // Methods
-  static void train(const DataSet &data, TreeNode *node, uint16_t max_Depth, size_t threshold);
+  static void train(const DataSet &data, TreeNode *node, uint16_t max_Depth, size_t threshold, uint64_t bins);
 
 private:
   // Getters
@@ -46,8 +46,9 @@ private:
   void set_depth(uint16_t depth);
   void set_Node(TreeNode *node);
   void set_Root(TreeNode *node);
-
-  void set_Histogram(size_t feature, Histogram2 &&histogram);
+  void set_Bins(uint64_t bins);
+  
+  void set_Histogram(size_t feature, Histogram &&histogram);
   void set_Index(std::vector<size_t> &&new_Index);
 
   // void init_Histograms(const DataSet &data);

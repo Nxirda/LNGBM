@@ -19,8 +19,8 @@ RandomValues::RandomValues() noexcept {
 //
 RandomValues::RandomValues(size_t x) {
   if (x <= 0) {
-    std::cerr << "Can't compute split criterias with x <= 0\n x is set to 32\n";
-    this->size = 32;
+    std::cerr << "Can't compute split criterias with x <= 0\n";
+    this->size = 256;
   } else {
     this->size = x;
   }

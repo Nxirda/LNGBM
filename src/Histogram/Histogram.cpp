@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "Histogram2.hpp"
+#include "Histogram.hpp"
 #include "TrainingElement.hpp"
 
 /**************************/
@@ -10,41 +10,41 @@
 /**************************/
 
 //
-Histogram2::Histogram2() { this->number_Of_Bins = 0; }
+Histogram::Histogram() { this->number_Of_Bins = 0; }
 
 //
-Histogram2::Histogram2(std::vector<Bin> &&new_Bins) {
+Histogram::Histogram(std::vector<Bin> &&new_Bins) {
   this->number_Of_Bins = new_Bins.size();
   this->histogram = std::move(new_Bins);
 }
 
-Histogram2::Histogram2(Histogram2 &&histo) {
+Histogram::Histogram(Histogram &&histo) {
   this->number_Of_Bins = histo.number_Of_Bins;
   this->histogram = std::move(histo.histogram);
 }
 
 //
-Histogram2::Histogram2(const Histogram2 &histo) {
+Histogram::Histogram(const Histogram &histo) {
   this->number_Of_Bins = histo.number_Of_Bins;
   this->histogram = histo.histogram;
 }
 
 //
-Histogram2 &Histogram2::operator=(Histogram2 &&histo) {
+Histogram &Histogram::operator=(Histogram &&histo) {
   this->number_Of_Bins = histo.number_Of_Bins;
   this->histogram = std::move(histo.histogram);
   return *this;
 }
 
 //
-Histogram2 &Histogram2::operator=(const Histogram2 &histo) {
+Histogram &Histogram::operator=(const Histogram &histo) {
   this->number_Of_Bins = histo.number_Of_Bins;
   this->histogram = histo.histogram;
   return *this;
 }
 
 //
-Histogram2::Histogram2(size_t size, const std::vector<double> &list) {
+Histogram::Histogram(size_t size, const std::vector<double> &list) {
 
   this->number_Of_Bins = size;
 
@@ -68,7 +68,7 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list) {
 }
 
 //
-Histogram2::Histogram2(size_t size, const std::vector<double> &list,
+Histogram::Histogram(size_t size, const std::vector<double> &list,
                        const std::vector<size_t> &idx) {
 
   double min = std::numeric_limits<double>::max();
@@ -100,7 +100,7 @@ Histogram2::Histogram2(size_t size, const std::vector<double> &list,
 }
 
 // Binary search because it's fast 
-void Histogram2::add_Point(double point_Value, double residual) {
+void Histogram::add_Point(double point_Value, double residual) {
   size_t left = 0;
   size_t right = this->histogram.size();
 
@@ -120,16 +120,16 @@ void Histogram2::add_Point(double point_Value, double residual) {
 }
 
 //
-Histogram2::~Histogram2() {}
+Histogram::~Histogram() {}
 
 //
-size_t Histogram2::get_Number_Of_Bins() const { return this->number_Of_Bins; }
+size_t Histogram::get_Number_Of_Bins() const { return this->number_Of_Bins; }
 
 //
-const std::vector<Bin> &Histogram2::get_Bins() const { return this->histogram; }
+const std::vector<Bin> &Histogram::get_Bins() const { return this->histogram; }
 
 //
-void Histogram2::print() const {
+void Histogram::print() const {
   for (size_t i = 0; i < this->number_Of_Bins; ++i) {
     std::cout << "Bin n° " << i << " "
               << " min " << this->histogram[i].get_Min() << " max "

@@ -15,8 +15,11 @@ private:
   uint16_t depth;
   uint16_t number_Of_Trees;
   uint16_t cross_Val_Folds;
-
+  char algorithm_Flag;
   uint8_t cross_Val_Flag;
+  // If used with histogram algorithm
+  uint64_t bins;
+  
 
 public:
   UserHandler();
@@ -25,6 +28,8 @@ public:
 
 private:
   void parse_Metric(const std::string &value);
+  void parse_Algorithm(const std::string &value, int rank);
+  void parse_Bins(const std::string &value, int rank);
   void parse_Criteria(const std::string &value);
   void parse_dataset_Path(const std::string &value);
   void parse_Depth(const std::string &value, int rank);

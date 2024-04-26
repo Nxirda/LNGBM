@@ -2,8 +2,8 @@
 add_library(Source_Lib
     #Dataset part
     Dataset/DataSet.cpp
-    #Histogram part
-    Histogram/Histogram2.cpp 
+    #UniformDistribution part
+    Histogram/Histogram.cpp 
     Histogram/Bins.cpp 
     #Operator part
     Operators/EnumOperator.cpp
@@ -13,7 +13,7 @@ add_library(Source_Lib
     Operators/RMSE.cpp
     #Criteria part
     Criterias/EnumCriteria.cpp
-    Criterias/Histogram.cpp
+    Criterias/UniformDistribution.cpp
     Criterias/Quartiles.cpp
     Criterias/Percentiles.cpp
     Criterias/RandomValues.cpp

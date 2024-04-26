@@ -7,7 +7,7 @@
 
 #include "ICriteria.hpp"
 
-#include "Histogram.hpp"
+#include "UniformDistribution.hpp"
 #include "Percentiles.hpp"
 #include "Quartiles.hpp"
 #include "RandomValues.hpp"
@@ -20,10 +20,10 @@ namespace criterias {
  *
  * This enumeration should contain the implemented types of criteria:
  *
- * Histogram, Percentiles, Quartiles, RandomValues, UniqueValues.
+ * UniformDistribution, Percentiles, Quartiles, RandomValues, UniqueValues.
  */
 enum class type {
-  Histogram,
+  UniformDistribution,
   Percentiles,
   Quartiles,
   RandomValues,

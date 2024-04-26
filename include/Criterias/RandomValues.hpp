@@ -17,8 +17,8 @@ private:
                                store the randomness */
   const std::string name =
       "Random_Values"; /**< A string variable to display the name. */
-  size_t size = 32; /**< Integer representing the number of values to compute.
-                       (default : 32)*/
+  size_t size = 256; /**< Integer representing the number of values to compute.
+                       (default : 256)*/
 
 public:
   /**

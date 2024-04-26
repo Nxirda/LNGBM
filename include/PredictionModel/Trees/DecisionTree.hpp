@@ -49,8 +49,10 @@ public:
   void set_Root(std::unique_ptr<TreeNode> node);
 
   // Methods
-
+  /* void train(const DataSet &data) override; */
+  void train(const DataSet &data, uint64_t bins) override;
   void train(const DataSet &data, ICriteria *crit, IOperator *op) override;
+
   std::vector<double> predict(const DataSet &data) const override;
 };
 

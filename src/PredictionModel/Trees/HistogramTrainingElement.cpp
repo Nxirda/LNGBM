@@ -5,9 +5,7 @@
 #include <stack>
 #include <tuple>
 
-#include "Histogram.hpp"
 #include "HistogramTrainingElement.hpp"
-#include "MAE.hpp"
 
 /**************************/
 /*                        */
@@ -19,15 +17,23 @@
 HistogramTrainingElement::HistogramTrainingElement() {
   this->depth = 0;
   this->node = nullptr;
+  this->bins = 256;
 }
 
 //
 HistogramTrainingElement::HistogramTrainingElement(
-    TreeNode *node, const std::vector<size_t> &index, uint16_t depth) {
+    TreeNode *node, const std::vector<size_t> &index, uint16_t depth,
+    uint64_t bins) {
 
   this->node = node;
   this->depth = depth;
   this->index = index;
+  if (bins == 0) {
+    std::cerr << " < Number of bins is incorrect, shall be > 0\n";
+    exit(1);
+  } else {
+    this->bins = bins;
+  }
 }
 
 //
@@ -37,6 +43,7 @@ HistogramTrainingElement::HistogramTrainingElement(
   this->depth = TE.depth;
   this->Histograms = TE.Histograms;
   this->index = TE.index;
+  this->bins = TE.bins;
 }
 
 //
@@ -46,6 +53,7 @@ HistogramTrainingElement::HistogramTrainingElement(
   this->depth = TE.depth;
   this->Histograms = std::move(TE.Histograms);
   this->index = std::move(TE.index);
+  this->bins = TE.bins;
 }
 
 HistogramTrainingElement &
@@ -54,6 +62,7 @@ HistogramTrainingElement::operator=(HistogramTrainingElement &&TE) {
   this->depth = TE.depth;
   this->Histograms = std::move(TE.Histograms);
   this->index = std::move(TE.index);
+  this->bins = TE.bins;
   return *this;
 }
 
@@ -64,6 +73,7 @@ HistogramTrainingElement::operator=(const HistogramTrainingElement &TE) {
   this->depth = TE.depth;
   this->Histograms = TE.Histograms;
   this->index = TE.index;
+  this->bins = TE.bins;
   return *this;
 }
 
@@ -85,10 +95,20 @@ void HistogramTrainingElement::set_Root(TreeNode *node) {
 }
 
 //
+void HistogramTrainingElement::set_Bins(uint64_t new_Bins) {
+  if (new_Bins == 0) {
+    std::cerr << " < Number of bins is incorrect, shall be > 0\n";
+    exit(1);
+  } else {
+    this->bins = new_Bins;
+  }
+}
+
+//
 void HistogramTrainingElement::set_Histogram(size_t feature,
-                                             Histogram2 &&histogram) {
+                                             Histogram &&histogram) {
   if (this->Histograms.size() < feature) {
-    std::cerr << "Histogram to set is out of range\n";
+    std::cerr << " < Histogram to set is out of range\n";
     exit(1);
   }
   this->Histograms.at(feature) = std::move(histogram);
@@ -165,19 +185,18 @@ void HistogramTrainingElement::fill_Histograms(
 
       this->Histograms[feature].add_Point(sample_Value, residual);
     }
-    //this->Histograms[feature].clean_Empty_Bins();
   }
 }
 
 //
 void HistogramTrainingElement::init_Histograms(
     const DataSet &data, const std::vector<size_t> &index) {
-
+  uint64_t bins = this->bins;
 #pragma omp parallel
   {
 #pragma omp for schedule(static)
     for (size_t feature = 0; feature < data.features_Number(); ++feature) {
-      Histogram2 h(256, data.get_Column(feature), index);
+      Histogram h(bins, data.get_Column(feature), index);
 #pragma omp critical
       { this->Histograms[feature] = std::move(h); }
     }
@@ -214,7 +233,7 @@ HistogramTrainingElement::split_Index(const DataSet &data, size_t bin,
 double HistogramTrainingElement::compute_Split_Value(size_t bin_Index,
                                                      size_t feature) const {
 
-  const Histogram2 &histogram = this->Histograms.at(feature);
+  const Histogram &histogram = this->Histograms.at(feature);
   size_t number_Of_Bins = histogram.get_Number_Of_Bins();
   const std::vector<Bin> &bins = histogram.get_Bins();
 
@@ -260,7 +279,7 @@ double HistogramTrainingElement::compute_Split_Value(size_t bin_Index,
 std::tuple<double, size_t, size_t>
 HistogramTrainingElement::best_Histogram_Split(size_t feature) const {
 
-  const Histogram2 &histogram = this->Histograms.at(feature);
+  const Histogram &histogram = this->Histograms.at(feature);
 
   double best_Score = 0.0;
   std::tuple<double, size_t, size_t> candidate;
@@ -328,7 +347,7 @@ HistogramTrainingElement::split_Node(const DataSet &data) {
   // Set the datas for the current node
   this->node->set_Split_Column(feature);
   this->node->set_Split_Criterion(split_Criterion);
-
+  uint64_t curr_Bins = this->bins;
   // Case 1 : Build Left Node(if information gained)
   if (left_Index) {
 
@@ -337,7 +356,8 @@ HistogramTrainingElement::split_Node(const DataSet &data) {
     this->node->add_Left(std::make_unique<TreeNode>(std::move(left)));
 
     HistogramTrainingElement train_Left_Tmp(this->node->get_Left_Node(),
-                                            std::move(*left_Index), next_Depth);
+                                            std::move(*left_Index), next_Depth,
+                                            curr_Bins);
 
     train_Left_Tmp.init_Histograms(data, train_Left_Tmp.index);
 
@@ -351,8 +371,9 @@ HistogramTrainingElement::split_Node(const DataSet &data) {
 
     this->node->add_Right(std::make_unique<TreeNode>(std::move(right)));
 
-    HistogramTrainingElement train_Right_Tmp(
-        this->node->get_Right_Node(), std::move(*right_Index), next_Depth);
+    HistogramTrainingElement train_Right_Tmp(this->node->get_Right_Node(),
+                                             std::move(*right_Index),
+                                             next_Depth, curr_Bins);
 
     train_Right_Tmp.init_Histograms(data, train_Right_Tmp.index);
 
@@ -364,10 +385,10 @@ HistogramTrainingElement::split_Node(const DataSet &data) {
 
 //
 void HistogramTrainingElement::train(const DataSet &data, TreeNode *node,
-                                     uint16_t max_Depth, size_t threshold) {
+                                     uint16_t max_Depth, size_t threshold,
+                                     uint64_t bins) {
 
   HistogramTrainingElement base_Node;
-
   // Compute bootstrapped indexes for samples
   std::vector<size_t> base_Index =
       std::move(base_Node.bootstrap(data.samples_Number()));
@@ -375,6 +396,8 @@ void HistogramTrainingElement::train(const DataSet &data, TreeNode *node,
   // Set Base Node
   base_Node.set_Root(node);
   base_Node.set_Index(std::move(base_Index));
+  base_Node.set_Bins(bins);
+
   base_Node.init_Histograms(data, base_Node.index);
 
   // Initialize a stack of Nodes that will be splitted

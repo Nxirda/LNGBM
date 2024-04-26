@@ -1,8 +1,4 @@
 #include "MPIWrapper.hpp"
-
-/* #include "EnumCriteria.hpp"
-#include "EnumOperator.hpp" */
-
 #include "Answers.hpp"
 #include "CrossValidation.hpp"
 #include "DataSet.hpp"
@@ -28,9 +24,12 @@ void MPI_Cross_Val(const BaggingModel &model, const DataSet &data, int K) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  BaggingModel model_To_Validate(model.get_Operator()->get_Name(),
-                                 model.get_Criteria()->get_Name(),
-                                 model.get_Depth(), model.get_Trees_Number());
+  BaggingModel model_To_Validate{};
+  model_To_Validate = model;  
+  /* (model.get_Operator()->get_Name(),
+    model.get_Criteria()->get_Name(),
+    model.get_Depth(), model.get_Trees_Number()); */
+
 
   Answers cross_Val_Res = CrossValidation::K_Folds(model_To_Validate, data, K);
 
