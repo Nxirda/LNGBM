@@ -10,7 +10,7 @@
 //
 int main(int argc, char **argv) {
 
-  UserHandler handler{};
+  UserHandler handler;
   int out = handler.command_Line_Handler(argc, argv);
 
   if (out == 1) {

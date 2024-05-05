@@ -11,22 +11,26 @@ it may have issues in it's structure
 """
 
 # ANSI escape codes for colors
-GREEN = "\033[92m"
+GREEN = "\033[1m\033[92m"
 RED = "\033[91m"
-RESET = "\033[0m"
+RESET = "\033[1m\033[0m"
+YELLOW="\033[1m\033[33m"
 
 # Constants for line position we need in this project
 RUNTIME_LINE = 10
 LAST_LINE = 17
 
+# Globald dir
+RESULT_DIR  = "results"
+
 # Folders representing operators
-bench_dirs = ["MAE_benchs", "MAPE_benchs", "RIV_benchs", "RMSE_benchs"]
+BENCH_DIRS = ["MAE_benchs", "MAPE_benchs", "RIV_benchs", "RMSE_benchs"]
 
 # Operators in this project implementation
 OPERATORS = ["MAE", "MAPE", "RIV", "RMSE"]
 
-# Criterias in this project implementation
-criterias = ["UD", "P", "Q", "RV"]
+# CRITERIAS in this project implementation
+CRITERIAS = ["UD", "P", "Q", "RV"]
 
 #
 def convert_to_seconds(value, unit):
@@ -43,13 +47,13 @@ def convert_to_seconds(value, unit):
 def generate_title(letter):
     str = "Influence of the depth on the trees predictions\n Splitting criteria is : "
     criteria = ""
-    if letter == criterias[0]:
+    if letter == CRITERIAS[0]:
         criteria = "Uniform Distribution"
-    elif letter == criterias[1]:
+    elif letter == CRITERIAS[1]:
         criteria = "Percentiles"
-    elif letter == criterias[2]:
+    elif letter == CRITERIAS[2]:
         criteria = "Quartiles"
-    elif letter == criterias[3]:
+    elif letter == CRITERIAS[3]:
         criteria = "Random Values"
     else:
         print(f"{RED} Couldn't generate title, variable unknown {RESET}")
@@ -126,7 +130,7 @@ class Parser:
         if len(file_parts) == 2 and file_parts[1].endswith('.data'):
             prefix, number_ext = file_parts[0], file_parts[1]
             number = number_ext.split('.')[0]
-            if prefix in criterias:
+            if prefix in CRITERIAS:
                 # Read data from the file and store it in the object
                 data = self.get_infos_from_file(file_path)
                 self.file_data[prefix].append(data)
@@ -149,25 +153,23 @@ class Parser:
 
     #
     def parse_runtime(self, line):
-        runtime_pattern = r"run time:= (\d+)h, (\d+)m, (\d+)s|run time:= (\d+)(ms)"
+        runtime_pattern = r"run time:= (\d+)h, (\d+)m, (\d+)s, (\d+)(ms)"
 
         match = re.search(runtime_pattern, line)
         if match:
-            if match.group(1) and match.group(2) and match.group(3):
+            if match.group(1) and match.group(2) and match.group(3) and match.group(4):
                 # If hours, minutes, and seconds are present
                 hours = convert_to_seconds(int(match.group(1)), "h")
                 minutes = convert_to_seconds(int(match.group(2)),"m")
                 seconds = int(match.group(3))
-                total_seconds = hours + minutes + seconds
-            elif match.group(4):
-                total_seconds =convert_to_seconds(int(match.group(4)),"ms")
+                ms = convert_to_seconds(int(match.group(4)),"ms")
+                total_seconds = hours + minutes + seconds + ms
 
             else:
                 total_seconds = 0  # Default to 0 if no match
             return total_seconds
         else:
             return None
-
 
 # Get the folders path
 def find_folders(directory, folders_to_find):
@@ -192,20 +194,20 @@ def plot(mae_arr, mape_arr, riv_arr, rmse_arr, depth_arr, crit, eval_metric) :
 
     # WE NEED TO HAVE A VECTOR OF DEPTH
     title = generate_title(crit)
-    file_save_name = eval_metric+"_"+crit+".pdf"
+    file_save_name = RESULT_DIR+"/"+eval_metric+"_"+crit+".pdf"
 
     plt.figure()
     plt.title(title)
 
     #MAE plot
-    plt.plot(depth_arr, mae_arr, "-x", color="red", label="Operator : MAE")
+    plt.plot(depth_arr, mae_arr, "--x", color="red", label="Operator : MAE")
     #MAPE plot
-    plt.plot(depth_arr, mape_arr,"-x", color="green", label="Operator: MAPE")
+    plt.plot(depth_arr, mape_arr,"--x", color="green", label="Operator: MAPE")
     #RIV plot
-    plt.plot(depth_arr, riv_arr, "-x", color="blue", label="Operator : RIV")
+    plt.plot(depth_arr, riv_arr, "--x", color="blue", label="Operator : RIV")
     #MSE plot
-    plt.plot(depth_arr, rmse_arr, "-x", color="black", label="Operator : RMSE")
-    
+    plt.plot(depth_arr, rmse_arr, "--x", color="black", label="Operator : RMSE")
+        
     plt.xlabel("Tree Depth")
     if(eval_metric == "runtime"):
         plt.ylabel(eval_metric+" (s)")
@@ -247,13 +249,13 @@ def handle_results(data_array, depth_arr, crit):
     # For each Operator using the same criteria 
     plot(mae_array[0], mae_array[1], mae_array[2], mae_array[3], depth_arr, crit, "mae") 
     plot(mape_array[0], mape_array[1], mape_array[2], mape_array[3], depth_arr, crit, "mape")
-    plot(std_dev_array[0], std_dev_array[1], std_dev_array[2], std_dev_array[3], depth_arr, crit, "std_dev")
-    plot(runtime_array[0], runtime_array[1], runtime_array[2], runtime_array[3], depth_arr, crit, "runtime")
+    plot(std_dev_array[0], std_dev_array[1], std_dev_array[2], std_dev_array[3],depth_arr, crit, "std_dev")
+    plot(runtime_array[0], runtime_array[1], runtime_array[2], runtime_array[3],depth_arr, crit, "runtime")
 
 # Handler function
 def main(path, depth):
-
-    found_folders = find_folders(path, bench_dirs)
+    RESULT_DIR = path
+    found_folders = find_folders(path, BENCH_DIRS)
     depth_arr = np.arange(1, depth + 1)
     results = [None] * len(found_folders)
 
@@ -266,7 +268,7 @@ def main(path, depth):
             results[i] = Parser(folder, operator) 
             i+=1 
     else:
-        print(f"{RED} No benchs folders found...{RESET}")
+        print(f"{RED} [ERROR]:No benchs folders found...{RESET}")
 
     # Not sure either
     
@@ -275,7 +277,6 @@ def main(path, depth):
     ud_array = []
     rv_array = []
 
-    # Not quite what we need atm
     for obj in results:
         p_array.append(obj.get_file_data()["P"])
         q_array.append(obj.get_file_data()["Q"])
@@ -295,5 +296,5 @@ if __name__ == "__main__":
         script_name = os.path.basename(__file__)
         print(f"Usage is: python3 {script_name} <path_to_benchmark_dir> <highest_depth>")
         sys.exit(1)
-
+    print(f"{YELLOW} [WARNING]: Doesnt support the plotting of histogram results atm {RESET}")
     main(sys.argv[1], int(sys.argv[2]))

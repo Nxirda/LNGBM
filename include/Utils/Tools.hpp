@@ -9,7 +9,7 @@
 namespace Tools {
 
 // Set width for columns
-const int column_Width = 17;
+const int column_Width = 21;
 
 // Print any header given as vector of string
 void display_Header(const std::vector<std::string> &header);

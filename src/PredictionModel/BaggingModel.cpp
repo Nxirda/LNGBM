@@ -32,7 +32,7 @@ BaggingModel::BaggingModel(const std::string &split_Operator,
 BaggingModel::BaggingModel(uint64_t bins, uint16_t depth,
                            uint16_t number_Of_Trees) noexcept {
   // Here we just prepare the infos for the model
-  if (max_Depth < 1) {
+  if (depth < 1) {
     std::cerr << " < Depth parameter should be at least 1\n";
     exit(1);
   }
@@ -192,17 +192,17 @@ BaggingModel::get_Forest() const {
   return this->forest.get_Trees();
 }
 
-//
+// What the fuck ??????? dont release & shit
 void BaggingModel::train(const DataSet &data) {
   // Depending on the mode used
   if (this->split_Criteria != nullptr && this->split_Operator != nullptr) {
-    ICriteria *criteria = this->split_Criteria.release();
-    IOperator *op = this->split_Operator.release();
+    /* ICriteria *criteria = this->split_Criteria.release();
+    IOperator *op = this->split_Operator.release(); */
+    
+    train(data, this->split_Criteria.get(), this->split_Operator.get());
 
-    train(data, criteria, op);
-
-    this->split_Criteria.reset(criteria);
-    this->split_Operator.reset(op);
+    /* this->split_Criteria.reset(criteria);
+    this->split_Operator.reset(op); */
   } else {
     train(data, this->bins);
   }

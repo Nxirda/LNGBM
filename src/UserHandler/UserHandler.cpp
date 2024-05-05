@@ -7,6 +7,8 @@
 #include "MPIWrapper.hpp"
 #include "UserHandler.hpp"
 
+#include "Loggin.hpp"
+
 //
 UserHandler::UserHandler() {
   this->metric = "MAPE";
@@ -58,7 +60,8 @@ void UserHandler::parse_Algorithm(const std::string &value, int rank) {
     this->algorithm_Flag = value.at(0);
   else {
     if (rank == 0)
-      std::cerr << " < Value after -alg should be a char\n";
+      /* std::cerr << " < Value after -alg should be a char\n"; */
+      logging::ERROR("Value after -alg should be a char");
     exit(1);
   }
 }
@@ -69,14 +72,15 @@ void UserHandler::parse_Bins(const std::string &value, int rank) {
     if (is_Integer(value)) {
       this->bins = std::stoi(value);
     } else {
-      if (rank == 0)
-        std::cerr << " < Value after -b should be an integer\n";
+      if (rank == 0) {
+        logging::ERROR("Value after -b should be an integer");
+      }
       exit(1);
     }
   } else {
-    if (rank == 0)
-      std::cerr << " < Bins can be set only if the histogram algorithm is "
-                   "set\n";
+    if (rank == 0) {
+      logging::ERROR("Bins can be set only if the histogram algorithm is set");
+    }
     exit(1);
   }
 }
@@ -87,7 +91,7 @@ void UserHandler::parse_Depth(const std::string &value, int rank) {
     this->depth = std::stoi(value);
   } else {
     if (rank == 0)
-      std::cerr << " < Value after -dt should be an integer\n";
+      logging::ERROR("Value after -dt should be an integer");
     exit(1);
   }
 }
@@ -103,7 +107,7 @@ void UserHandler::parse_Number_Of_Trees(const std::string &value, int rank) {
         std::stoi(value); // balancer(std::stoi(value), size, rank);
   } else {
     if (rank == 0)
-      std::cerr << " < Value after -nt should be an integer\n";
+      logging::ERROR("Value after -nt should be an integer");
     exit(1);
   }
 }
@@ -115,7 +119,7 @@ void UserHandler::parse_Cross_Val(const std::string &value, int rank) {
     this->cross_Val_Folds = std::stoi(value);
   } else {
     if (rank == 0)
-      std::cerr << " < Value after -cv should be an integer\n";
+      logging::ERROR("Value after -cv should be an integer");
     exit(1);
   }
 }
@@ -172,16 +176,20 @@ void UserHandler::input_Parser(int argc, char **argv, int rank, int size) {
 
       } else if (!flag.compare("b")) {
         parse_Bins(value, rank);
+      } else {
+        std::string message = "Invalid argument " + arg;
+        logging::ERROR(message.c_str());
+        exit(1);
       }
-
     } else {
-      std::cout << " < Invalid argument " << arg << "\n";
+      std::string message = "Invalid argument " + arg;
+      logging::ERROR(message.c_str());
       exit(1);
     }
   }
 
   if (this->number_Of_Trees < size && rank == 0) {
-    std::cerr << " < MPI Processes should be <= to the number of Trees\n";
+    logging::ERROR("MPI Processes should be <= to the number of Trees");
     if (size > 1) {
       MPI_Abort(MPI_COMM_WORLD, 1);
     }
@@ -216,7 +224,8 @@ void UserHandler::first_Arg_Handler(char **argv, int rank, int size) {
       if (size > 1 && rank == 0) {
         MPI_Abort(MPI_COMM_WORLD, 1);
       }
-      std::cerr << " < Invalid argument " << arg << "\n";
+      std::string message = "Invalid argument " + arg;
+      logging::ERROR(message.c_str());
       helper_Printer(argv[0]);
     }
     exit(1);
@@ -240,7 +249,7 @@ int UserHandler::command_Line_Handler(int argc, char **argv) {
   // Option -alg= either s for standard or h for histogram
   DataSet data{this->dataset_Path};
   BaggingModel model;
-  
+
   if (this->algorithm_Flag != 'h') {
     model = std::move(BaggingModel{this->metric, this->criteria, this->depth,
                                    this->number_Of_Trees});
