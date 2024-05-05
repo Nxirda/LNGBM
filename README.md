@@ -76,9 +76,7 @@ $ cmake -S . -B <BUILD_DIR> <CMAKE OPTIONS>
 ```sh
 # Ensure the project has been built properly
 cd build
-Usage is : mpiexec -np <Process>  \
-           ./lngbm [Path to DataSet] [Split Metric] [Split Criteria] [Depth] [Number of Trees] \
-           [Cross_Val] [Folds]
+Usage is : ./lngbm [-h] 
 ```
 
 ## Tests : 
