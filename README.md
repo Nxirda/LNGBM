@@ -77,7 +77,7 @@ $ cmake -S . -B <BUILD_DIR> <CMAKE OPTIONS>
 # Ensure the project has been built properly
 cd build
 Usage is : mpiexec -np <Process>  \
-           ./main [Path to DataSet] [Split Metric] [Split Criteria] [Depth] [Number of Trees] \
+           ./lngbm [Path to DataSet] [Split Metric] [Split Criteria] [Depth] [Number of Trees] \
            [Cross_Val] [Folds]
 ```
 
