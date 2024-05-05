@@ -12,10 +12,6 @@ set(CMAKE_COLOR_DIAGNOSTICS ON)
 
 # Required dependencies 
 find_package(MPI REQUIRED)
-if(MPI_FOUND)
-    include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-    set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
-endif()
 
 find_package(BLAS REQUIRED)
 
@@ -24,10 +20,10 @@ find_package(OpenMP REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization mpi)
 
 # Set compile options for Release build -DNDEBUG
-set(FLAGS_RELEASE -std=c++23 -O3 -march=native)
+set(FLAGS_RELEASE -std=c++23 -Ofast -march=native -DNDEBUG)
 
 # Set compile options for Debug build
-set(FLAGS_DEBUG -std=c++23 -g3 -O0 -Wextra -Werror -Wpedantic)
+set(FLAGS_DEBUG -std=c++23 -g -O0 -Wextra -Werror -Wpedantic)
 
 # Add compilation options | -Wconversion
 if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -66,11 +62,3 @@ target_link_libraries(tests PRIVATE Source_Lib)
 target_link_libraries(tests PRIVATE BLAS::BLAS)
 
 gtest_discover_tests(tests)
-
-# ===== Benchmark Part =====
-
-add_executable(Benchmarks benchmark/mainBenchmark.cpp)
-
-add_subdirectory(benchmark)
-
-target_link_libraries(Benchmarks PRIVATE Source_Lib)

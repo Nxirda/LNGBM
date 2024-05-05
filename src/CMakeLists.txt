@@ -60,7 +60,6 @@ target_include_directories(Source_Lib
 target_link_libraries(Source_Lib 
     PUBLIC 
     MPI::MPI_CXX 
-    Boost::mpi 
     Boost::serialization 
     BLAS::BLAS
     OpenMP::OpenMP_CXX

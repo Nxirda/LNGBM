@@ -18,6 +18,7 @@ Histogram::Histogram(std::vector<Bin> &&new_Bins) {
   this->histogram = std::move(new_Bins);
 }
 
+//
 Histogram::Histogram(Histogram &&histo) {
   this->number_Of_Bins = histo.number_Of_Bins;
   this->histogram = std::move(histo.histogram);

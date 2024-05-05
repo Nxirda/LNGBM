@@ -48,7 +48,7 @@ README2.md
 Notes.md
 
 # Keep only the actual scripts in git
-scripts/*
-!scripts/*.*
-
+scripts/
 results/
+documents/
+data/d1_Test.csv
