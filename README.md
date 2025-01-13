@@ -94,9 +94,7 @@ If you want to benchmark your model you can run the benchmarks :
 
 
 ## Authors :
-[Adrien Henrot](https://github.com/Nxirda) \
-[Valentin Denis](https://github.com/valde3003)  \
-[Alioune Badara](https://github.com/Alioune-Badara)  
+[Adrien Henrot](https://github.com/Nxirda)
 
 ## Thanks to
 
